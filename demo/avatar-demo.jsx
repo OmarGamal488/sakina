@@ -1,23 +1,24 @@
 // avatar-demo.jsx — standalone demo for the SakinaAvatar component
+// DAIR emotion set: sadness · joy · love · anger · fear · surprise
 
 const { useState: useSD } = React;
 
-const ALL_EMOTIONS = ['neutral', 'sad', 'anxious', 'angry', 'happy', 'crisis'];
+const ALL_EMOTIONS = ['sadness', 'joy', 'love', 'anger', 'fear', 'surprise'];
 const EMO_LABEL_EN = {
-  neutral: 'Neutral', sad: 'Sad', anxious: 'Anxious',
-  angry: 'Angry', happy: 'Happy', crisis: 'Crisis',
+  sadness: 'Sadness', joy: 'Joy', love: 'Love',
+  anger: 'Anger', fear: 'Fear', surprise: 'Surprise',
 };
 const EMO_NOTE = {
-  neutral: 'Calm baseline',
-  sad: 'Cooler, comforting',
-  anxious: 'Softens anxiety',
-  angry: 'Warm, not alarm',
-  happy: 'Sunlit, gentle',
-  crisis: 'Soothing, not red',
+  sadness:  'Cooler, comforting',
+  joy:      'Sunlit, gentle',
+  love:     'Warm, present',
+  anger:    'Warm, not alarm',
+  fear:     'Softens anxiety',
+  surprise: 'Gentle wonder',
 };
 
 function AvatarDemo() {
-  const [emotion, setEmotion] = useSD('neutral');
+  const [emotion, setEmotion] = useSD('joy');
   const [isSpeaking, setIsSpeaking] = useSD(false);
   const color = EMOTION_COLORS[emotion];
 
@@ -25,7 +26,7 @@ function AvatarDemo() {
     <main className="av-demo" style={{ '--emo': color }}>
       <div>
         <h1>Sakina · emotion-reactive presence</h1>
-        <div className="lede">click an emotion · 600ms color crossfade · 200ms face crossfade</div>
+        <div className="lede">DAIR emotion set · 600ms color crossfade · 200ms face crossfade</div>
       </div>
 
       {/* HERO at md (120px) — the default chat presence size */}
@@ -96,15 +97,15 @@ function AvatarDemo() {
         </div>
         <div className="spec-card">
           <b>Breathing</b>
-          <p>Gentle 1.0 ↔ 1.03 scale, 4s cycle. Slows to 6s during crisis as a co-regulation cue. Pauses on hover.</p>
+          <p>Gentle 1.0 ↔ 1.03 scale, 4s cycle, infinite. Pauses on hover so the user can examine the face.</p>
         </div>
         <div className="spec-card">
-          <b>Anxious tremor</b>
-          <p>±1px horizontal jitter on the anxious state. Sakina embodies a hint of the user's anxiety to acknowledge it.</p>
+          <b>Fear tremor</b>
+          <p>±1px horizontal jitter only on fear. Sakina embodies a hint of the user's anxiety to acknowledge it.</p>
         </div>
         <div className="spec-card">
-          <b>Crisis = deep mint</b>
-          <p>#88B2A8, never red. A mental-health product must calm, not alarm. The face stays composed.</p>
+          <b>No alarm hues</b>
+          <p>Every color is calm. No red, no neon. A mental-health product must visually settle, not panic.</p>
         </div>
         <div className="spec-card">
           <b>Sage clothing always</b>

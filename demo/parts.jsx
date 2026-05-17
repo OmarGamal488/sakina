@@ -114,7 +114,7 @@ function Bubble({ msg, lang, t, streaming = false }) {
           {txt}
           {streaming && <span className="caret" />}
         </div>
-        {isAssistant && msg.emotion && msg.emotion !== 'neutral' && (
+        {isAssistant && msg.emotion && (
           <div className="emo-tag" style={{ '--emo-c': emoColor }}>
             <span className="swatch" />
             <span>{emoLabel}</span>

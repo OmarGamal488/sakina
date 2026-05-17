@@ -1,6 +1,5 @@
-// avatar.jsx — Sakina avatar v2
-// Hand-drawn SVG, emotion-reactive ring/face/motion, sm/md/lg/hero sizes.
-// Three style variants: character (default), orb, glyph.
+// avatar.jsx — Sakina avatar v3 (DAIR emotion set)
+// Emotions: sadness · joy · love · anger · fear · surprise
 
 const { useMemo: useMemoA, useState: useStateA, useEffect: useEffectA } = React;
 
@@ -12,38 +11,37 @@ const SIZE_PRESETS = {
   hero: { px: 220, ring: 8, glow: 36, ringGap: 6 },
 };
 
-// ── EXPRESSION MAP ──
+// ── EXPRESSION MAP (used by orb/glyph variants) ──
 const EXPRESSIONS = {
-  neutral: { eyes: 'default', mouth: 'default',   brow: 'rest' },
-  sad:     { eyes: 'squint',  mouth: 'concerned', brow: 'down' },
-  anxious: { eyes: 'side',    mouth: 'concerned', brow: 'lift' },
-  angry:   { eyes: 'default', mouth: 'serious',   brow: 'pinch' },
-  happy:   { eyes: 'happy',   mouth: 'smile',     brow: 'lift' },
-  crisis:  { eyes: 'default', mouth: 'concerned', brow: 'down' },
+  sadness:  { eyes: 'squint',  mouth: 'concerned', brow: 'down' },
+  joy:      { eyes: 'happy',   mouth: 'smile',     brow: 'lift' },
+  love:     { eyes: 'happy',   mouth: 'smile',     brow: 'lift' },
+  anger:    { eyes: 'default', mouth: 'serious',   brow: 'pinch' },
+  fear:     { eyes: 'side',    mouth: 'concerned', brow: 'lift' },
+  surprise: { eyes: 'wide',    mouth: 'o',         brow: 'lift' },
 };
 
 const SR_LABELS = {
-  neutral: 'Sakina, calm',
-  sad: 'Sakina, gentle and quiet',
-  anxious: 'Sakina, attentive',
-  angry: 'Sakina, focused',
-  happy: 'Sakina, warm',
-  crisis: 'Sakina, here with you',
+  sadness:  'Sakina, gentle and quiet',
+  joy:      'Sakina, warm',
+  love:     'Sakina, warm and present',
+  anger:    'Sakina, focused',
+  fear:     'Sakina, attentive',
+  surprise: 'Sakina, attentive',
 };
 
-// ── CHARACTER FACE (real DiceBear micah asset) ──
+// ── CHARACTER FACE (DiceBear micah asset) ──
 const AVATAR_SRC = {
-  neutral: 'assets/avatars/sakina_neutral.svg',
-  sad:     'assets/avatars/sakina_sad.svg',
-  anxious: 'assets/avatars/sakina_anxious.svg',
-  angry:   'assets/avatars/sakina_angry.svg',
-  happy:   'assets/avatars/sakina_happy.svg',
-  crisis:  'assets/avatars/sakina_crisis.svg',
+  sadness:  'assets/avatars/sakina_sadness.svg',
+  joy:      'assets/avatars/sakina_joy.svg',
+  love:     'assets/avatars/sakina_love.svg',
+  anger:    'assets/avatars/sakina_anger.svg',
+  fear:     'assets/avatars/sakina_fear.svg',
+  surprise: 'assets/avatars/sakina_surprise.svg',
 };
 
-function CharacterFace({ emotion = 'neutral', size = 120 }) {
-  const src = AVATAR_SRC[emotion] || AVATAR_SRC.neutral;
-  // Slightly inset so the head fills the ring nicely (the SVG has padding inside its 360 box)
+function CharacterFace({ emotion = 'joy', size = 120 }) {
+  const src = AVATAR_SRC[emotion] || AVATAR_SRC.joy;
   return (
     <img
       src={src}
@@ -64,9 +62,9 @@ function CharacterFace({ emotion = 'neutral', size = 120 }) {
 }
 
 // ── ORB FACE ──
-function OrbFace({ emotion = 'neutral', size = 120 }) {
-  const color = EMOTION_COLORS[emotion] || EMOTION_COLORS.neutral;
-  const expr = EXPRESSIONS[emotion];
+function OrbFace({ emotion = 'joy', size = 120 }) {
+  const color = EMOTION_COLORS[emotion] || EMOTION_COLORS.joy;
+  const expr = EXPRESSIONS[emotion] || EXPRESSIONS.joy;
   const gid = `orb-${emotion}-${size}-${Math.random().toString(36).slice(2,6)}`;
   return (
     <svg viewBox="0 0 100 100" width={size} height={size}>
@@ -81,16 +79,26 @@ function OrbFace({ emotion = 'neutral', size = 120 }) {
       {expr.mouth === 'smile' && <path d="M 38 60 q 12 9 24 0" stroke="rgba(255,255,255,0.9)" strokeWidth="2.2" fill="none" strokeLinecap="round" />}
       {expr.mouth === 'concerned' && <path d="M 40 62 q 10 -3 20 0" stroke="rgba(255,255,255,0.8)" strokeWidth="2" fill="none" strokeLinecap="round" />}
       {expr.mouth === 'serious' && <path d="M 40 61 L 60 61" stroke="rgba(255,255,255,0.8)" strokeWidth="2" strokeLinecap="round" />}
+      {expr.mouth === 'o' && <ellipse cx="50" cy="62" rx="3" ry="4" fill="rgba(255,255,255,0.85)" />}
       {expr.mouth === 'default' && <path d="M 41 60 q 9 2 18 0" stroke="rgba(255,255,255,0.6)" strokeWidth="1.7" fill="none" strokeLinecap="round" />}
-      <circle cx="40" cy="46" r="2.1" fill="rgba(255,255,255,0.92)" />
-      <circle cx="60" cy="46" r="2.1" fill="rgba(255,255,255,0.92)" />
+      {expr.eyes === 'wide' ? (
+        <>
+          <circle cx="40" cy="46" r="3.2" fill="rgba(255,255,255,0.92)" />
+          <circle cx="60" cy="46" r="3.2" fill="rgba(255,255,255,0.92)" />
+        </>
+      ) : (
+        <>
+          <circle cx="40" cy="46" r="2.1" fill="rgba(255,255,255,0.92)" />
+          <circle cx="60" cy="46" r="2.1" fill="rgba(255,255,255,0.92)" />
+        </>
+      )}
     </svg>
   );
 }
 
 // ── GLYPH FACE ──
-function GlyphFace({ emotion = 'neutral', size = 120 }) {
-  const color = EMOTION_COLORS[emotion] || EMOTION_COLORS.neutral;
+function GlyphFace({ emotion = 'joy', size = 120 }) {
+  const color = EMOTION_COLORS[emotion] || EMOTION_COLORS.joy;
   return (
     <svg viewBox="0 0 100 100" width={size} height={size}>
       <circle cx="50" cy="50" r="46" fill="#F0E6D2" />
@@ -103,17 +111,8 @@ function GlyphFace({ emotion = 'neutral', size = 120 }) {
 }
 
 // ── PUBLIC: SakinaAvatar ──
-// Props:
-//   emotion: Emotion
-//   size: 'sm'|'md'|'lg'|'hero' OR a number (px)
-//   isSpeaking: bool — adds outer sonar ping
-//   onClick: optional
-//   label: aria-label override
-//   style: 'character'|'orb'|'glyph'
-//   ring: bool (default true)
-//   breathe: bool (default true)
 function SakinaAvatar({
-  emotion = 'neutral',
+  emotion = 'joy',
   size = 'md',
   isSpeaking = false,
   label,
@@ -127,17 +126,15 @@ function SakinaAvatar({
     : { px: size, ring: Math.max(2, Math.round(size / 30)), glow: Math.round(size / 6), ringGap: Math.max(2, Math.round(size / 30)) };
 
   const px = preset.px;
-  const color = EMOTION_COLORS[emotion] || EMOTION_COLORS.neutral;
+  const color = EMOTION_COLORS[emotion] || EMOTION_COLORS.joy;
   const Face = style === 'orb' ? OrbFace : style === 'glyph' ? GlyphFace : CharacterFace;
 
-  // Inner face inset so it sits inside the ring + gap
   const inset = preset.ring + preset.ringGap;
   const faceSize = px - inset * 2;
 
-  // Crisis: slower breath (6s). Anxious: tremor.
+  // Fear keeps the subtle tremor (the old "anxious" behavior). All others: normal 4s breath.
   const breatheClass = breathe ? (
-    emotion === 'crisis' ? 'avatar-breathe slow' :
-    emotion === 'anxious' ? 'avatar-breathe anxious' :
+    emotion === 'fear' ? 'avatar-breathe anxious' :
     'avatar-breathe'
   ) : '';
 
@@ -159,13 +156,9 @@ function SakinaAvatar({
       aria-label={label || SR_LABELS[emotion] || 'Sakina'}
     >
       <span className="sr-only">{SR_LABELS[emotion] || 'Sakina'}</span>
-      {/* Sonar speaking ping */}
       {isSpeaking && <span className="sakina-av-ping" aria-hidden />}
-      {/* Outer glow */}
       <span className="sakina-av-glow" aria-hidden />
-      {/* Ring */}
       {ring && <span className="sakina-av-ring" aria-hidden />}
-      {/* Face with breathing + face crossfade */}
       <span className={`sakina-av-face ${breatheClass}`} aria-hidden>
         <FaceCrossfade keyId={emotion} duration={200}>
           <Face emotion={emotion} size={faceSize} />
@@ -178,7 +171,7 @@ function SakinaAvatar({
 // Soft opacity crossfade when emotion changes
 function FaceCrossfade({ keyId, duration, children }) {
   const [shown, setShown] = useStateA(children);
-  const [fade, setFade] = useStateA('in'); // in | out
+  const [fade, setFade] = useStateA('in');
   const lastKey = React.useRef(keyId);
   useEffectA(() => {
     if (lastKey.current === keyId) return;
@@ -197,7 +190,6 @@ function FaceCrossfade({ keyId, duration, children }) {
   );
 }
 
-// Back-compat alias used elsewhere
 const Avatar = SakinaAvatar;
 
-Object.assign(window, { SakinaAvatar, Avatar, EXPRESSIONS, SR_LABELS, SIZE_PRESETS });
+Object.assign(window, { SakinaAvatar, Avatar, EXPRESSIONS, SR_LABELS, SIZE_PRESETS, AVATAR_SRC });

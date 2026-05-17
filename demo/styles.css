@@ -15,17 +15,20 @@
   --line: #D9D2BE;
   --line-soft: rgba(217, 210, 190, 0.5);
 
-  /* Emotion-reactive accent */
-  --emo-neutral: #5C8374;
-  --emo-sad: #6B8FB5;
-  --emo-anxious: #B8A6C4;
-  --emo-angry: #D4856B;
-  --emo-happy: #E4B363;
-  --emo-crisis: #88B2A8;
+  /* Emotion-reactive accent (DAIR set) */
+  --emo-sadness:  #6B8FB5;
+  --emo-joy:      #E4B363;
+  --emo-love:     #C8959B;
+  --emo-anger:    #D4856B;
+  --emo-fear:     #B8A6C4;
+  --emo-surprise: #E5B0A4;
+
+  /* Calm-card accent (separate from avatar emotion set) */
+  --c-mint-deep:  #88B2A8;
 
   /* Active emotion (set via JS) */
-  --emo: var(--emo-neutral);
-  --emo-soft: rgba(92, 131, 116, 0.12);
+  --emo: var(--emo-joy);
+  --emo-soft: rgba(228, 179, 99, 0.14);
 
   /* Type */
   --font-en: 'Inter', ui-sans-serif, system-ui, sans-serif;
@@ -682,12 +685,12 @@ body.theme-dusk-page .pane-label { color: rgba(232, 225, 206, 0.5); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.crisis-card { --emo: var(--emo-crisis); }
+.crisis-card { --emo: var(--c-mint-deep); }
 .crisis-card .crisis-icon {
   width: 38px; height: 38px;
   border-radius: 50%;
   background: rgba(136, 178, 168, 0.18);
-  color: var(--emo-crisis);
+  color: var(--c-mint-deep);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -725,7 +728,7 @@ body.theme-dusk-page .pane-label { color: rgba(232, 225, 206, 0.5); }
   transition: background 200ms, color 200ms, border-color 200ms;
 }
 .btn-primary {
-  background: var(--emo-crisis);
+  background: var(--c-mint-deep);
   color: #fff;
 }
 .btn-primary:hover { background: #729f95; }
@@ -739,8 +742,8 @@ body.theme-dusk-page .pane-label { color: rgba(232, 225, 206, 0.5); }
 .btn-sage:hover { background: var(--sage-deep); }
 .btn-destructive {
   background: transparent;
-  color: var(--emo-angry);
-  border: 1px solid var(--emo-angry);
+  color: var(--emo-anger);
+  border: 1px solid var(--emo-anger);
 }
 .btn-destructive:hover { background: rgba(212, 133, 107, 0.08); }
 
@@ -755,7 +758,7 @@ body.theme-dusk-page .pane-label { color: rgba(232, 225, 206, 0.5); }
 }
 
 /* Journal card */
-.journal-card { --emo: var(--emo-happy); }
+.journal-card { --emo: var(--emo-joy); }
 .journal-card .label-soft {
   font-size: 13px;
   color: var(--ink-soft);
@@ -775,7 +778,7 @@ body.theme-dusk-page .pane-label { color: rgba(232, 225, 206, 0.5); }
   outline: none;
 }
 [dir="rtl"] .journal-card textarea { font-family: var(--font-ar); }
-.journal-card textarea:focus { border-color: var(--emo-happy); }
+.journal-card textarea:focus { border-color: var(--emo-joy); }
 .journal-chips {
   display: flex;
   flex-wrap: wrap;

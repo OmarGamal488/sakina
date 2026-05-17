@@ -44,10 +44,12 @@ function ChatShell({
 
   // Streaming simulation
   const streamRef = useRefSC(null);
-  const startStreaming = (fullText, detectedEmotion) => {
+  const didTriggerCrisisRef = useRefSC(false);
+  const startStreaming = (fullText, detectedEmotion, didTriggerCrisis = false) => {
     setStatus('streaming');
     setStreamingText('');
     setPendingEmo(detectedEmotion);
+    didTriggerCrisisRef.current = didTriggerCrisis;
     let i = 0;
     const tick = () => {
       i += Math.max(1, Math.floor(Math.random() * 3));
@@ -65,8 +67,8 @@ function ChatShell({
         setMessages(m => [...m, newMsg]);
         setStatus('ready');
         setPendingEmo(null);
-        // Crisis card injection
-        if (detectedEmotion === 'crisis' && !m_containsCrisis()) {
+        // Crisis card injection — fires from explicit safety trigger, not emotion classification
+        if (didTriggerCrisisRef.current && !m_containsCrisis()) {
           setTimeout(() => setMessages(m => [...m, { id: 'crisis-' + Date.now(), kind: 'crisis', role: 'system' }]), 400);
         }
         return;
@@ -99,11 +101,12 @@ function ChatShell({
       text: { en: text, ar: text },
     }]);
     setStatus('submitted');
-    const detected = detectEmotion(text, emotion === 'crisis' ? 'crisis' : 'neutral');
+    const triggersCrisis = typeof isCrisisTrigger === 'function' ? isCrisisTrigger(text) : false;
+    const detected = detectEmotion(text, emotion);
     setEmotion(detected);
     // Compose response
-    const responseText = SIM_RESPONSES[detected][lang];
-    setTimeout(() => startStreaming(responseText, detected), 250);
+    const responseText = (SIM_RESPONSES[detected] || SIM_RESPONSES.joy)[lang];
+    setTimeout(() => startStreaming(responseText, detected, triggersCrisis), 250);
   };
 
   const handleClear = () => {

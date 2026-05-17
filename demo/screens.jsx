@@ -35,7 +35,7 @@ function JournalCard({ t, lang, onSave, onSkip }) {
   return (
     <div className="inline-card journal-card" role="dialog" aria-label="Journal prompt">
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-        <Icon.Sparkle style={{ color: 'var(--emo-happy)' }} />
+        <Icon.Sparkle style={{ color: 'var(--emo-joy)' }} />
         <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600 }}>{t.journalTitle}</h3>
       </div>
       <textarea
@@ -61,7 +61,7 @@ function JournalCard({ t, lang, onSave, onSkip }) {
 function MoodTimeline({ t, lang, data, range, onRangeChange, onClose }) {
   // Build stacked areas
   const W = 380, H = 180, PAD = 20;
-  const emotions = ['neutral', 'happy', 'sad', 'anxious', 'angry', 'crisis'];
+  const emotions = ['sadness', 'joy', 'love', 'anger', 'fear', 'surprise'];
   const xStep = (W - PAD * 2) / (data.length - 1);
   // For each emotion, build a stacked y for each point. Stack order:
   const stacks = data.map(d => {
@@ -89,7 +89,7 @@ function MoodTimeline({ t, lang, data, range, onRangeChange, onClose }) {
     a[e] = data.reduce((s, d) => s + (d.emotions[e] || 0), 0);
     return a;
   }, {});
-  const dominant = emotions.reduce((a, e) => totals[e] > totals[a] ? e : a, 'neutral');
+  const dominant = emotions.reduce((a, e) => totals[e] > totals[a] ? e : a, 'joy');
 
   return (
     <aside className="timeline-panel" onClick={(e) => e.stopPropagation()}>
@@ -142,7 +142,7 @@ function MoodTimeline({ t, lang, data, range, onRangeChange, onClose }) {
         <div style={{ minHeight: 38, marginTop: 8, fontSize: 13, color: 'var(--ink-soft)' }}>
           {hover !== null ? (() => {
             const d = data[hover];
-            const dom = emotions.reduce((a, e) => (d.emotions[e] || 0) > (d.emotions[a] || 0) ? e : a, 'neutral');
+            const dom = emotions.reduce((a, e) => (d.emotions[e] || 0) > (d.emotions[a] || 0) ? e : a, 'joy');
             return (
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ width: 8, height: 8, borderRadius: 999, background: EMOTION_COLORS[dom] }} />
@@ -280,7 +280,7 @@ function SettingsSheet({ t, lang, onLangChange, voiceOn, onVoiceToggle, memory, 
             <Icon.ChevronLeft className="mirror" />
           </button>
           <button className="row" style={{ background: 'transparent', border: 0, padding: '8px 0', width: '100%', cursor: 'pointer' }}>
-            <span style={{ color: 'var(--emo-angry)' }}>{t.privDelete}</span>
+            <span style={{ color: 'var(--emo-anger)' }}>{t.privDelete}</span>
             <Icon.ChevronLeft className="mirror" />
           </button>
         </div>
@@ -302,7 +302,7 @@ function SettingsSheet({ t, lang, onLangChange, voiceOn, onVoiceToggle, memory, 
 function Onboarding({ t, lang, onLangChange, onStart, avatarStyle }) {
   return (
     <div className="onboarding-card" role="dialog">
-      <Avatar emotion="neutral" size={96} style={avatarStyle} glow />
+      <Avatar emotion="joy" size={96} style={avatarStyle} glow />
       <h1>{t.onboardTitle}</h1>
       <p>{t.onboardBody}</p>
       <div className="radio-row" style={{ marginBottom: 16 }}>

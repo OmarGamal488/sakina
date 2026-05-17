@@ -3,7 +3,7 @@
 const { useState: useS, useEffect: useE } = React;
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "emotion": "neutral",
+  "emotion": "joy",
   "view": "split",
   "theme": "cream",
   "density": "default",
@@ -78,7 +78,7 @@ function App() {
         <TweakSelect
           label="Detected emotion"
           value={t.emotion}
-          options={['neutral', 'sad', 'anxious', 'angry', 'happy', 'crisis']}
+          options={['sadness', 'joy', 'love', 'anger', 'fear', 'surprise']}
           onChange={(v) => setTweak('emotion', v)}
         />
         <EmotionSwatches
@@ -143,7 +143,7 @@ function App() {
 
 // Custom: emotion color swatches row
 function EmotionSwatches({ value, onChange }) {
-  const order = ['neutral', 'sad', 'anxious', 'angry', 'happy', 'crisis'];
+  const order = ['sadness', 'joy', 'love', 'anger', 'fear', 'surprise'];
   return (
     <div className="twk-row">
       <div className="twk-lbl"><span>Quick pick</span><span className="twk-val">{value}</span></div>

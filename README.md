@@ -40,8 +40,12 @@ What you'll see:
   emotion controls in a tweaks panel, and the male avatar reacting to
   emotion changes via ring color, facial expression, and motion.
 - **`avatar-demo.html`** — standalone avatar component playground.
-- **`avatar-gallery.html`** — the original six-emotion static gallery
-  rendered with vanilla CSS animations (no React, no Babel).
+
+The avatar emotion set is aligned 1:1 with the
+[DAIR emotion dataset](https://huggingface.co/datasets/dair-ai/emotion):
+`sadness · joy · love · anger · fear · surprise`. Same character (seed
+`sakina`, DiceBear `micah` style, male, clean-shaven, sage shirt). Only
+the ring color and facial expression change with the detected emotion.
 
 > The demo is for design iteration only. The production build will live in
 > `frontend/` and use Vite + Vercel AI SDK + a real FastAPI backend.
@@ -52,8 +56,8 @@ What you'll see:
 
 - **Language detection** — TF-IDF + Logistic Regression with a `lingua-py`
   fallback for short inputs.
-- **Emotion classifier** — XLM-RoBERTa fine-tuned on GoEmotions + DAIR,
-  six classes: `neutral / sad / anxious / angry / happy / crisis`.
+- **Emotion classifier** — XLM-RoBERTa fine-tuned on DAIR,
+  six classes: `sadness · joy · love · anger · fear · surprise`.
 - **Intent classifier** — Few-shot via Groq (`gpt-oss-120b` or `gpt-oss-20b`).
 - **RAG** — BM25 + dense (MiniLM) hybrid with RRF fusion, cross-encoder
   rerank, served from Qdrant Cloud.
