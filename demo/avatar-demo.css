@@ -1,0 +1,305 @@
+/* Sakina Avatar — standalone demo styles */
+:root {
+  --ink: #2D3B36;
+  --ink-soft: #5C6B65;
+  --ink-fade: rgba(45, 59, 54, 0.45);
+  --sage: #5C8374;
+  --sage-deep: #496B5E;
+  --sand: #E8DFCA;
+  --sand-soft: #F0E9D6;
+  --cream: #F7F4EA;
+  --cream-deep: #EDE7D2;
+  --line: #D9D2BE;
+  --line-soft: rgba(217, 210, 190, 0.55);
+  --font-en: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-en);
+  -webkit-font-smoothing: antialiased;
+}
+
+.av-demo {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 36px;
+  padding: 56px 32px 64px;
+}
+
+.av-demo h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  text-align: center;
+}
+.av-demo .lede {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-fade);
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+  text-align: center;
+}
+
+.hero-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 40px 60px;
+}
+.hero-stage .hero-emo {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-fade);
+  transition: color 600ms ease;
+}
+.hero-stage .hero-emo .swatch {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--emo, var(--sage));
+  margin-inline-end: 8px;
+  vertical-align: 1px;
+  transition: background 600ms ease;
+}
+
+.pill-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.emo-pill {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--cream);
+  padding: 10px 16px 10px 12px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 200ms, border-color 200ms, color 200ms;
+}
+.emo-pill:hover { background: var(--sand-soft); }
+.emo-pill.on {
+  border-color: var(--emo, var(--sage));
+  background: var(--emo, var(--sage));
+  color: #fff;
+}
+.emo-pill .pill-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.4) inset;
+}
+.emo-pill.on .pill-dot {
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.3) inset;
+}
+
+.size-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  background: var(--cream-deep);
+  border-radius: 22px;
+  padding: 36px 28px;
+  border: 1px solid var(--line-soft);
+  max-width: 980px;
+  width: 100%;
+}
+.size-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  min-height: 280px;
+}
+.size-cell .size-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-fade);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.size-cell .size-meta b {
+  display: block;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.speak-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  user-select: none;
+  cursor: pointer;
+  padding: 10px 18px;
+  background: var(--cream-deep);
+  border: 1px solid var(--line-soft);
+  border-radius: 999px;
+}
+.switch-mini {
+  display: inline-block;
+  width: 34px; height: 20px;
+  background: var(--line);
+  border-radius: 999px;
+  position: relative;
+  transition: background 200ms;
+}
+.switch-mini::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--cream);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  transition: left 200ms;
+}
+.speak-toggle.on .switch-mini { background: var(--sage); }
+.speak-toggle.on .switch-mini::after { left: 16px; }
+
+.spec-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 760px;
+  width: 100%;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.spec-card {
+  padding: 16px;
+  background: var(--cream-deep);
+  border-radius: 14px;
+  border: 1px solid var(--line-soft);
+}
+.spec-card b {
+  display: block;
+  color: var(--ink);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  margin-bottom: 8px;
+}
+.spec-card p { margin: 0; line-height: 1.6; }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0);
+  white-space: nowrap; border: 0;
+}
+
+/* ───── AVATAR component styles (mirrored from styles.css) ───── */
+.sakina-av {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  border-radius: 50%;
+  isolation: isolate;
+}
+.sakina-av.clickable { cursor: pointer; }
+.sakina-av.clickable:focus-visible {
+  outline: 2px solid var(--sage);
+  outline-offset: 4px;
+}
+.sakina-av-glow {
+  position: absolute;
+  inset: calc(var(--glow) * -0.5);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--emo) 0%, var(--emo) 30%, transparent 70%);
+  opacity: 0.35;
+  filter: blur(calc(var(--glow) * 0.6));
+  transition: background 600ms ease-in-out, opacity 600ms ease;
+  pointer-events: none;
+  z-index: 0;
+}
+.sakina-av-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: var(--ring) solid var(--emo);
+  pointer-events: none;
+  transition: border-color 600ms ease-in-out;
+  z-index: 2;
+}
+.sakina-av-ping {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: calc(var(--ring) - 1px) solid var(--emo);
+  pointer-events: none;
+  z-index: 1;
+  animation: sonar-ping 1.2s ease-out infinite;
+}
+@keyframes sonar-ping {
+  0%   { transform: scale(1);    opacity: 0.4; }
+  100% { transform: scale(1.18); opacity: 0; }
+}
+.sakina-av-face {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%; height: 100%;
+  z-index: 3;
+  border-radius: 50%;
+  overflow: hidden;
+  background: transparent;
+  transform-origin: center 65%;
+}
+.avatar-breathe { animation: av-breathe 4s ease-in-out infinite; }
+.avatar-breathe.slow { animation: av-breathe 6s ease-in-out infinite; }
+.avatar-breathe.anxious {
+  animation: av-breathe 4s ease-in-out infinite, av-tremor 0.22s ease-in-out infinite;
+}
+.sakina-av:hover .avatar-breathe { animation-play-state: paused; }
+@keyframes av-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.03); }
+}
+@keyframes av-tremor {
+  0%, 100% { translate: 0 0; }
+  25%      { translate: -1px 0; }
+  75%      { translate: 1px 0; }
+}
+.sakina-fade {
+  display: inline-flex;
+  transition: opacity 200ms ease-in-out;
+  opacity: 1;
+}
+.sakina-fade.out { opacity: 0; }
+.sakina-fade.in  { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .avatar-breathe, .avatar-breathe.slow, .avatar-breathe.anxious,
+  .sakina-av-ping { animation: none !important; }
+}

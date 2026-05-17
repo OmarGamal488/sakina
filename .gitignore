@@ -1,0 +1,96 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.log
+
+# --- Node / Vite ---
+node_modules/
+dist/
+.vite/
+.next/
+.turbo/
+.cache/
+*.tsbuildinfo
+.npm/
+.pnpm-store/
+
+# --- Editor / OS ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# --- Secrets / env ---
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+credentials.json
+secrets/
+
+# --- ML artifacts (large, not for git) ---
+models/
+checkpoints/
+artifacts/
+*.bin
+*.safetensors
+*.gguf
+*.onnx
+*.pt
+*.pth
+*.h5
+wandb/
+mlruns/
+.cache/huggingface/
+
+# --- Data (use DVC or pointer files for large datasets) ---
+data/raw/
+data/interim/
+data/processed/
+data/external/
+*.csv.gz
+*.parquet
+*.arrow
+
+# --- Notebooks ---
+.ipynb_checkpoints/
+
+# --- Build outputs ---
+build/
+*.tar.gz
+
+# --- Misc ---
+tmp/
+.tmp/
+
+# --- Claude Code / Claude CLI artifacts ---
+.claude/
+CLAUDE.md
+.claude-history
+.claude-sessions/
+claude.json
+.anthropic/
+.aider*
+.cursor/
+.continue/
+.codeium/
+.windsurf/
+
+# --- AI-assistant prompt drafts (local working files only) ---
+**/Sakina_*_Prompt.txt
+**/Sakina_UI_Design_Prompt.txt
+**/Sakina_Avatar_Prompt.txt
+prompts/drafts/
+
