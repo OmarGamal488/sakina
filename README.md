@@ -1,4 +1,4 @@
-# Sakina 🌙
+# Sakina
 
 > A multilingual, emotion-aware mental-health support chatbot with retrieval-augmented
 > generation, a crisis-safety gate, and an avatar that adapts to how you feel.
@@ -27,14 +27,14 @@ and shows support resources.
 
 ## Features
 
-- 🌍 **Multilingual** — detects and replies across 20 languages (Arabic + English are the primary UI languages, with full RTL/LTR support).
-- 💚 **Emotion-aware** — classifies six emotions (`sadness · joy · love · anger · fear · surprise`); the avatar's color and expression adapt in real time.
-- 🔎 **RAG-grounded answers** — hybrid retrieval (BM25 + dense `bge-m3`, RRF fusion, cross-encoder rerank) over a mental-health counseling corpus in Qdrant.
-- 🧭 **Smart routing** — five intents; only genuine mental-health questions go through retrieval, everything else is answered directly.
-- 🆘 **Crisis safety** — a fast regex gate runs before any model call and surfaces crisis hotline resources when self-harm risk is detected.
-- 🎙️ **Voice** — speech-to-text and text-to-speech for hands-free conversation.
-- 🧠 **Conversation memory** — Redis-backed sessions (with a graceful in-process fallback) so Sakina remembers the thread.
-- ✨ **Adaptive presence** — an emotion-reactive avatar plus a gentle idle check-in when you go quiet.
+- **Multilingual** — detects and replies across 20 languages (Arabic + English are the primary UI languages, with full RTL/LTR support).
+- **Emotion-aware** — classifies six emotions (`sadness · joy · love · anger · fear · surprise`); the avatar's color and expression adapt in real time.
+- **RAG-grounded answers** — hybrid retrieval (BM25 + dense `bge-m3`, RRF fusion, cross-encoder rerank) over a mental-health counseling corpus in Qdrant.
+- **Smart routing** — five intents; only genuine mental-health questions go through retrieval, everything else is answered directly.
+- **Crisis safety** — a fast regex gate runs before any model call and surfaces crisis hotline resources when self-harm risk is detected.
+- **Voice** — speech-to-text and text-to-speech for hands-free conversation.
+- **Conversation memory** — Redis-backed sessions (with a graceful in-process fallback) so Sakina remembers the thread.
+- **Adaptive presence** — an emotion-reactive avatar plus a gentle idle check-in when you go quiet.
 
 ## How it works
 
@@ -45,7 +45,7 @@ your message
   3. Intent classifier   →  5 intents            (few-shot LLM)
   4. RAG retrieval       →  grounded passages     (BM25 + bge-m3 + reranker, Qdrant)
   5. Orchestrator        →  empathetic, grounded reply (streamed)
-  ⚠ Crisis gate          →  fires before everything → hotline card
+  * Crisis gate          →  fires before everything → hotline card
 ```
 
 ## Tech stack
