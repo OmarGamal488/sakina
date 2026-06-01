@@ -1,143 +1,121 @@
-# Sakina
+# Sakina 🌙
 
-> Bilingual (Arabic + English) emotion-aware mental-health support chatbot
-> with retrieval-augmented generation, a crisis-safety protocol, and an
-> adaptive avatar that reacts to the user's detected emotion.
->
-> ITI AI Track — NLP Final Project, Intake 46.
+> A multilingual, emotion-aware mental-health support chatbot with retrieval-augmented
+> generation, a crisis-safety gate, and an avatar that adapts to how you feel.
 
----
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
+![Qdrant](https://img.shields.io/badge/Qdrant-DC244C?logo=qdrant&logoColor=white)
+![uv](https://img.shields.io/badge/uv-managed-DE5FE9?logo=uv&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-## What's in this repo
-
-```
-sakina/
-├── demo/         Browser-only React preview (no build step — open index.html)
-├── docs/         Project brief, pipeline document, and design prompts
-├── frontend/     [planned] Production React + Vite + Vercel AI SDK app
-├── api/          [planned] FastAPI orchestrator + RAG + crisis safety
-└── notebooks/    [planned] Four module notebooks per the assignment brief
-```
-
-Only `demo/` and `docs/` have code today. The other folders are scaffolded
-placeholders so the planned structure is clear to anyone who clones this.
+**ITI — AI Track · NLP Final Project · Intake 46**
 
 ---
 
-## Run the demo (no build required)
+## What it does
 
-The demo is a no-build React app that uses CDN React + Babel-standalone for
-in-browser JSX compilation. To run it:
+You send a message in any of **20 languages**. Sakina detects the language, reads the
+emotion behind it, figures out what you're asking for, and — if it's a real mental-health
+question — answers from a grounded counseling knowledge base. The reply streams back in
+your language while the on-screen avatar shifts its expression to match your mood. If the
+message signals self-harm risk, a crisis safety gate intervenes **before** anything else
+and shows support resources.
+
+## Features
+
+- 🌍 **Multilingual** — detects and replies across 20 languages (Arabic + English are the primary UI languages, with full RTL/LTR support).
+- 💚 **Emotion-aware** — classifies six emotions (`sadness · joy · love · anger · fear · surprise`); the avatar's color and expression adapt in real time.
+- 🔎 **RAG-grounded answers** — hybrid retrieval (BM25 + dense `bge-m3`, RRF fusion, cross-encoder rerank) over a mental-health counseling corpus in Qdrant.
+- 🧭 **Smart routing** — five intents; only genuine mental-health questions go through retrieval, everything else is answered directly.
+- 🆘 **Crisis safety** — a fast regex gate runs before any model call and surfaces crisis hotline resources when self-harm risk is detected.
+- 🎙️ **Voice** — speech-to-text and text-to-speech for hands-free conversation.
+- 🧠 **Conversation memory** — Redis-backed sessions (with a graceful in-process fallback) so Sakina remembers the thread.
+- ✨ **Adaptive presence** — an emotion-reactive avatar plus a gentle idle check-in when you go quiet.
+
+## How it works
+
+```
+your message
+  1. Language detection  →  1 of 20 languages   (TF-IDF + calibrated LinearSVC)
+  2. Emotion classifier  →  6 emotions           (translate-then-classify, no training)
+  3. Intent classifier   →  5 intents            (few-shot LLM)
+  4. RAG retrieval       →  grounded passages     (BM25 + bge-m3 + reranker, Qdrant)
+  5. Orchestrator        →  empathetic, grounded reply (streamed)
+  ⚠ Crisis gate          →  fires before everything → hotline card
+```
+
+## Tech stack
+
+**Backend:** Python 3.11, FastAPI (SSE streaming), Transformers, sentence-transformers,
+scikit-learn, Qdrant, Redis, Lightning AI (`gpt-oss-120b`). **Frontend:** React 18,
+TypeScript, Vite, Tailwind, Vercel AI SDK. **Tooling:** `uv` workspace, `ruff`, `pytest`, `vitest`.
+
+## Installation
+
+**Prerequisites:** Python 3.11, [`uv`](https://docs.astral.sh/uv/), Node 18+, and accounts for
+[Qdrant Cloud](https://cloud.qdrant.io) + [Lightning AI](https://lightning.ai) (Redis and a
+[Groq](https://console.groq.com) key are optional — for persistent memory and voice).
 
 ```bash
-cd demo
-python3 -m http.server 8000
-# then open http://localhost:8000 in your browser
-```
+# clone
+git clone https://github.com/OmarGamal488/sakina.git
+cd sakina
 
-What you'll see:
-- **`index.html`** — the main chat shell with EN/AR split-pane preview,
-  emotion controls in a tweaks panel, and the male avatar reacting to
-  emotion changes via ring color, facial expression, and motion.
-- **`avatar-demo.html`** — standalone avatar component playground.
+# backend + notebooks (one venv for the whole workspace)
+uv sync --all-packages --all-extras
+cp api/.env.example api/.env        # fill in LIGHTNING_*, QDRANT_* (+ optional REDIS_URL, GROQ_API_KEY)
 
-The avatar emotion set is aligned 1:1 with the
-[DAIR emotion dataset](https://huggingface.co/datasets/dair-ai/emotion):
-`sadness · joy · love · anger · fear · surprise`. Same character (seed
-`sakina`, DiceBear `micah` style, male, clean-shaven, sage shirt). Only
-the ring color and facial expression change with the detected emotion.
-
-> The demo is for design iteration only. The production build will live in
-> `frontend/` and use Vite + Vercel AI SDK + a real FastAPI backend.
-
----
-
-## Planned architecture (see `docs/`)
-
-- **Language detection** — TF-IDF + Logistic Regression with a `lingua-py`
-  fallback for short inputs.
-- **Emotion classifier** — XLM-RoBERTa fine-tuned on DAIR,
-  six classes: `sadness · joy · love · anger · fear · surprise`.
-- **Intent classifier** — Few-shot via Groq (`gpt-oss-120b` or `gpt-oss-20b`).
-- **RAG** — BM25 + dense (MiniLM) hybrid with RRF fusion, cross-encoder
-  rerank, served from Qdrant Cloud.
-- **Orchestrator** — Emotion × Intent matrix selecting one of 30 response
-  strategies, with a crisis-override regex that bypasses retrieval.
-- **Safety** — Three-level crisis escalation with a human-confirmation gate
-  before any hotline dial action.
-- **Frontend** — React 18 + Tailwind + Framer Motion + Vercel AI SDK
-  (`useChat`, `streamUI`) consuming a FastAPI SSE stream.
-- **Avatar** — Generated client-side from DiceBear `micah` (seed `sakina`,
-  male, clean-shaven, sage shirt locked). Ring color shifts with detected
-  emotion. SVGs are also pre-rendered in `demo/assets/avatars/` for
-  offline preview.
-
-For full detail, read **`docs/brief.pdf`** (the assignment) and
-**`docs/pipeline_v2.0_backup.pdf`** (the architecture document).
-
----
-
-## Setting up a development environment
-
-> The production code is not in this repo yet. The steps below describe how
-> the `frontend/` and `api/` will be initialized.
-
-### Frontend (planned)
-```bash
+# frontend
 cd frontend
 npm install
-npm run dev          # Vite dev server on :5173
+cp .env.example .env.local          # VITE_API_URL=http://localhost:8001
+cd ..
 ```
-Stack: React 18, TypeScript, Vite, Tailwind, Framer Motion, Vercel AI SDK
-(`ai`, `@ai-sdk/react`, `@ai-sdk/groq`), DiceBear `@dicebear/core` +
-`@dicebear/collection`, shadcn/ui, Recharts.
 
-### API (planned)
+## Usage
+
+Run the API and the frontend in two terminals:
+
 ```bash
+# terminal 1 — API on http://localhost:8001
 cd api
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8001
-```
-Stack: Python 3.11, FastAPI, Qdrant client, sentence-transformers,
-transformers, groq, redis, pydantic v2.
+uv run uvicorn app.main:app --reload --port 8001
 
-### Notebooks (planned)
+# terminal 2 — UI on http://localhost:5173
+cd frontend
+npm run dev
+```
+
+Open **http://localhost:5173** and start chatting.
+
+**Rebuild the model artifacts** (optional — the four module notebooks):
+
 ```bash
-cd notebooks
-jupyter lab
+uv run jupyter lab     # open notebooks/01..04 and Run All
 ```
-One notebook per module: `01_language_detection.ipynb`,
-`02_emotion.ipynb`, `03_intent.ipynb`, `04_rag.ipynb`. Each ends by
-exporting a model artifact consumed by the API.
 
----
+**Browse the design demo** (no build step):
 
-## Design assets
+```bash
+cd demo && python3 -m http.server 8000   # http://localhost:8000
+```
 
-See **`docs/design/`** for the design prompts used to generate the
-React + Tailwind components via claude.ai Artifacts. The avatar prompt
-specifies the male `micah` character, the six emotion overrides, the
-ring-color system, and the breathing/tremor motion model.
+## Team
 
-The pre-rendered avatar SVGs in `demo/assets/avatars/` were generated
-via the public DiceBear v9 HTTP API
-(`https://api.dicebear.com/9.x/micah/svg?seed=sakina&...`). To regenerate
-or tweak, see the design prompt — no API key required, no signup.
+ITI AI Track · NLP · Intake 46
 
----
+- Abdullah Mohamed
+- Ahmed Gamal
+- Hamza Hesham
+- Omar Gamal
 
 ## License
 
-MIT — see `LICENSE`.
+MIT — see [`LICENSE`](LICENSE).
 
-Avatar artwork is generated via DiceBear's `micah` style by Micah Lanier,
-licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
-
----
-
-## Credits
-
-Built as the final project for the ITI AI Track NLP module, Intake 46.
-Pipeline architecture, safety protocol, and frontend design by
-Omar Gamal ElKady.
+Avatar artwork uses DiceBear's `micah` style by Micah Lanier, licensed
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

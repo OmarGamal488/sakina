@@ -1,0 +1,108 @@
+{
+  "version": "3.2",
+  "approach": "translate-then-classify (no fine-tuning)",
+  "emotion_model": "bhadresh-savani/distilbert-base-uncased-emotion",
+  "emotion_model_max_length": 256,
+  "translator_model": "facebook/nllb-200-distilled-1.3B",
+  "translator_target_english_code": "eng_Latn",
+  "flores_codes": {
+    "ar": "arb_Arab",
+    "bg": "bul_Cyrl",
+    "de": "deu_Latn",
+    "el": "ell_Grek",
+    "en": "eng_Latn",
+    "es": "spa_Latn",
+    "fr": "fra_Latn",
+    "hi": "hin_Deva",
+    "it": "ita_Latn",
+    "ja": "jpn_Jpan",
+    "nl": "nld_Latn",
+    "pl": "pol_Latn",
+    "pt": "por_Latn",
+    "ru": "rus_Cyrl",
+    "sw": "swh_Latn",
+    "th": "tha_Thai",
+    "tr": "tur_Latn",
+    "ur": "urd_Arab",
+    "vi": "vie_Latn",
+    "zh": "zho_Hans"
+  },
+  "labels": [
+    "sadness",
+    "joy",
+    "love",
+    "anger",
+    "fear",
+    "surprise"
+  ],
+  "id2label": {
+    "0": "sadness",
+    "1": "joy",
+    "2": "love",
+    "3": "anger",
+    "4": "fear",
+    "5": "surprise"
+  },
+  "label2id": {
+    "sadness": 0,
+    "joy": 1,
+    "love": 2,
+    "anger": 3,
+    "fear": 4,
+    "surprise": 5
+  },
+  "pipeline": [
+    "detect language (lang_id.joblib from NB 01)",
+    "if language != en: translate text -> English via NLLB-200",
+    "classify English text with the emotion model -> one of 6 DAIR labels"
+  ],
+  "english_test_metrics": {
+    "n": 2000,
+    "accuracy": 0.927,
+    "macro_f1": 0.882506152828781,
+    "weighted_f1": 0.926876082854655
+  },
+  "multilingual_eval": {
+    "n_per_lang": 60,
+    "pooled_n": 1200,
+    "decision_metric": "pooled macro-F1 across all 20 languages",
+    "pooled_macro_f1": 0.8975,
+    "pooled_accuracy": 0.8958,
+    "note": "Stratified 60-row DAIR test slice (10 per emotion). The SAME rows were machine-translated into natural text in each of the 20 languages (forward via gpt-oss-20b), then translated back to English by the runtime translator (NLLB-200-distilled-1.3B) and classified. Gold = original English DAIR label. Per-language n=60 is directional (noisy); the ship decision rests on the pooled macro-F1 across all 20 (n=1200).",
+    "per_language": {
+      "ar": { "accuracy": 0.9167, "macro_f1": 0.9165 },
+      "bg": { "accuracy": 0.9167, "macro_f1": 0.9181 },
+      "de": { "accuracy": 0.8500, "macro_f1": 0.8511 },
+      "el": { "accuracy": 0.9667, "macro_f1": 0.9673 },
+      "en": { "accuracy": 1.0000, "macro_f1": 1.0000 },
+      "es": { "accuracy": 0.9000, "macro_f1": 0.9000 },
+      "fr": { "accuracy": 0.9000, "macro_f1": 0.9010 },
+      "hi": { "accuracy": 0.9667, "macro_f1": 0.9673 },
+      "it": { "accuracy": 0.7500, "macro_f1": 0.7561 },
+      "ja": { "accuracy": 0.9000, "macro_f1": 0.9000 },
+      "nl": { "accuracy": 0.9667, "macro_f1": 0.9673 },
+      "pl": { "accuracy": 0.9333, "macro_f1": 0.9333 },
+      "pt": { "accuracy": 0.8833, "macro_f1": 0.8836 },
+      "ru": { "accuracy": 0.8833, "macro_f1": 0.8824 },
+      "sw": { "accuracy": 0.9167, "macro_f1": 0.9170 },
+      "th": { "accuracy": 0.8667, "macro_f1": 0.8698 },
+      "tr": { "accuracy": 0.8500, "macro_f1": 0.8522 },
+      "ur": { "accuracy": 0.9167, "macro_f1": 0.9165 },
+      "vi": { "accuracy": 0.8500, "macro_f1": 0.8513 },
+      "zh": { "accuracy": 0.7833, "macro_f1": 0.7756 }
+    },
+    "translator_comparison_pooled_macro_f1": {
+      "note": "Same DistilBERT classifier + same gold across all rows; methods differ only in the translator (or, for llm_direct, replace the whole pipeline). NLLB-1.3B selected as the best.",
+      "nllb_200_distilled_1.3B": 0.8975,
+      "nllb_200_distilled_600M": 0.8806,
+      "llm_gpt_oss_120b_translate": 0.8759,
+      "llm_gpt_oss_20b_translate": 0.7983,
+      "llm_gpt_oss_20b_direct_no_translation": 0.4919
+    },
+    "selection_rationale": "NLLB-1.3B wins pooled (+1.7pp over 600M, better in 13/20 langs) and is free, local, 0 API calls. LLM-as-translator (20B 0.80, 120B 0.88) both scored BELOW NLLB pooled AND cost an API call per message against the shared 15 req/min budget. LLM-direct (~0.49) is confounded (DistilBERT is fine-tuned on DAIR, so a zero-shot LLM is graded out-of-distribution). Knowledge distillation considered but not pursued: it reopens the no-fine-tuning constraint and its supervision is still NLLB-bottlenecked (uncertain accuracy gain)."
+  },
+  "eval_languages": [
+    "ar", "bg", "de", "el", "en", "es", "fr", "hi", "it", "ja",
+    "nl", "pl", "pt", "ru", "sw", "th", "tr", "ur", "vi", "zh"
+  ]
+}

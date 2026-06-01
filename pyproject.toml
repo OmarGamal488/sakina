@@ -1,0 +1,33 @@
+[project]
+name = "sakina"
+version = "0.1.0"
+description = "Bilingual emotion-aware mental-health RAG chatbot — ITI NLP Final 2026"
+readme = "README.md"
+requires-python = "==3.11.*"
+license = { text = "MIT" }
+authors = [{ name = "Omar Gamal ElKady" }]
+
+[tool.uv.workspace]
+members = ["api", "notebooks"]
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+torchvision = [{ index = "pytorch-cpu" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's File/Form/Query/Depends are call-in-default BY DESIGN (DI markers),
+# so B008 is a false positive on idiomatic FastAPI signatures.
+extend-immutable-calls = ["fastapi.File", "fastapi.Form", "fastapi.Query", "fastapi.Depends"]

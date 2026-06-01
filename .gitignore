@@ -1,96 +1,30 @@
-# --- Python ---
-__pycache__/
-*.py[cod]
-*.egg-info/
-.venv/
-venv/
-env/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-htmlcov/
-*.log
-
-# --- Node / Vite ---
-node_modules/
-dist/
-.vite/
-.next/
-.turbo/
-.cache/
-*.tsbuildinfo
-.npm/
-.pnpm-store/
-
-# --- Editor / OS ---
-.vscode/
-.idea/
-*.swp
-*.swo
-.DS_Store
-Thumbs.db
-
-# --- Secrets / env ---
+# Secrets — never commit real env files (only *.env.example)
 .env
-.env.*
-!.env.example
-*.key
-*.pem
-credentials.json
-secrets/
+.env.local
+.env.*.local
 
-# --- ML artifacts (large, not for git) ---
-models/
-checkpoints/
-artifacts/
-*.bin
-*.safetensors
-*.gguf
-*.onnx
-*.pt
-*.pth
-*.h5
-wandb/
-mlruns/
-.cache/huggingface/
-
-# --- Data (use DVC or pointer files for large datasets) ---
-data/raw/
-data/interim/
-data/processed/
-data/external/
-*.csv.gz
-*.parquet
-*.arrow
-
-# --- Notebooks ---
-.ipynb_checkpoints/
-
-# --- Build outputs ---
-build/
-*.tar.gz
-
-# --- Misc ---
-tmp/
-.tmp/
-
-# --- Claude Code / Claude CLI artifacts ---
-.claude/
+# --- Claude / agent working files ---
+.understand-anything/
 CLAUDE.md
-.claude-history
-.claude-sessions/
-claude.json
-.anthropic/
-.aider*
-.cursor/
-.continue/
-.codeium/
-.windsurf/
+HANDOFF.md
+AGENT_BRIEF.md
 
-# --- AI-assistant prompt drafts (local working files only) ---
-**/Sakina_*_Prompt.txt
-**/Sakina_UI_Design_Prompt.txt
-**/Sakina_Avatar_Prompt.txt
-prompts/drafts/
+# --- Markdown: keep ONLY README files, drop everything else ---
+*.md
+!README.md
+!**/README.md
 
+# --- Docs folder (not pushed) ---
+docs/
+
+# --- Test folders (not pushed) ---
+tests/
+
+# --- Frontend co-located tests: DELETE these 3 lines if you WANT them pushed ---
+*.test.ts
+*.test.tsx
+frontend/src/test/
+
+# --- Python caches ---
+__pycache__/
+*.pyc

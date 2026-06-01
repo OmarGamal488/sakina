@@ -1,0 +1,60 @@
+[project]
+name = "sakina-api"
+version = "0.1.0"
+description = "Sakina FastAPI orchestrator — SSE chat, RAG, crisis safety"
+requires-python = "==3.11.*"
+dependencies = [
+    # web framework + SSE
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "sse-starlette>=2.1",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "python-multipart>=0.0.12",
+
+    # LLM provider — Lightning AI (OpenAI-compatible API).
+    # base_url="https://lightning.ai/api/v1/", api_key=LIGHTNING_API_KEY
+    # Models: lightning-ai/gpt-oss-120b (primary), lightning-ai/gpt-oss-20b (fallback).
+    "openai>=1.55",
+
+    # ML inference (loads Phase-1 artifacts)
+    "torch>=2.4",
+    "transformers>=4.46",
+    "sentence-transformers>=3.3",
+    "scikit-learn>=1.5",
+    "joblib>=1.4",
+    "numpy>=1.26,<2.0",
+
+    # RAG
+    "qdrant-client>=1.12",
+    "rank-bm25>=0.2.2",
+
+    # language detection fallback
+    "lingua-language-detector>=2.0",
+
+    # memory + cache
+    "redis>=5.2",
+
+    # observability
+    "structlog>=24.4",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.27",
+    "ruff>=0.7",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]

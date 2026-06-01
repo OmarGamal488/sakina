@@ -1,0 +1,2252 @@
+[
+  {
+    "text": "Здрасти! Как си днес, приятелю?",
+    "gold": "greeting",
+    "lang": "bg"
+  },
+  {
+    "text": "Добър ден! Имате ли свободно време за кратък разговор?",
+    "gold": "greeting",
+    "lang": "bg"
+  },
+  {
+    "text": "Здравейте, надявам се всичко е наред при вас днес.",
+    "gold": "greeting",
+    "lang": "bg"
+  },
+  {
+    "text": "Хей! Как минаваш? Искам да споделя нещо с теб.",
+    "gold": "greeting",
+    "lang": "bg"
+  },
+  {
+    "text": "Привет! Дали имаш минутка за нова идея, която имам?",
+    "gold": "greeting",
+    "lang": "bg"
+  },
+  {
+    "text": "Чао, благодаря за помощта!",
+    "gold": "goodbye",
+    "lang": "bg"
+  },
+  {
+    "text": "Трябва да си вървя, до скоро!",
+    "gold": "goodbye",
+    "lang": "bg"
+  },
+  {
+    "text": "Благодаря, всичко е ясно – довиждане!",
+    "gold": "goodbye",
+    "lang": "bg"
+  },
+  {
+    "text": "Ще се чуем отново, приятелко!",
+    "gold": "goodbye",
+    "lang": "bg"
+  },
+  {
+    "text": "Много се радвам, че говорихме – до следващия път!",
+    "gold": "goodbye",
+    "lang": "bg"
+  },
+  {
+    "text": "Благодаря ти огромно, без твоето съдействие нямаше да успеем.",
+    "gold": "gratitude",
+    "lang": "bg"
+  },
+  {
+    "text": "Много съм благодарен за бързия отговор – спасяваш деня ми!",
+    "gold": "gratitude",
+    "lang": "bg"
+  },
+  {
+    "text": "Ти си истински професионалист, благодаря за точните инструкции.",
+    "gold": "gratitude",
+    "lang": "bg"
+  },
+  {
+    "text": "Огромно благодаря, решенията ти бяха точно това, от което се нуждаех.",
+    "gold": "gratitude",
+    "lang": "bg"
+  },
+  {
+    "text": "Благодаря за подкрепата, сега мога спокойно да продължа напред.",
+    "gold": "gratitude",
+    "lang": "bg"
+  },
+  {
+    "text": "Здравей, чувствам се много напрегната в последно време, как мога да се успокоя?",
+    "gold": "asking_mental_health_question",
+    "lang": "bg"
+  },
+  {
+    "text": "Имам проблеми със съня, не мога да заспя след 11 вечерта, какво ми съветваш?",
+    "gold": "asking_mental_health_question",
+    "lang": "bg"
+  },
+  {
+    "text": "Чувствам се тъжен почти всеки ден, как мога да се справя с тази депресия?",
+    "gold": "asking_mental_health_question",
+    "lang": "bg"
+  },
+  {
+    "text": "Страхувам се от социалните контакти, усещам тревожност, как да се справя?",
+    "gold": "asking_mental_health_question",
+    "lang": "bg"
+  },
+  {
+    "text": "В отношенията с партньора ми имаме чести спорове, как да подобрим комуникацията?",
+    "gold": "asking_mental_health_question",
+    "lang": "bg"
+  },
+  {
+    "text": "Какво е времето днес в София?",
+    "gold": "out_of_scope",
+    "lang": "bg"
+  },
+  {
+    "text": "Можеш ли да ми обясниш как да направя цикъл в Python?",
+    "gold": "out_of_scope",
+    "lang": "bg"
+  },
+  {
+    "text": "Кой спечели последния мач между Левски и ЦСКА?",
+    "gold": "out_of_scope",
+    "lang": "bg"
+  },
+  {
+    "text": "Колко е 23 умножено по 47?",
+    "gold": "out_of_scope",
+    "lang": "bg"
+  },
+  {
+    "text": "Какви са новините за политиката в ЕС тази седмица?",
+    "gold": "out_of_scope",
+    "lang": "bg"
+  },
+  {
+    "text": "Hey, ich hoffe, du hast einen guten Tag!",
+    "gold": "greeting",
+    "lang": "de"
+  },
+  {
+    "text": "Guten Morgen! Hast du kurz Zeit für eine Frage?",
+    "gold": "greeting",
+    "lang": "de"
+  },
+  {
+    "text": "Servus! Wie läuft's bei dir?",
+    "gold": "greeting",
+    "lang": "de"
+  },
+  {
+    "text": "Hallo zusammen, ich bin neu hier und würde mich gern vorstellen.",
+    "gold": "greeting",
+    "lang": "de"
+  },
+  {
+    "text": "Moin! Was gibt's Neues im Chat?",
+    "gold": "greeting",
+    "lang": "de"
+  },
+  {
+    "text": "Danke für die Hilfe, ich muss jetzt leider los. Tschüss!",
+    "gold": "goodbye",
+    "lang": "de"
+  },
+  {
+    "text": "War super, aber ich habe noch einen Termin. Bis bald!",
+    "gold": "goodbye",
+    "lang": "de"
+  },
+  {
+    "text": "Ich melde mich später wieder, jetzt muss ich schlafen. Gute Nacht!",
+    "gold": "goodbye",
+    "lang": "de"
+  },
+  {
+    "text": "Alles klar, danke! Ich gehe jetzt. Mach's gut!",
+    "gold": "goodbye",
+    "lang": "de"
+  },
+  {
+    "text": "Ach, die Zeit ist um – ich muss los. Auf Wiedersehen!",
+    "gold": "goodbye",
+    "lang": "de"
+  },
+  {
+    "text": "Vielen Dank für deine schnelle Unterstützung, das war echt super hilfreich!",
+    "gold": "gratitude",
+    "lang": "de"
+  },
+  {
+    "text": "Ich schätze deine Geduld total, danke für die ausführliche Erklärung.",
+    "gold": "gratitude",
+    "lang": "de"
+  },
+  {
+    "text": "Danke, du hast mir den Tag gerettet – ohne dich wär's nicht geklappt!",
+    "gold": "gratitude",
+    "lang": "de"
+  },
+  {
+    "text": "Echt super, dass du mir das schnell erklärt hast, danke!",
+    "gold": "gratitude",
+    "lang": "de"
+  },
+  {
+    "text": "Danke für den Tipp, das hat mir echt weitergeholfen, ich weiß das zu schätzen.",
+    "gold": "gratitude",
+    "lang": "de"
+  },
+  {
+    "text": "Ich fühle mich seit ein paar Tagen total erschöpft, hast du einen Tipp gegen Burnout?",
+    "gold": "asking_mental_health_question",
+    "lang": "de"
+  },
+  {
+    "text": "Kann ich dir sagen, dass ich nachts kaum schlafen kann?",
+    "gold": "asking_mental_health_question",
+    "lang": "de"
+  },
+  {
+    "text": "Warum habe ich plötzlich Angst, wenn ich an die Arbeit denke?",
+    "gold": "asking_mental_health_question",
+    "lang": "de"
+  },
+  {
+    "text": "Meine Beziehung macht mich oft traurig, weißt du, wie ich damit umgehen kann?",
+    "gold": "asking_mental_health_question",
+    "lang": "de"
+  },
+  {
+    "text": "Ich habe das Gefühl, meine Stimmung schwankt ständig, ist das normal?",
+    "gold": "asking_mental_health_question",
+    "lang": "de"
+  },
+  {
+    "text": "Wie schreibe ich in JavaScript eine Schleife, die ein Array durchläuft?",
+    "gold": "out_of_scope",
+    "lang": "de"
+  },
+  {
+    "text": "Kannst du mir das aktuelle Wetter für München geben?",
+    "gold": "out_of_scope",
+    "lang": "de"
+  },
+  {
+    "text": "Wer hat das letzte Spiel der Bundesliga gewonnen?",
+    "gold": "out_of_scope",
+    "lang": "de"
+  },
+  {
+    "text": "Löse bitte die Gleichung x^2 - 4x + 4 = 0 für mich.",
+    "gold": "out_of_scope",
+    "lang": "de"
+  },
+  {
+    "text": "Erzähl mir bitte die neuesten Nachrichten aus der US-Politik.",
+    "gold": "out_of_scope",
+    "lang": "de"
+  },
+  {
+    "text": "Γεια σου! Πώς είσαι σήμερα;",
+    "gold": "greeting",
+    "lang": "el"
+  },
+  {
+    "text": "Καλημέρα! Έχεις λίγο χρόνο για μια συζήτηση;",
+    "gold": "greeting",
+    "lang": "el"
+  },
+  {
+    "text": "Χαίρετε, είμαι ο Νίκος. Πώς μπορώ να βοηθήσω;",
+    "gold": "greeting",
+    "lang": "el"
+  },
+  {
+    "text": "Γεια σας! Ελπίζω να περνάτε καλά, τι νέο υπάρχει;",
+    "gold": "greeting",
+    "lang": "el"
+  },
+  {
+    "text": "Καλησπέρα, φίλε! Έχεις κάτι ενδιαφέρον να μοιραστείς σήμερα;",
+    "gold": "greeting",
+    "lang": "el"
+  },
+  {
+    "text": "Τα λέμε, ευχαριστώ για τη βοήθεια, να έχεις μια όμορφη μέρα!",
+    "gold": "goodbye",
+    "lang": "el"
+  },
+  {
+    "text": "Καληνύχτα, ξεκουράσου καλά και τα λέμε ξανά σύντομα.",
+    "gold": "goodbye",
+    "lang": "el"
+  },
+  {
+    "text": "Ευχαριστώ πολύ, αποχαιρετώ τώρα. Καλή συνέχεια!",
+    "gold": "goodbye",
+    "lang": "el"
+  },
+  {
+    "text": "Πρέπει να φύγω, τα λέμε στην επόμενη συνομιλία, να προσέχεις!",
+    "gold": "goodbye",
+    "lang": "el"
+  },
+  {
+    "text": "Ώρα για ένα διάλειμμα, τα λέμε αργότερα, καλή τύχη!",
+    "gold": "goodbye",
+    "lang": "el"
+  },
+  {
+    "text": "Ευχαριστώ πάρα πολύ για τη βοήθεια, ήσασταν πραγματικά σωτήρας!",
+    "gold": "gratitude",
+    "lang": "el"
+  },
+  {
+    "text": "Στέλνω μεγάλο ευχαριστώ στην ομάδα, χωρίς εσάς δεν θα τα κατάφερνα.",
+    "gold": "gratitude",
+    "lang": "el"
+  },
+  {
+    "text": "Μπράβο και ευχαριστώ για την άμεση απάντηση, ήταν πολύ χρήσιμη!",
+    "gold": "gratitude",
+    "lang": "el"
+  },
+  {
+    "text": "Δεν ξέρω τι θα έκανα χωρίς τη συμβουλή σου, ευχαριστώ γερά!",
+    "gold": "gratitude",
+    "lang": "el"
+  },
+  {
+    "text": "Ευχαριστώ πολύ που μου εξήγησες τα βήματα, τώρα τα καταλαβαίνω καλύτερα.",
+    "gold": "gratitude",
+    "lang": "el"
+  },
+  {
+    "text": "Νιώθω πολύ άγχος τελευταία, τι μπορώ να κάνω;",
+    "gold": "asking_mental_health_question",
+    "lang": "el"
+  },
+  {
+    "text": "Δεν κοιμάμαι καλά από δυο εβδομάδες, γιατί;",
+    "gold": "asking_mental_health_question",
+    "lang": "el"
+  },
+  {
+    "text": "Έχω καταθλιπτικά συναισθήματα, πώς μπορώ να τα αντιμετωπίσω;",
+    "gold": "asking_mental_health_question",
+    "lang": "el"
+  },
+  {
+    "text": "Η σχέση μου με τον σύντροφό μου είναι τεταμένη, τι συμβουλή έχεις;",
+    "gold": "asking_mental_health_question",
+    "lang": "el"
+  },
+  {
+    "text": "Συνεχώς νιώθω κούραση και απογοήτευση, τι λείπει;",
+    "gold": "asking_mental_health_question",
+    "lang": "el"
+  },
+  {
+    "text": "Πώς μπορώ να γράψω μια συνάρτηση σε Python;",
+    "gold": "out_of_scope",
+    "lang": "el"
+  },
+  {
+    "text": "Τι καιρό κάνει σήμερα στην Αθήνα;",
+    "gold": "out_of_scope",
+    "lang": "el"
+  },
+  {
+    "text": "Πες μου το σκορ του τελευταίου αγώνα του Ολυμπιακού.",
+    "gold": "out_of_scope",
+    "lang": "el"
+  },
+  {
+    "text": "Ποιος είναι ο τρέχων πληθυσμός της Ελλάδας;",
+    "gold": "out_of_scope",
+    "lang": "el"
+  },
+  {
+    "text": "Μπορείς να μου πεις τις τελευταίες ειδήσεις για την οικονομία;",
+    "gold": "out_of_scope",
+    "lang": "el"
+  },
+  {
+    "text": "¡Hola! ¿Cómo estás? Hace tiempo que no hablamos.",
+    "gold": "greeting",
+    "lang": "es"
+  },
+  {
+    "text": "Buenas, ¿qué tal va tu día?",
+    "gold": "greeting",
+    "lang": "es"
+  },
+  {
+    "text": "¡Hey! ¿Todo bien? Tengo una duda rápida.",
+    "gold": "greeting",
+    "lang": "es"
+  },
+  {
+    "text": "Saludos, ¿puedes ayudarme con una consulta?",
+    "gold": "greeting",
+    "lang": "es"
+  },
+  {
+    "text": "¡Qué onda! Necesito información sobre horarios.",
+    "gold": "greeting",
+    "lang": "es"
+  },
+  {
+    "text": "¡Hasta luego! Que tengas un buen día.",
+    "gold": "goodbye",
+    "lang": "es"
+  },
+  {
+    "text": "Me despido, gracias por la ayuda. ¡Nos vemos!",
+    "gold": "goodbye",
+    "lang": "es"
+  },
+  {
+    "text": "Bueno, me voy. ¡Cuídate y hablamos pronto!",
+    "gold": "goodbye",
+    "lang": "es"
+  },
+  {
+    "text": "Gracias por todo, me retiro ahora. ¡Adiós!",
+    "gold": "goodbye",
+    "lang": "es"
+  },
+  {
+    "text": "Ya es hora de cerrar. ¡Hasta la próxima!",
+    "gold": "goodbye",
+    "lang": "es"
+  },
+  {
+    "text": "¡Muchas gracias por la ayuda, me salvaste el día!",
+    "gold": "gratitude",
+    "lang": "es"
+  },
+  {
+    "text": "Te agradezco mucho, la solución funcionó a la perfección.",
+    "gold": "gratitude",
+    "lang": "es"
+  },
+  {
+    "text": "¡Mil gracias! No hubiera podido resolverlo sin ti.",
+    "gold": "gratitude",
+    "lang": "es"
+  },
+  {
+    "text": "Gracias por tu paciencia y por explicarme paso a paso.",
+    "gold": "gratitude",
+    "lang": "es"
+  },
+  {
+    "text": "De verdad, gracias, ahora entiendo mucho mejor el tema.",
+    "gold": "gratitude",
+    "lang": "es"
+  },
+  {
+    "text": "¿Por qué me cuesta tanto dormir después de la cena?",
+    "gold": "asking_mental_health_question",
+    "lang": "es"
+  },
+  {
+    "text": "Me siento agotado todo el día, ¿crees que sea ansiedad?",
+    "gold": "asking_mental_health_question",
+    "lang": "es"
+  },
+  {
+    "text": "¿Cómo puedo manejar el estrés en el trabajo sin que me afecte en casa?",
+    "gold": "asking_mental_health_question",
+    "lang": "es"
+  },
+  {
+    "text": "Últimamente me siento triste sin razón, ¿qué me recomiendas?",
+    "gold": "asking_mental_health_question",
+    "lang": "es"
+  },
+  {
+    "text": "¿Es normal sentir celos intensos en una relación nueva?",
+    "gold": "asking_mental_health_question",
+    "lang": "es"
+  },
+  {
+    "text": "¿Puedes decirme la predicción del tiempo para mañana en Madrid?",
+    "gold": "out_of_scope",
+    "lang": "es"
+  },
+  {
+    "text": "Necesito ayuda con un algoritmo de ordenamiento en Python, ¿cómo lo implemento?",
+    "gold": "out_of_scope",
+    "lang": "es"
+  },
+  {
+    "text": "¿Quién ganó la Champions League la temporada pasada?",
+    "gold": "out_of_scope",
+    "lang": "es"
+  },
+  {
+    "text": "¿Cuál es la raíz cuadrada de 1521?",
+    "gold": "out_of_scope",
+    "lang": "es"
+  },
+  {
+    "text": "¿Qué pasa con la crisis política en Venezuela ahora mismo?",
+    "gold": "out_of_scope",
+    "lang": "es"
+  },
+  {
+    "text": "Bonjour, comment allez‑vous ce matin ?",
+    "gold": "greeting",
+    "lang": "fr"
+  },
+  {
+    "text": "Salut ! J’espère que ta journée se passe bien, tu as du temps ?",
+    "gold": "greeting",
+    "lang": "fr"
+  },
+  {
+    "text": "Hey, ça fait longtemps, on se parle un peu ?",
+    "gold": "greeting",
+    "lang": "fr"
+  },
+  {
+    "text": "Bonsoir, vous êtes disponible pour une petite discussion maintenant ?",
+    "gold": "greeting",
+    "lang": "fr"
+  },
+  {
+    "text": "Coucou, je viens d’arriver, vous avez une minute ?",
+    "gold": "greeting",
+    "lang": "fr"
+  },
+  {
+    "text": "Merci pour tout, à la prochaine !",
+    "gold": "goodbye",
+    "lang": "fr"
+  },
+  {
+    "text": "Je dois y aller, à bientôt et bonne soirée !",
+    "gold": "goodbye",
+    "lang": "fr"
+  },
+  {
+    "text": "C’est tout pour aujourd’hui, je vous dis au revoir.",
+    "gold": "goodbye",
+    "lang": "fr"
+  },
+  {
+    "text": "Bon, je file, prends soin de toi !",
+    "gold": "goodbye",
+    "lang": "fr"
+  },
+  {
+    "text": "Je vous remercie, c’était super, à la prochaine fois.",
+    "gold": "goodbye",
+    "lang": "fr"
+  },
+  {
+    "text": "Merci infiniment pour ton aide, je n’aurais pas pu le faire sans toi !",
+    "gold": "gratitude",
+    "lang": "fr"
+  },
+  {
+    "text": "Un grand merci pour le soutien, ça m’a vraiment dépanné aujourd’hui.",
+    "gold": "gratitude",
+    "lang": "fr"
+  },
+  {
+    "text": "Merci, c’est super gentil de ta part de m’avoir expliqué tout ça rapidement.",
+    "gold": "gratitude",
+    "lang": "fr"
+  },
+  {
+    "text": "Je te remercie du fond du cœur pour ton conseil, il m’a sauvé la mise.",
+    "gold": "gratitude",
+    "lang": "fr"
+  },
+  {
+    "text": "Merci mille fois, ton aide a vraiment éclairé mon problème.",
+    "gold": "gratitude",
+    "lang": "fr"
+  },
+  {
+    "text": "Je me sens vraiment anxieuse ces derniers temps, tu peux m’aider à comprendre pourquoi ?",
+    "gold": "asking_mental_health_question",
+    "lang": "fr"
+  },
+  {
+    "text": "J’ai du mal à dormir, je me réveille plusieurs fois chaque nuit, des conseils ?",
+    "gold": "asking_mental_health_question",
+    "lang": "fr"
+  },
+  {
+    "text": "Je suis dépassée par le travail, je sens que le stress me monte, que faire ?",
+    "gold": "asking_mental_health_question",
+    "lang": "fr"
+  },
+  {
+    "text": "Je ne sais plus comment parler à mon copain, on se dispute tout le temps, t’as une idée ?",
+    "gold": "asking_mental_health_question",
+    "lang": "fr"
+  },
+  {
+    "text": "Je me sens vide, comme si rien ne m’intéressait plus, c’est de la dépression ?",
+    "gold": "asking_mental_health_question",
+    "lang": "fr"
+  },
+  {
+    "text": "Quel temps fera-t-il demain à Lyon ?",
+    "gold": "out_of_scope",
+    "lang": "fr"
+  },
+  {
+    "text": "Tu peux m'expliquer comment faire un tableau en Python ?",
+    "gold": "out_of_scope",
+    "lang": "fr"
+  },
+  {
+    "text": "Qui a gagné le match de foot hier soir ?",
+    "gold": "out_of_scope",
+    "lang": "fr"
+  },
+  {
+    "text": "Résous-moi cette équation : 3x² - 7x + 2 = 0.",
+    "gold": "out_of_scope",
+    "lang": "fr"
+  },
+  {
+    "text": "Quel est le dernier score du match de basket entre les Lakers et les Celtics ?",
+    "gold": "out_of_scope",
+    "lang": "fr"
+  },
+  {
+    "text": "नमस्ते, मैं आज किस विषय में मदद कर सकता हूँ?",
+    "gold": "greeting",
+    "lang": "hi"
+  },
+  {
+    "text": "हाय! क्या आपका दिन अच्छा चल रहा है?",
+    "gold": "greeting",
+    "lang": "hi"
+  },
+  {
+    "text": "सलाम, बताइए आज आप क्या जानना चाहते हैं?",
+    "gold": "greeting",
+    "lang": "hi"
+  },
+  {
+    "text": "अरे, कैसे हैं आप? कुछ पूछना है तो बताइए।",
+    "gold": "greeting",
+    "lang": "hi"
+  },
+  {
+    "text": "जुड़े रहिए, मैं यहाँ हूँ आपकी मदद के लिए।",
+    "gold": "greeting",
+    "lang": "hi"
+  },
+  {
+    "text": "ठीक है, अब मैं चलूँगा, आपका बहुत धन्यवाद!",
+    "gold": "goodbye",
+    "lang": "hi"
+  },
+  {
+    "text": "अभी समय नहीं है, बाद में बात करेंगे, अलविदा!",
+    "gold": "goodbye",
+    "lang": "hi"
+  },
+  {
+    "text": "बहुत मदद मिली, अब घर जाना है, फिर मिलेंगे।",
+    "gold": "goodbye",
+    "lang": "hi"
+  },
+  {
+    "text": "धन्यवाद, आपका दिन शुभ रहे, अब विदा ले रहा हूँ।",
+    "gold": "goodbye",
+    "lang": "hi"
+  },
+  {
+    "text": "चलते-फिरते थक गया हूँ, आज के लिए बस इतना ही, बाय बाय!",
+    "gold": "goodbye",
+    "lang": "hi"
+  },
+  {
+    "text": "आपकी मदद के लिए बहुत धन्यवाद, इससे मेरा काम काफी आसान हो गया।",
+    "gold": "gratitude",
+    "lang": "hi"
+  },
+  {
+    "text": "इतनी जल्दी जवाब देने के लिए शुक्रिया, सच में सराहा।",
+    "gold": "gratitude",
+    "lang": "hi"
+  },
+  {
+    "text": "बिना आपकी सहायता के मैं इस प्रोजेक्ट को पूरा नहीं कर पाता, धन्यवाद!",
+    "gold": "gratitude",
+    "lang": "hi"
+  },
+  {
+    "text": "अरे यार, तुम्हारी सलाह ने मेरी समस्या हल कर दी, बहुत-बहुत आभारी हूँ।",
+    "gold": "gratitude",
+    "lang": "hi"
+  },
+  {
+    "text": "सपोर्ट टीम, आपका सहयोग बेहतरीन रहा, दिल से धन्यवाद।",
+    "gold": "gratitude",
+    "lang": "hi"
+  },
+  {
+    "text": "कल रात सो नहीं पाई, मेरे दिमाग में बहुत बेचैनी है। क्या करूँ?",
+    "gold": "asking_mental_health_question",
+    "lang": "hi"
+  },
+  {
+    "text": "काम का दबाव बढ़ रहा है, मुझे लगता है मैं थक गया हूँ, कोई सलाह?",
+    "gold": "asking_mental_health_question",
+    "lang": "hi"
+  },
+  {
+    "text": "मेरी दोस्ती में टेंशन है, मुझे नहीं पता कैसे बात करूँ। मदद चाहिए।",
+    "gold": "asking_mental_health_question",
+    "lang": "hi"
+  },
+  {
+    "text": "पिछले कुछ हफ्तों से नींद नहीं आती, क्या यह डिप्रेशन का संकेत है?",
+    "gold": "asking_mental_health_question",
+    "lang": "hi"
+  },
+  {
+    "text": "अभी बहुत उदास महसूस कर रहा हूँ, कुछ सकारात्मक विचार चाहिए।",
+    "gold": "asking_mental_health_question",
+    "lang": "hi"
+  },
+  {
+    "text": "मुझे अपना जावा प्रोग्राम ठीक कर दो, समझ नहीं आ रहा।",
+    "gold": "out_of_scope",
+    "lang": "hi"
+  },
+  {
+    "text": "आज दिल्ली में मौसम कैसा रहेगा? बता दो।",
+    "gold": "out_of_scope",
+    "lang": "hi"
+  },
+  {
+    "text": "फ़ुटबॉल मैच का स्कोर बताओ, कौन जीतेगा?",
+    "gold": "out_of_scope",
+    "lang": "hi"
+  },
+  {
+    "text": "पिछले साल के चुनाव परिणाम क्या थे?",
+    "gold": "out_of_scope",
+    "lang": "hi"
+  },
+  {
+    "text": "क्या आप इस गणित के इंटीग्रल को हल कर सकते हैं?",
+    "gold": "out_of_scope",
+    "lang": "hi"
+  },
+  {
+    "text": "Ciao! Come va oggi, amico?",
+    "gold": "greeting",
+    "lang": "it"
+  },
+  {
+    "text": "Buongiorno, ho una domanda su come funziona il tuo servizio.",
+    "gold": "greeting",
+    "lang": "it"
+  },
+  {
+    "text": "Ehi, sono nuovo qui, potresti darmi una mano?",
+    "gold": "greeting",
+    "lang": "it"
+  },
+  {
+    "text": "Salve, avrei bisogno di qualche informazione, per favore.",
+    "gold": "greeting",
+    "lang": "it"
+  },
+  {
+    "text": "Oi! Come stai? Mi chiamo Luca e vorrei parlare con te.",
+    "gold": "greeting",
+    "lang": "it"
+  },
+  {
+    "text": "Grazie per l'aiuto, ci sentiamo presto!",
+    "gold": "goodbye",
+    "lang": "it"
+  },
+  {
+    "text": "Devo andare, buona serata a tutti.",
+    "gold": "goodbye",
+    "lang": "it"
+  },
+  {
+    "text": "È stato bello chiacchierare, a presto!",
+    "gold": "goodbye",
+    "lang": "it"
+  },
+  {
+    "text": "Mi sa che è ora di chiudere, ciao ciao.",
+    "gold": "goodbye",
+    "lang": "it"
+  },
+  {
+    "text": "Arrivederci, grazie mille, ci risentiamo domani.",
+    "gold": "goodbye",
+    "lang": "it"
+  },
+  {
+    "text": "Grazie mille per l'aiuto, mi hai davvero salvato la giornata!",
+    "gold": "gratitude",
+    "lang": "it"
+  },
+  {
+    "text": "Ti ringrazio tanto, il tuo consiglio è stato perfetto.",
+    "gold": "gratitude",
+    "lang": "it"
+  },
+  {
+    "text": "Un enorme grazie, senza di te non ce l'avrei fatta.",
+    "gold": "gratitude",
+    "lang": "it"
+  },
+  {
+    "text": "Grazie di cuore, sei sempre così disponibile quando ho bisogno.",
+    "gold": "gratitude",
+    "lang": "it"
+  },
+  {
+    "text": "Apprezzo davvero il tuo supporto, sei stato d’aiuto più di quanto credo.",
+    "gold": "gratitude",
+    "lang": "it"
+  },
+  {
+    "text": "Mi sento sempre più ansiosa, non riesco a dormire; cosa posso fare?",
+    "gold": "asking_mental_health_question",
+    "lang": "it"
+  },
+  {
+    "text": "Ultimamente ho il morale a zero, credo sia depressione, mi consigli qualcosa?",
+    "gold": "asking_mental_health_question",
+    "lang": "it"
+  },
+  {
+    "text": "Sono stressata dal lavoro e non so come rilassarmi, hai qualche tecnica?",
+    "gold": "asking_mental_health_question",
+    "lang": "it"
+  },
+  {
+    "text": "Mi sento solo e non riesco a parlare dei miei sentimenti, come affrontare?",
+    "gold": "asking_mental_health_question",
+    "lang": "it"
+  },
+  {
+    "text": "Sto avendo incubi ogni notte, è legato all'ansia? Che cosa posso provare?",
+    "gold": "asking_mental_health_question",
+    "lang": "it"
+  },
+  {
+    "text": "Puoi spiegarmi come funziona una lista collegata in Python?",
+    "gold": "out_of_scope",
+    "lang": "it"
+  },
+  {
+    "text": "Che tempo farà domani a Roma? Voglio organizzare un picnic.",
+    "gold": "out_of_scope",
+    "lang": "it"
+  },
+  {
+    "text": "Chi ha vinto l'ultimo campionato di Serie A?",
+    "gold": "out_of_scope",
+    "lang": "it"
+  },
+  {
+    "text": "Qual è la soluzione dell'integrale di sin(x)/x dx?",
+    "gold": "out_of_scope",
+    "lang": "it"
+  },
+  {
+    "text": "Mi consigli un buon ristorante a Napoli per cena stasera?",
+    "gold": "out_of_scope",
+    "lang": "it"
+  },
+  {
+    "text": "こんにちは、今日はどんなことを話したいですか？",
+    "gold": "greeting",
+    "lang": "ja"
+  },
+  {
+    "text": "やっほー！元気にしてる？",
+    "gold": "greeting",
+    "lang": "ja"
+  },
+  {
+    "text": "お疲れ様です、何か相談したいことありますか？",
+    "gold": "greeting",
+    "lang": "ja"
+  },
+  {
+    "text": "おはようございます、今日も頑張りましょうね！",
+    "gold": "greeting",
+    "lang": "ja"
+  },
+  {
+    "text": "おっす、ちょっと聞きたいことがあるんだけど。",
+    "gold": "greeting",
+    "lang": "ja"
+  },
+  {
+    "text": "それじゃ、またね！今日はありがとう。",
+    "gold": "goodbye",
+    "lang": "ja"
+  },
+  {
+    "text": "そろそろ失礼します。次回もよろしくお願いします。",
+    "gold": "goodbye",
+    "lang": "ja"
+  },
+  {
+    "text": "お疲れ様でした。もう行かなきゃ、また連絡してね。",
+    "gold": "goodbye",
+    "lang": "ja"
+  },
+  {
+    "text": "バイバイ、また近いうちに話そうや。",
+    "gold": "goodbye",
+    "lang": "ja"
+  },
+  {
+    "text": "もう時間だし、ここでお別れです。さようなら。",
+    "gold": "goodbye",
+    "lang": "ja"
+  },
+  {
+    "text": "昨日の資料、すごく分かりやすかったです。ありがとうございました！",
+    "gold": "gratitude",
+    "lang": "ja"
+  },
+  {
+    "text": "助けてくれて本当に助かりました、感謝してます。",
+    "gold": "gratitude",
+    "lang": "ja"
+  },
+  {
+    "text": "さっきのトラブル、すぐに解決してくれて感謝です。",
+    "gold": "gratitude",
+    "lang": "ja"
+  },
+  {
+    "text": "いつも親切にサポートしてくれるおかげで安心できます、ありがとう。",
+    "gold": "gratitude",
+    "lang": "ja"
+  },
+  {
+    "text": "お忙しい中、時間を割いて説明してくれてありがとうね！",
+    "gold": "gratitude",
+    "lang": "ja"
+  },
+  {
+    "text": "最近、仕事のストレスがすごくて眠れないんです。どうしたらいいですか？",
+    "gold": "asking_mental_health_question",
+    "lang": "ja"
+  },
+  {
+    "text": "友達と喧嘩してから、ずっと落ち込んでるんだけど、何かアドバイスある？",
+    "gold": "asking_mental_health_question",
+    "lang": "ja"
+  },
+  {
+    "text": "最近、胸が苦しくて不安が止まらないんです。どうやってリラックスすればいいですか？",
+    "gold": "asking_mental_health_question",
+    "lang": "ja"
+  },
+  {
+    "text": "朝起きたらすぐに疲れを感じるんだけど、もしかしてうつなのかな？",
+    "gold": "asking_mental_health_question",
+    "lang": "ja"
+  },
+  {
+    "text": "勉強のプレッシャーが強くて集中できない。気持ちを落ち着かせるコツが知りたいです。",
+    "gold": "asking_mental_health_question",
+    "lang": "ja"
+  },
+  {
+    "text": "Pythonでリストをソートする最適な方法を教えてください。",
+    "gold": "out_of_scope",
+    "lang": "ja"
+  },
+  {
+    "text": "今日の東京の天気はどうですか？雨が降りそうです。",
+    "gold": "out_of_scope",
+    "lang": "ja"
+  },
+  {
+    "text": "今シーズンのサッカーレギュラーで注目の選手は誰ですか？",
+    "gold": "out_of_scope",
+    "lang": "ja"
+  },
+  {
+    "text": "二次方程式の解の公式をもう一度説明してもらえますか？",
+    "gold": "out_of_scope",
+    "lang": "ja"
+  },
+  {
+    "text": "最近の米国大統領選の結果について最新情報を知りたいです。",
+    "gold": "out_of_scope",
+    "lang": "ja"
+  },
+  {
+    "text": "Hey, hoe gaat het met je vandaag?",
+    "gold": "greeting",
+    "lang": "nl"
+  },
+  {
+    "text": "Goedemorgen! Ik ben net wakker en klaar voor een praatje.",
+    "gold": "greeting",
+    "lang": "nl"
+  },
+  {
+    "text": "Hoi, ik heb een vraag over mijn account, kun je me helpen?",
+    "gold": "greeting",
+    "lang": "nl"
+  },
+  {
+    "text": "Hallo daar! Alles goed? Ik ben benieuwd naar je advies.",
+    "gold": "greeting",
+    "lang": "nl"
+  },
+  {
+    "text": "Goede middag, ik ben op zoek naar een nieuw recept voor het avondeten.",
+    "gold": "greeting",
+    "lang": "nl"
+  },
+  {
+    "text": "Bedankt voor je hulp, tot later!",
+    "gold": "goodbye",
+    "lang": "nl"
+  },
+  {
+    "text": "Ik moet nu gaan, fijne dag nog!",
+    "gold": "goodbye",
+    "lang": "nl"
+  },
+  {
+    "text": "Doei, ik zie je morgen weer hier.",
+    "gold": "goodbye",
+    "lang": "nl"
+  },
+  {
+    "text": "Alvast een prettige avond, tot de volgende keer!",
+    "gold": "goodbye",
+    "lang": "nl"
+  },
+  {
+    "text": "Nou, ik sluit af – tot ziens, bedankt!",
+    "gold": "goodbye",
+    "lang": "nl"
+  },
+  {
+    "text": "Bedankt voor je snelle antwoord, dat heeft me echt geholpen!",
+    "gold": "gratitude",
+    "lang": "nl"
+  },
+  {
+    "text": "Super dankjewel voor de tip, ik ga het meteen proberen.",
+    "gold": "gratitude",
+    "lang": "nl"
+  },
+  {
+    "text": "Ik waardeer je hulp enorm, zonder jou had ik het niet gered.",
+    "gold": "gratitude",
+    "lang": "nl"
+  },
+  {
+    "text": "Dank je wel, je advies was precies wat ik nodig had.",
+    "gold": "gratitude",
+    "lang": "nl"
+  },
+  {
+    "text": "Heel erg bedankt, jouw uitleg maakte het ineens duidelijk voor me.",
+    "gold": "gratitude",
+    "lang": "nl"
+  },
+  {
+    "text": "Ik voel me de laatste tijd zo moe, kun je me helpen beter te slapen?",
+    "gold": "asking_mental_health_question",
+    "lang": "nl"
+  },
+  {
+    "text": "Waarom ben ik zo onrustig op het werk? Ik krijg constant stress.",
+    "gold": "asking_mental_health_question",
+    "lang": "nl"
+  },
+  {
+    "text": "Ik maak me zorgen over mijn relatie, vind je dat normaal om zo te twijfelen?",
+    "gold": "asking_mental_health_question",
+    "lang": "nl"
+  },
+  {
+    "text": "Heb je tips tegen mijn angst om 's ochtends op te staan?",
+    "gold": "asking_mental_health_question",
+    "lang": "nl"
+  },
+  {
+    "text": "Ik heb last van sombere gedachten, hoe kan ik hier uit komen?",
+    "gold": "asking_mental_health_question",
+    "lang": "nl"
+  },
+  {
+    "text": "Kun je me de huidige beurskoersen laten zien?",
+    "gold": "out_of_scope",
+    "lang": "nl"
+  },
+  {
+    "text": "Hoe los ik deze fout in mijn JavaScript‑code op?",
+    "gold": "out_of_scope",
+    "lang": "nl"
+  },
+  {
+    "text": "Wat is het weer vandaag in Amsterdam?",
+    "gold": "out_of_scope",
+    "lang": "nl"
+  },
+  {
+    "text": "Wie won de Champions League dit jaar?",
+    "gold": "out_of_scope",
+    "lang": "nl"
+  },
+  {
+    "text": "Kun je me helpen met een lineair‑algebra probleem?",
+    "gold": "out_of_scope",
+    "lang": "nl"
+  },
+  {
+    "text": "Cześć! Czy mogę zapytać o kilka rzeczy?",
+    "gold": "greeting",
+    "lang": "pl"
+  },
+  {
+    "text": "Hej, jak się masz? Potrzebuję pomocy z zamówieniem.",
+    "gold": "greeting",
+    "lang": "pl"
+  },
+  {
+    "text": "Dzień dobry, chciałbym dowiedzieć się więcej o waszych usługach.",
+    "gold": "greeting",
+    "lang": "pl"
+  },
+  {
+    "text": "Siema! Czy możesz mi wyjaśnić, jak działa ten produkt?",
+    "gold": "greeting",
+    "lang": "pl"
+  },
+  {
+    "text": "Witam serdecznie, mam pytanie odnośnie mojego konta.",
+    "gold": "greeting",
+    "lang": "pl"
+  },
+  {
+    "text": "Do zobaczenia, dzięki za pomoc!",
+    "gold": "goodbye",
+    "lang": "pl"
+  },
+  {
+    "text": "Na razie, muszę już iść.",
+    "gold": "goodbye",
+    "lang": "pl"
+  },
+  {
+    "text": "Trzymaj się, było miło rozmawiać.",
+    "gold": "goodbye",
+    "lang": "pl"
+  },
+  {
+    "text": "Dzięki, to wszystko na dziś. Pa!",
+    "gold": "goodbye",
+    "lang": "pl"
+  },
+  {
+    "text": "Cześć, życzę miłego dnia i do usłyszenia.",
+    "gold": "goodbye",
+    "lang": "pl"
+  },
+  {
+    "text": "Dzięki za szybką odpowiedź, naprawdę pomogło mi to rozwiązać problem.",
+    "gold": "gratitude",
+    "lang": "pl"
+  },
+  {
+    "text": "Bardzo dziękuję za wsparcie, nie wiedziałem, jak to zrobić bez twojej pomocy.",
+    "gold": "gratitude",
+    "lang": "pl"
+  },
+  {
+    "text": "Serio, dzięki! Twoje wskazówki uratowały mi dzień.",
+    "gold": "gratitude",
+    "lang": "pl"
+  },
+  {
+    "text": "Dzięki wielkie za wyjaśnienia, teraz wszystko jest jasne.",
+    "gold": "gratitude",
+    "lang": "pl"
+  },
+  {
+    "text": "Dzięki za pomoc, doceniam twoją cierpliwość i zaangażowanie.",
+    "gold": "gratitude",
+    "lang": "pl"
+  },
+  {
+    "text": "Czuję się przytłoczona ostatnio, co mogę zrobić?",
+    "gold": "asking_mental_health_question",
+    "lang": "pl"
+  },
+  {
+    "text": "Mam ciągłe lęki przed wyjściem z domu, jak sobie z nimi radzić?",
+    "gold": "asking_mental_health_question",
+    "lang": "pl"
+  },
+  {
+    "text": "Nie mogę się skoncentrować w pracy, czy to objaw depresji?",
+    "gold": "asking_mental_health_question",
+    "lang": "pl"
+  },
+  {
+    "text": "Czuję się samotny po rozstaniu, czy znajdę jeszcze szczęście?",
+    "gold": "asking_mental_health_question",
+    "lang": "pl"
+  },
+  {
+    "text": "Mój sen jest przerywany, budzę się co dwie godziny, co robić?",
+    "gold": "asking_mental_health_question",
+    "lang": "pl"
+  },
+  {
+    "text": "Hej, wiesz może, jaka dziś jest prognoza pogody w Krakowie?",
+    "gold": "out_of_scope",
+    "lang": "pl"
+  },
+  {
+    "text": "Czy możesz napisać kod w Pythonie, który sortuje listę?",
+    "gold": "out_of_scope",
+    "lang": "pl"
+  },
+  {
+    "text": "Kto wygrał ostatni mecz Legii Warszawa?",
+    "gold": "out_of_scope",
+    "lang": "pl"
+  },
+  {
+    "text": "Oblicz mi, proszę, pierwiastek kwadratowy z 987654.",
+    "gold": "out_of_scope",
+    "lang": "pl"
+  },
+  {
+    "text": "Co się dzieje w polityce w UE w tym tygodniu?",
+    "gold": "out_of_scope",
+    "lang": "pl"
+  },
+  {
+    "text": "Oi! Como você está hoje?",
+    "gold": "greeting",
+    "lang": "pt"
+  },
+  {
+    "text": "Bom dia, poderia me ajudar com uma dúvida?",
+    "gold": "greeting",
+    "lang": "pt"
+  },
+  {
+    "text": "E aí, tudo tranquilo? Preciso de uma informação rápida.",
+    "gold": "greeting",
+    "lang": "pt"
+  },
+  {
+    "text": "Olá, gostaria de saber mais sobre seus serviços, pode me responder?",
+    "gold": "greeting",
+    "lang": "pt"
+  },
+  {
+    "text": "Oi, estou sem tempo, mas queria iniciar uma conversa rápida.",
+    "gold": "greeting",
+    "lang": "pt"
+  },
+  {
+    "text": "Valeu pela ajuda, preciso ir agora. Até mais!",
+    "gold": "goodbye",
+    "lang": "pt"
+  },
+  {
+    "text": "Foi bom conversar, mas já estou saindo. Tchau!",
+    "gold": "goodbye",
+    "lang": "pt"
+  },
+  {
+    "text": "Preciso desligar o computador, obrigada. Boa noite!",
+    "gold": "goodbye",
+    "lang": "pt"
+  },
+  {
+    "text": "Desculpa, tenho reunião. Até a próxima!",
+    "gold": "goodbye",
+    "lang": "pt"
+  },
+  {
+    "text": "Obrigado por tudo, vou me ausentar. Até logo!",
+    "gold": "goodbye",
+    "lang": "pt"
+  },
+  {
+    "text": "Valeu demais pela ajuda, não sei o que faria sem você!",
+    "gold": "gratitude",
+    "lang": "pt"
+  },
+  {
+    "text": "Muito obrigado por esclarecer minhas dúvidas tão rapidamente.",
+    "gold": "gratitude",
+    "lang": "pt"
+  },
+  {
+    "text": "Agradeço de coração, sua explicação salvou meu dia.",
+    "gold": "gratitude",
+    "lang": "pt"
+  },
+  {
+    "text": "Obrigado, você realmente facilitou tudo pra mim.",
+    "gold": "gratitude",
+    "lang": "pt"
+  },
+  {
+    "text": "Gratidão! Seu suporte foi essencial para eu concluir o projeto.",
+    "gold": "gratitude",
+    "lang": "pt"
+  },
+  {
+    "text": "Estou me sentindo muito ansiosa ultimamente, o que posso fazer para acalmar?",
+    "gold": "asking_mental_health_question",
+    "lang": "pt"
+  },
+  {
+    "text": "Não consigo dormir bem, acordo várias vezes à noite, tem algum conselho?",
+    "gold": "asking_mental_health_question",
+    "lang": "pt"
+  },
+  {
+    "text": "Minha relação com meus pais está tensa, como lido com isso?",
+    "gold": "asking_mental_health_question",
+    "lang": "pt"
+  },
+  {
+    "text": "Sinto que a tristeza não vai embora, preciso de ajuda para entender.",
+    "gold": "asking_mental_health_question",
+    "lang": "pt"
+  },
+  {
+    "text": "O trabalho está me estressando demais, como posso lidar com a pressão?",
+    "gold": "asking_mental_health_question",
+    "lang": "pt"
+  },
+  {
+    "text": "Você pode me dizer como escrever uma função em JavaScript que calcula fatorial?",
+    "gold": "out_of_scope",
+    "lang": "pt"
+  },
+  {
+    "text": "Qual será a temperatura em São Paulo amanhã?",
+    "gold": "out_of_scope",
+    "lang": "pt"
+  },
+  {
+    "text": "Quem ganhou a última partida da Liga dos Campeões?",
+    "gold": "out_of_scope",
+    "lang": "pt"
+  },
+  {
+    "text": "Me ajuda a resolver essa equação quadrática: 2x^2 - 5x + 3 = 0",
+    "gold": "out_of_scope",
+    "lang": "pt"
+  },
+  {
+    "text": "Quais são as principais notícias de hoje sobre política internacional?",
+    "gold": "out_of_scope",
+    "lang": "pt"
+  },
+  {
+    "text": "Привет! Как твой день проходит?",
+    "gold": "greeting",
+    "lang": "ru"
+  },
+  {
+    "text": "Здорово, давно не общались, расскажи, что нового?",
+    "gold": "greeting",
+    "lang": "ru"
+  },
+  {
+    "text": "Здравствуйте! Можно задать вам пару вопросов?",
+    "gold": "greeting",
+    "lang": "ru"
+  },
+  {
+    "text": "Салют! Есть минутка поболтать?",
+    "gold": "greeting",
+    "lang": "ru"
+  },
+  {
+    "text": "Доброго времени суток! Как настроение?",
+    "gold": "greeting",
+    "lang": "ru"
+  },
+  {
+    "text": "Спасибо за помощь! Пока, до встречи!",
+    "gold": "goodbye",
+    "lang": "ru"
+  },
+  {
+    "text": "Мне уже нужно идти, спасибо, пока‑пока!",
+    "gold": "goodbye",
+    "lang": "ru"
+  },
+  {
+    "text": "Ну всё, я отключаюсь, хорошего дня!",
+    "gold": "goodbye",
+    "lang": "ru"
+  },
+  {
+    "text": "Было приятно пообщаться, но я ухожу. До свидания!",
+    "gold": "goodbye",
+    "lang": "ru"
+  },
+  {
+    "text": "Сейчас заканчиваю, спасибо за ответы, прощай!",
+    "gold": "goodbye",
+    "lang": "ru"
+  },
+  {
+    "text": "Спасибо, вы мне очень помогли разобраться с проблемой!",
+    "gold": "gratitude",
+    "lang": "ru"
+  },
+  {
+    "text": "Огромное спасибо за быстрый отклик, вы спасли меня.",
+    "gold": "gratitude",
+    "lang": "ru"
+  },
+  {
+    "text": "Благодарю за поддержку, без вашей помощи я бы не справился.",
+    "gold": "gratitude",
+    "lang": "ru"
+  },
+  {
+    "text": "Спасибо огромное! Ваш совет оказался точным и полезным.",
+    "gold": "gratitude",
+    "lang": "ru"
+  },
+  {
+    "text": "Респект за помощь, вы крутые!",
+    "gold": "gratitude",
+    "lang": "ru"
+  },
+  {
+    "text": "Мне всё время не хватает сил, как справиться с такой усталостью?",
+    "gold": "asking_mental_health_question",
+    "lang": "ru"
+  },
+  {
+    "text": "Почему я так часто переживаю даже мелочи? Что со мной?",
+    "gold": "asking_mental_health_question",
+    "lang": "ru"
+  },
+  {
+    "text": "Сон плохой, просыпаюсь в панике, что делать?",
+    "gold": "asking_mental_health_question",
+    "lang": "ru"
+  },
+  {
+    "text": "Я боюсь идти к людям, как избавиться от этой тревоги?",
+    "gold": "asking_mental_health_question",
+    "lang": "ru"
+  },
+  {
+    "text": "Отношения с мамой стали напряжёнными, как вернуть мир?",
+    "gold": "asking_mental_health_question",
+    "lang": "ru"
+  },
+  {
+    "text": "Подскажи, как написать функцию сортировки в Python?",
+    "gold": "out_of_scope",
+    "lang": "ru"
+  },
+  {
+    "text": "Какая будет погода в Москве завтра?",
+    "gold": "out_of_scope",
+    "lang": "ru"
+  },
+  {
+    "text": "Кто победил в последнем матче Реала?",
+    "gold": "out_of_scope",
+    "lang": "ru"
+  },
+  {
+    "text": "Помоги решить уравнение: 2x^2 - 5x + 3 = 0.",
+    "gold": "out_of_scope",
+    "lang": "ru"
+  },
+  {
+    "text": "Что происходит в новостях сегодня? Какие крупные события?",
+    "gold": "out_of_scope",
+    "lang": "ru"
+  },
+  {
+    "text": "Hujambo! Niko hapa kuzungumza, wewe je?",
+    "gold": "greeting",
+    "lang": "sw"
+  },
+  {
+    "text": "Mambo vipi? Nataka kujua unafanyaje leo.",
+    "gold": "greeting",
+    "lang": "sw"
+  },
+  {
+    "text": "Salamu za jioni, ninafurahi kuzungumza nawe.",
+    "gold": "greeting",
+    "lang": "sw"
+  },
+  {
+    "text": "Hee, habari yako? Nimekuwa nikifikiria kuhusu swali lako.",
+    "gold": "greeting",
+    "lang": "sw"
+  },
+  {
+    "text": "Sasa tu nipo, karibuni. Mambo?",
+    "gold": "greeting",
+    "lang": "sw"
+  },
+  {
+    "text": "Asante sana, nimepata taarifa zote, kwaheri!",
+    "gold": "goodbye",
+    "lang": "sw"
+  },
+  {
+    "text": "Sawa, nitachukua muda kidogo, baadaye tutaongea tena.",
+    "gold": "goodbye",
+    "lang": "sw"
+  },
+  {
+    "text": "Nimekamilisha yote, tutaonana kesho, usiku mwema!",
+    "gold": "goodbye",
+    "lang": "sw"
+  },
+  {
+    "text": "Nimepumzika, nitakuja tena baada ya darasa, kwaheri!",
+    "gold": "goodbye",
+    "lang": "sw"
+  },
+  {
+    "text": "Tutaonana baadaye, shukrani kwa msaada wako, salamu!",
+    "gold": "goodbye",
+    "lang": "sw"
+  },
+  {
+    "text": "Asante sana kwa msaada wako, bila wewe nisingeweza kufanya hili!",
+    "gold": "gratitude",
+    "lang": "sw"
+  },
+  {
+    "text": "Nashukuru sana, umefanya siku yangu kuwa rahisi.",
+    "gold": "gratitude",
+    "lang": "sw"
+  },
+  {
+    "text": "Mambo! Shukrani kwa kunielekeza, sasa ninaelewa vizuri.",
+    "gold": "gratitude",
+    "lang": "sw"
+  },
+  {
+    "text": "Vipi, asante kwa kuchukua muda wako kunijibu maswali yote.",
+    "gold": "gratitude",
+    "lang": "sw"
+  },
+  {
+    "text": "Shukrani tele! Hii ilikuwa msaada muhimu sana.",
+    "gold": "gratitude",
+    "lang": "sw"
+  },
+  {
+    "text": "Nimekuwa na ndoto mbaya kila usiku, na si najua kusimama.",
+    "gold": "asking_mental_health_question",
+    "lang": "sw"
+  },
+  {
+    "text": "Nifanyeje kupunguza wasiwasi ninapoangalia mitandao?",
+    "gold": "asking_mental_health_question",
+    "lang": "sw"
+  },
+  {
+    "text": "Nahitaji ushauri kuhusu jinsi ya kuwasiliana na mwenzi wangu baada ya mgogoro.",
+    "gold": "asking_mental_health_question",
+    "lang": "sw"
+  },
+  {
+    "text": "Nimechoka sana kazini, na najihisi kuchoka bila sababu.",
+    "gold": "asking_mental_health_question",
+    "lang": "sw"
+  },
+  {
+    "text": "Nina shida kulala, na ninahisi mawazo yangu yananukilia.",
+    "gold": "asking_mental_health_question",
+    "lang": "sw"
+  },
+  {
+    "text": "Nahitaji msaada kuandika script ya Python kwa kuchambua data za mauzo.",
+    "gold": "out_of_scope",
+    "lang": "sw"
+  },
+  {
+    "text": "Samahani, unaweza kuniambia hali ya hewa mjini Dar es Salaam leo?",
+    "gold": "out_of_scope",
+    "lang": "sw"
+  },
+  {
+    "text": "Michezo ya leo, ni timu gani itashinda mashindano ya soka.",
+    "gold": "out_of_scope",
+    "lang": "sw"
+  },
+  {
+    "text": "Nataka kujua jinsi ya kutatua equation ya quadratic: x^2 + 5x + 6 = 0.",
+    "gold": "out_of_scope",
+    "lang": "sw"
+  },
+  {
+    "text": "Ni habari gani za hivi karibuni kuhusu uchaguzi wa rais nchini Kenya?",
+    "gold": "out_of_scope",
+    "lang": "sw"
+  },
+  {
+    "text": "สวัสดีครับ ผมอยากถามเรื่องการใช้บริการหน่อย",
+    "gold": "greeting",
+    "lang": "th"
+  },
+  {
+    "text": "หวัดดีจ้า! มีอะไรให้ช่วยได้บ้าง?",
+    "gold": "greeting",
+    "lang": "th"
+  },
+  {
+    "text": "สวัสดีค่ะ วันนี้อากาศดีจัง อยากรู้ข้อมูลสินค้า",
+    "gold": "greeting",
+    "lang": "th"
+  },
+  {
+    "text": "เฮ้! มีคำถามเกี่ยวกับโปรโมชั่นล่าสุดได้ไหม?",
+    "gold": "greeting",
+    "lang": "th"
+  },
+  {
+    "text": "สวัสดีครับ พอดีอยากเช็คยอดคงเหลือในบัญชี",
+    "gold": "greeting",
+    "lang": "th"
+  },
+  {
+    "text": "ค่ะ ขอบคุณมากนะคะ ที่ช่วยตอบคำถาม คุณนะ แล้วเจอกันใหม่ครับ",
+    "gold": "goodbye",
+    "lang": "th"
+  },
+  {
+    "text": "โอเค คราวหน้าอยากคุยต่อบอกได้เลย สวัสดีครับ ขอให้วันดีนะ แล้วเจอกัน",
+    "gold": "goodbye",
+    "lang": "th"
+  },
+  {
+    "text": "ต้องไปทำงานแล้ว บายๆ นะจ๊ะ อย่าลืมพักผ่อน แล้วคุยกันใหม่วันพรุ่งนี้",
+    "gold": "goodbye",
+    "lang": "th"
+  },
+  {
+    "text": "คุยกันสนุกมาก ขอบคุณที่ช่วยตอบ ผมต้องไปแล้ว ลาก่อนครับ ดูแลตัวเองนะ",
+    "gold": "goodbye",
+    "lang": "th"
+  },
+  {
+    "text": "บ๊ายบาย! พรุ่งนี้เจอกันอีกทีนะ อย่าลืมทำการบ้าน แล้วส่งให้ฉันดูนะครับ จริงๆ",
+    "gold": "goodbye",
+    "lang": "th"
+  },
+  {
+    "text": "ขอบคุณมากเลยครับที่ช่วยตรวจเอกสารให้เสร็จเร็ว ๆ นี้",
+    "gold": "gratitude",
+    "lang": "th"
+  },
+  {
+    "text": "จริง ๆ แล้วไม่มีคุณคงทำไม่ได้ ขอบคุณนะ",
+    "gold": "gratitude",
+    "lang": "th"
+  },
+  {
+    "text": "ขอบคุณที่แนะนําแอปนี้ ให้ชีวิตสะดวกขึ้นเยอะเลย",
+    "gold": "gratitude",
+    "lang": "th"
+  },
+  {
+    "text": "ขอบคุณคุณพี่ช่วยยืมเครื่องมือทำโปรเจคต์ ไปเลย",
+    "gold": "gratitude",
+    "lang": "th"
+  },
+  {
+    "text": "ขอบคุณที่อธิบายวิธีทำสูตรนี้ให้เข้าใจง่ายมาก ๆ",
+    "gold": "gratitude",
+    "lang": "th"
+  },
+  {
+    "text": "ช่วงนี้ ฉัน นอนไม่ค่อยหลับเลย เหนื่อยกับความเครียดงานมาก",
+    "gold": "asking_mental_health_question",
+    "lang": "th"
+  },
+  {
+    "text": "รู้สึกหดหู่ทุกวัน ไม่รู้จะทำยังไงดี",
+    "gold": "asking_mental_health_question",
+    "lang": "th"
+  },
+  {
+    "text": "เพื่อนเครียดมาก มีอาการใจสั่น อยากให้คำแนะนำ",
+    "gold": "asking_mental_health_question",
+    "lang": "th"
+  },
+  {
+    "text": "ฉันเริ่มหลงลืมความสนใจที่เคยชอบ ทำไมถึงเป็นแบบนี้นะ?",
+    "gold": "asking_mental_health_question",
+    "lang": "th"
+  },
+  {
+    "text": "ตอนนี้รู้สึกกังวลมากเกี่ยวกับการสอบ แบ่งเวลานอนก็ยาก",
+    "gold": "asking_mental_health_question",
+    "lang": "th"
+  },
+  {
+    "text": "ช่วย เขียนฟังก์ชัน JavaScript ให้ ดึงข้อมูลจาก API หน่อยได้ไหม",
+    "gold": "out_of_scope",
+    "lang": "th"
+  },
+  {
+    "text": "พรุ่งนี้ ฝน จะ ตก ไหม? อยาก รู้ สภาพ อากาศ ตอน เย็น เพื่อ วางแผน ออก ไป เดิน",
+    "gold": "out_of_scope",
+    "lang": "th"
+  },
+  {
+    "text": "ทีม ชลบุรี จะ ชนะ ทีม บุรีรัมย์ ใน ศึก นี้ หรือ เปล่า?",
+    "gold": "out_of_scope",
+    "lang": "th"
+  },
+  {
+    "text": "สูตร หาความ ต่าง ศูนย์กลาง ของ วงกลม คือ อะไร? ช่วย อธิบาย ให้ เข้าใจ ง่าย",
+    "gold": "out_of_scope",
+    "lang": "th"
+  },
+  {
+    "text": "ข่าว ด่วน เกี่ยวกับ การ เลือกตั้ง ปี นี้ มี อะไร บ้าง? อยาก อัพเดท เร็ว",
+    "gold": "out_of_scope",
+    "lang": "th"
+  },
+  {
+    "text": "Selam! Bugün nasılsın, bir şey sorabilir miyim?",
+    "gold": "greeting",
+    "lang": "tr"
+  },
+  {
+    "text": "Merhaba, nasılsınız? Birkaç dakikanız var mı?",
+    "gold": "greeting",
+    "lang": "tr"
+  },
+  {
+    "text": "Hey, nasılsın? Şu an bir şey danışmak istiyorum.",
+    "gold": "greeting",
+    "lang": "tr"
+  },
+  {
+    "text": "Günaydın! Kahvemizi alırken bir sorum olacak, yardımcı olur musun?",
+    "gold": "greeting",
+    "lang": "tr"
+  },
+  {
+    "text": "Naber, bir saniye zamanın var mı? Konuşmak istiyorum.",
+    "gold": "greeting",
+    "lang": "tr"
+  },
+  {
+    "text": "Tamam, şimdi çıkıyorum, görüşürüz!",
+    "gold": "goodbye",
+    "lang": "tr"
+  },
+  {
+    "text": "Sohbet çok güzeldi, tekrar konuşmak için sabırsızlanıyorum, hoşça kal!",
+    "gold": "goodbye",
+    "lang": "tr"
+  },
+  {
+    "text": "Şimdi işime dönmem lazım, kendine iyi bak!",
+    "gold": "goodbye",
+    "lang": "tr"
+  },
+  {
+    "text": "Bugün çok şey öğrendim, teşekkürler, hoşça kalın!",
+    "gold": "goodbye",
+    "lang": "tr"
+  },
+  {
+    "text": "Yarın görüşürsek devam ederiz, hoşça kal, sevgiler!",
+    "gold": "goodbye",
+    "lang": "tr"
+  },
+  {
+    "text": "Çok teşekkür ederim, gerçekten çok yardımcı oldun!",
+    "gold": "gratitude",
+    "lang": "tr"
+  },
+  {
+    "text": "Sağ ol, sorunum çözüldü, minnettarım.",
+    "gold": "gratitude",
+    "lang": "tr"
+  },
+  {
+    "text": "Yardımın için çok sağ ol, çok kıymetliydi.",
+    "gold": "gratitude",
+    "lang": "tr"
+  },
+  {
+    "text": "Destek için çok müteşekkirim, harika bir çözüm sundun.",
+    "gold": "gratitude",
+    "lang": "tr"
+  },
+  {
+    "text": "Vaktini ayırıp yardımcı olduğun için çok teşekkürler.",
+    "gold": "gratitude",
+    "lang": "tr"
+  },
+  {
+    "text": "Son zamanlarda sürekli yorgun hissediyorum, uyku düzenim bozuldu, ne yapmalıyım?",
+    "gold": "asking_mental_health_question",
+    "lang": "tr"
+  },
+  {
+    "text": "Arkadaşlarımla konuşmak zorlaşıyor, içimde bir sıkıntı var, neden böyle hissediyorum?",
+    "gold": "asking_mental_health_question",
+    "lang": "tr"
+  },
+  {
+    "text": "Sınav stresi yüzünden kalbim çarpıyor, nefes almak bile zorlaşıyor.",
+    "gold": "asking_mental_health_question",
+    "lang": "tr"
+  },
+  {
+    "text": "Geçen haftadan beri kendimi umutsuz hissediyorum, bu normal mi?",
+    "gold": "asking_mental_health_question",
+    "lang": "tr"
+  },
+  {
+    "text": "Annemle sürekli tartışıyorum, evdeki atmosfer beni çok yıpratıyor, bir çözüm önerin var mı?",
+    "gold": "asking_mental_health_question",
+    "lang": "tr"
+  },
+  {
+    "text": "Python'da bir fonksiyon yazmamda yardımcı olur musun?",
+    "gold": "out_of_scope",
+    "lang": "tr"
+  },
+  {
+    "text": "Bugün İstanbul'da hava nasıl, yağmur yağacak mı?",
+    "gold": "out_of_scope",
+    "lang": "tr"
+  },
+  {
+    "text": "Galatasaray'ın bu sezonki performansı hakkında ne düşünüyorsun?",
+    "gold": "out_of_scope",
+    "lang": "tr"
+  },
+  {
+    "text": "2+2 kaç eder, hızlıca söyleyebilir misin?",
+    "gold": "out_of_scope",
+    "lang": "tr"
+  },
+  {
+    "text": "ABD başkanlık seçim sonuçları ne zaman açıklanacak?",
+    "gold": "out_of_scope",
+    "lang": "tr"
+  },
+  {
+    "text": "اسلام علیکم! آج کیسے ہیں آپ؟",
+    "gold": "greeting",
+    "lang": "ur"
+  },
+  {
+    "text": "ہیلو! کیا حال ہے؟ ابھی وقت ملے تو گپ شپ کریں۔",
+    "gold": "greeting",
+    "lang": "ur"
+  },
+  {
+    "text": "ہیلو بھائی، کیا چل رہا ہے آج کل؟",
+    "gold": "greeting",
+    "lang": "ur"
+  },
+  {
+    "text": "السلامُ علیکم، آپ سے بات کر کے خوشی ہوئی۔",
+    "gold": "greeting",
+    "lang": "ur"
+  },
+  {
+    "text": "آج کا دن کیسا گزر رہا ہے؟ سلام!",
+    "gold": "greeting",
+    "lang": "ur"
+  },
+  {
+    "text": "خدا حافظ، آپ سے بات کر کے خوشی ہوئی۔",
+    "gold": "goodbye",
+    "lang": "ur"
+  },
+  {
+    "text": "چلتا ہوں، پھر ملیں گے۔ اپنا خیال رکھنا!",
+    "gold": "goodbye",
+    "lang": "ur"
+  },
+  {
+    "text": "اب مجھے جانا پڑے گا، آپ کا دن اچھا گزرے۔",
+    "gold": "goodbye",
+    "lang": "ur"
+  },
+  {
+    "text": "ٹھیک ہے، فی الحال الوداع۔ بعد میں بات کرتے ہیں۔",
+    "gold": "goodbye",
+    "lang": "ur"
+  },
+  {
+    "text": "یار، اب وقت ختم ہوا، جلدی ملتے ہیں۔",
+    "gold": "goodbye",
+    "lang": "ur"
+  },
+  {
+    "text": "آپ کی مدد کے لیے دل سے شکریہ، آپ نے میرا دن بچا دیا!",
+    "gold": "gratitude",
+    "lang": "ur"
+  },
+  {
+    "text": "بہت مہربانی! آپ کی ہدایات نے میرے مسئلے کو فوراً حل کر دیا۔",
+    "gold": "gratitude",
+    "lang": "ur"
+  },
+  {
+    "text": "یار، تم نے جو لنک بھیجا تھا، بالکل کام آ گیا۔ شکریہ!",
+    "gold": "gratitude",
+    "lang": "ur"
+  },
+  {
+    "text": "آپ کی صبر اور رہنمائی کے بغیر یہ کام ممکن نہیں تھا، شکریہ!",
+    "gold": "gratitude",
+    "lang": "ur"
+  },
+  {
+    "text": "ماشاءاللہ، آپ کی معلومات نے میری پریشانی ختم کر دی، بہت بہت شکریہ۔",
+    "gold": "gratitude",
+    "lang": "ur"
+  },
+  {
+    "text": "مجھے کل سے نیند نہیں آ رہی، کوئی مشورہ دیں؟",
+    "gold": "asking_mental_health_question",
+    "lang": "ur"
+  },
+  {
+    "text": "آج دفتر میں بہت دباؤ محسوس ہو رہا ہے، کیا یہ عام ہے؟",
+    "gold": "asking_mental_health_question",
+    "lang": "ur"
+  },
+  {
+    "text": "میری سہیلی سے بات کرنے کے بعد دل اداس رہتا ہے، کیوں؟",
+    "gold": "asking_mental_health_question",
+    "lang": "ur"
+  },
+  {
+    "text": "کبھی کبھی دل پر بوجھ سا محسوس ہوتا ہے، کیا یہ ڈپریشن ہے؟",
+    "gold": "asking_mental_health_question",
+    "lang": "ur"
+  },
+  {
+    "text": "پریشان ہوں کہ میرا خوف بڑھ رہا ہے، کیسے آرام ملے؟",
+    "gold": "asking_mental_health_question",
+    "lang": "ur"
+  },
+  {
+    "text": "کیا آپ مجھے پائتھن میں لیسٹ سورت کرنے کا طریقہ بتا سکتے ہیں؟",
+    "gold": "out_of_scope",
+    "lang": "ur"
+  },
+  {
+    "text": "آج لاہور کا موسم کیسا ہے؟",
+    "gold": "out_of_scope",
+    "lang": "ur"
+  },
+  {
+    "text": "پچھلے میچ میں پاکستان نے کتنے رنز بنائے؟",
+    "gold": "out_of_scope",
+    "lang": "ur"
+  },
+  {
+    "text": "2x^2 - 5x + 3 کا ڈسکرمننٹ کیا ہوگا؟",
+    "gold": "out_of_scope",
+    "lang": "ur"
+  },
+  {
+    "text": "ابھار کے تازہ ترین سیاسی حالات کے بارے میں بتائیں۔",
+    "gold": "out_of_scope",
+    "lang": "ur"
+  },
+  {
+    "text": "Chào bạn! Mình mới đăng ký, có thể giúp mình không?",
+    "gold": "greeting",
+    "lang": "vi"
+  },
+  {
+    "text": "Xin chào ạ, mình muốn hỏi về dịch vụ hỗ trợ khách hàng.",
+    "gold": "greeting",
+    "lang": "vi"
+  },
+  {
+    "text": "Hey, có ai online không? Mình đang muốn trò chuyện một chút.",
+    "gold": "greeting",
+    "lang": "vi"
+  },
+  {
+    "text": "Dạ, chào anh/chị! Em có thể giúp gì cho quý khách hôm nay?",
+    "gold": "greeting",
+    "lang": "vi"
+  },
+  {
+    "text": "Sao anh/chị, mình vừa vừa xem video, muốn hỏi vài chuyện nho nhỏ.",
+    "gold": "greeting",
+    "lang": "vi"
+  },
+  {
+    "text": "Cảm ơn bạn, mình phải đi mất rồi. Hẹn gặp lại nhé!",
+    "gold": "goodbye",
+    "lang": "vi"
+  },
+  {
+    "text": "Ok, tạm biệt, chúc bạn một ngày tốt lành!",
+    "gold": "goodbye",
+    "lang": "vi"
+  },
+  {
+    "text": "Bây giờ mình bận, mình phải dọn việc. Bye!",
+    "gold": "goodbye",
+    "lang": "vi"
+  },
+  {
+    "text": "Được rồi, mình ra nhé, hẹn sau nhé mọi người!",
+    "gold": "goodbye",
+    "lang": "vi"
+  },
+  {
+    "text": "Thôi, tạm biệt, mình quay lại lúc khác nhé, cảm ơn!",
+    "gold": "goodbye",
+    "lang": "vi"
+  },
+  {
+    "text": "Cảm ơn bạn đã giải đáp thắc mắc của mình, thực sự rất hữu ích!",
+    "gold": "gratitude",
+    "lang": "vi"
+  },
+  {
+    "text": "Cám ơn nhiều, nhờ bạn mà mình hoàn thành dự án đúng hạn.",
+    "gold": "gratitude",
+    "lang": "vi"
+  },
+  {
+    "text": "Bạn giúp mình rất nhanh, cảm ơn nhé!",
+    "gold": "gratitude",
+    "lang": "vi"
+  },
+  {
+    "text": "Thật tuyệt vời, cảm ơn bạn đã hỗ trợ chi tiết trong suốt buổi học.",
+    "gold": "gratitude",
+    "lang": "vi"
+  },
+  {
+    "text": "Cảm ơn bác sĩ, nhờ lời khuyên của bác tôi đã bình phục nhanh hơn.",
+    "gold": "gratitude",
+    "lang": "vi"
+  },
+  {
+    "text": "Dạo này mình cảm thấy lo lắng quá, không biết phải làm sao?",
+    "gold": "asking_mental_health_question",
+    "lang": "vi"
+  },
+  {
+    "text": "Bạn có lời khuyên nào để giảm stress khi đi làm không?",
+    "gold": "asking_mental_health_question",
+    "lang": "vi"
+  },
+  {
+    "text": "Mình khó ngủ vì suy nghĩ liên tục, có cách nào giúp không?",
+    "gold": "asking_mental_health_question",
+    "lang": "vi"
+  },
+  {
+    "text": "Bạn nghĩ sao về việc mình đang cô đơn và muốn tìm người chia sẻ?",
+    "gold": "asking_mental_health_question",
+    "lang": "vi"
+  },
+  {
+    "text": "Cảm giác buồn bã kéo dài, mình có thể làm gì để cải thiện tâm trạng?",
+    "gold": "asking_mental_health_question",
+    "lang": "vi"
+  },
+  {
+    "text": "Bạn có thể cho mình biết thời tiết Hà Nội hôm nay không?",
+    "gold": "out_of_scope",
+    "lang": "vi"
+  },
+  {
+    "text": "Làm sao mình viết hàm sắp xếp nhanh trong Python?",
+    "gold": "out_of_scope",
+    "lang": "vi"
+  },
+  {
+    "text": "Ai thắng trận đấu giữa Real Madrid và Barcelona tối qua?",
+    "gold": "out_of_scope",
+    "lang": "vi"
+  },
+  {
+    "text": "Giải tích đa biến có công thức nào để tính đạo hàm riêng?",
+    "gold": "out_of_scope",
+    "lang": "vi"
+  },
+  {
+    "text": "Bạn biết tin tức mới nhất về dịch COVID-19 ở Việt Nam không?",
+    "gold": "out_of_scope",
+    "lang": "vi"
+  },
+  {
+    "text": "你好，我想问一下今天的天气怎么样？",
+    "gold": "greeting",
+    "lang": "zh"
+  },
+  {
+    "text": "嗨，能帮我查一下最近的电影票吗？",
+    "gold": "greeting",
+    "lang": "zh"
+  },
+  {
+    "text": "早上好！请问有什么推荐的早餐？",
+    "gold": "greeting",
+    "lang": "zh"
+  },
+  {
+    "text": "哎呀，久等了，咱们聊聊吧。",
+    "gold": "greeting",
+    "lang": "zh"
+  },
+  {
+    "text": "您好，请问可以帮忙翻译这段文字吗？",
+    "gold": "greeting",
+    "lang": "zh"
+  },
+  {
+    "text": "好的，谢谢你的帮助，先走了，再见！",
+    "gold": "goodbye",
+    "lang": "zh"
+  },
+  {
+    "text": "今天聊得很开心，先下线啦，保重哦～",
+    "gold": "goodbye",
+    "lang": "zh"
+  },
+  {
+    "text": "时间不早了，我得去睡觉了，晚安~",
+    "gold": "goodbye",
+    "lang": "zh"
+  },
+  {
+    "text": "先撤了，有事再聊，拜拜！",
+    "gold": "goodbye",
+    "lang": "zh"
+  },
+  {
+    "text": "谢谢了，先走一步，回头再聊哈。",
+    "gold": "goodbye",
+    "lang": "zh"
+  },
+  {
+    "text": "谢谢你刚才的帮助，真的很及时！",
+    "gold": "gratitude",
+    "lang": "zh"
+  },
+  {
+    "text": "太感谢了，这个问题我之前一直卡住。",
+    "gold": "gratitude",
+    "lang": "zh"
+  },
+  {
+    "text": "感激不尽，您提供的资料正好符合我的需求。",
+    "gold": "gratitude",
+    "lang": "zh"
+  },
+  {
+    "text": "非常感谢，帮了我大忙！",
+    "gold": "gratitude",
+    "lang": "zh"
+  },
+  {
+    "text": "谢谢啦，您真是太贴心了～",
+    "gold": "gratitude",
+    "lang": "zh"
+  },
+  {
+    "text": "最近总是失眠，怎么办才好？",
+    "gold": "asking_mental_health_question",
+    "lang": "zh"
+  },
+  {
+    "text": "我最近情绪很低落，不知道该和谁倾诉。",
+    "gold": "asking_mental_health_question",
+    "lang": "zh"
+  },
+  {
+    "text": "工作压力好大，感觉快喘不过气了，有没有缓解办法？",
+    "gold": "asking_mental_health_question",
+    "lang": "zh"
+  },
+  {
+    "text": "和男朋友吵架后，我一直很焦虑，怎么才能平复心情？",
+    "gold": "asking_mental_health_question",
+    "lang": "zh"
+  },
+  {
+    "text": "最近对什么都提不起兴趣，可能是抑郁吗？",
+    "gold": "asking_mental_health_question",
+    "lang": "zh"
+  },
+  {
+    "text": "帮我写一个Python函数实现二分查找。",
+    "gold": "out_of_scope",
+    "lang": "zh"
+  },
+  {
+    "text": "今天北京的天气怎么样？",
+    "gold": "out_of_scope",
+    "lang": "zh"
+  },
+  {
+    "text": "刚刚的NBA总决赛谁赢了？",
+    "gold": "out_of_scope",
+    "lang": "zh"
+  },
+  {
+    "text": "请解释一下微积分中的极限概念。",
+    "gold": "out_of_scope",
+    "lang": "zh"
+  },
+  {
+    "text": "最近有什么热门的科技新闻吗？",
+    "gold": "out_of_scope",
+    "lang": "zh"
+  }
+]

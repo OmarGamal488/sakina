@@ -1,0 +1,62 @@
+{
+  "version": "2.0",
+  "approach": "few-shot LLM prompting (DSPy/MIPROv2 removed — it scored below zero-shot)",
+  "model": "lightning-ai/gpt-oss-120b",
+  "max_tokens": 512,
+  "temperature": 0.0,
+  "intents": [
+    "greeting",
+    "goodbye",
+    "gratitude",
+    "asking_mental_health_question",
+    "out_of_scope"
+  ],
+  "intent_descriptions": {
+    "greeting": "hello / salutations / opening a conversation",
+    "goodbye": "farewell / closing the conversation",
+    "gratitude": "thank you / appreciation for help received",
+    "asking_mental_health_question": "a question or statement about feelings, mental state, relationships, stress, anxiety, depression, sleep, or any topic Sakina can help with",
+    "out_of_scope": "anything else — coding questions, weather, sports, math, current events, etc."
+  },
+  "system_prompt": "You classify a user's chat message to Sakina, a multilingual mental-health support chatbot, into EXACTLY ONE intent. Messages may arrive in ANY language. Reply with ONLY the intent label (one of the five below), nothing else.\n\nIntents:\n- greeting: hello / salutations / opening a conversation\n- goodbye: farewell / closing the conversation\n- gratitude: thank you / appreciation for help received\n- asking_mental_health_question: a question or statement about feelings, mental state, relationships, stress, anxiety, depression, sleep, or any topic Sakina can help with\n- out_of_scope: anything else — coding questions, weather, sports, math, current events, etc.\n\nExamples:\nMessage: Hey Sakina\nIntent: greeting\nMessage: عامل ايه؟\nIntent: greeting\nMessage: Hi, are you there?\nIntent: greeting\nMessage: that's all for today, bye\nIntent: goodbye\nMessage: Bye for now, talk later\nIntent: goodbye\nMessage: Goodbye\nIntent: goodbye\nMessage: Thank you so much, that really helped\nIntent: gratitude\nMessage: شكرا\nIntent: gratitude\nMessage: تسلم ايدك\nIntent: gratitude\nMessage: بكره نفسي\nIntent: asking_mental_health_question\nMessage: I feel so empty inside lately\nIntent: asking_mental_health_question\nMessage: I keep having intrusive thoughts\nIntent: asking_mental_health_question\nMessage: what time is it in tokyo\nIntent: out_of_scope\nMessage: كم باقي على رمضان\nIntent: out_of_scope\nMessage: recommend a restaurant in dubai\nIntent: out_of_scope",
+  "user_template": "Message: {message}\nIntent:",
+  "parse": "lowercase the response; the intent label that appears LAST wins; default out_of_scope",
+  "eval": {
+    "test_n": 24,
+    "test_accuracy": 1.0,
+    "multilingual_probe_n": 450,
+    "multilingual_probe_accuracy": 0.92,
+    "probe_per_language": {
+      "bg": 0.92,
+      "de": 0.96,
+      "el": 0.96,
+      "es": 0.92,
+      "fr": 0.92,
+      "hi": 0.96,
+      "it": 0.88,
+      "ja": 1.0,
+      "nl": 0.88,
+      "pl": 0.84,
+      "pt": 0.88,
+      "ru": 1.0,
+      "sw": 1.0,
+      "th": 0.8,
+      "tr": 0.92,
+      "ur": 0.96,
+      "vi": 0.96,
+      "zh": 0.8
+    },
+    "probe_per_intent": {
+      "asking_mental_health_question": 1.0,
+      "goodbye": 0.911,
+      "gratitude": 1.0,
+      "greeting": 0.689,
+      "out_of_scope": 1.0
+    },
+    "baselines_on_test": {
+      "zero_shot": 1.0,
+      "dspy_miprov2": 0.9583
+    },
+    "note": "Probe = 450 synthetic messages (18 non-EN/AR langs x 5 intents x 5); gold = generation intent. 'greeting' low = compound synthetic rows, not a real failure."
+  }
+}

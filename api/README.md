@@ -23,7 +23,7 @@ api/
 │   │   ├── emotion.py
 │   │   └── intent.py
 │   ├── memory.py            # Redis semantic cache + sliding window
-│   └── llm.py               # Groq client wrapper
+│   └── llm.py               # Lightning AI client wrapper (OpenAI-compatible)
 ├── tests/
 └── Dockerfile
 ```
@@ -32,7 +32,7 @@ api/
 
 - `POST /chat`          — main streaming chat (SSE)
 - `GET  /healthz`       — liveness
-- `GET  /readyz`        — readiness (checks Qdrant, Redis, Groq)
+- `GET  /readyz`        — readiness (checks Qdrant, Redis, Lightning AI)
 - `POST /feedback`      — store user feedback for offline eval
 - `GET  /memory/{user}` — fetch sliding-window history
 
@@ -41,6 +41,6 @@ api/
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env   # then fill GROQ_API_KEY, QDRANT_URL, REDIS_URL
+cp .env.example .env   # then fill LIGHTNING_API_KEY, QDRANT_URL, REDIS_URL
 uvicorn app.main:app --reload --port 8001
 ```
