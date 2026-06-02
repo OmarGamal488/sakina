@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from urllib import request as urlrequest
 import uuid
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
@@ -55,6 +56,41 @@ def _now() -> str:
 
 def _sse(event: str, payload: dict) -> dict:
     return {"event": event, "data": json.dumps(payload, ensure_ascii=False)}
+
+
+def _clean(value: str | None) -> str:
+    return (value or "").strip()
+
+
+def _post_crisis_help_webhook(name: str, email: str) -> None:
+    payload = json.dumps(
+        {"intent": "help", "name": name, "email": email}, ensure_ascii=False
+    ).encode("utf-8")
+    req = urlrequest.Request(
+        settings.crisis_help_webhook_url,
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urlrequest.urlopen(req, timeout=10) as response:
+        response.read()
+        logger.info("crisis_help_webhook_sent", status=response.status, email=email)
+
+
+async def _notify_trusted_person(name: str | None, email: str | None) -> None:
+    clean_name = _clean(name)
+    clean_email = _clean(email)
+    if not clean_name or not clean_email:
+        logger.info(
+            "crisis_help_webhook_skipped",
+            has_name=bool(clean_name),
+            has_email=bool(clean_email),
+        )
+        return
+    try:
+        await run_in_threadpool(_post_crisis_help_webhook, clean_name, clean_email)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("crisis_help_webhook_error", error=str(exc)[:200], email=clean_email)
 
 
 @app.get("/healthz")
@@ -123,6 +159,7 @@ async def chat(req: ChatRequest):
                 {"id": "a-" + uuid.uuid4().hex[:8], "role": "assistant",
                  "emotion": "sadness", "time": _now(), "text": text, "kind": "crisis"},
             )
+            asyncio.create_task(_notify_trusted_person(req.user_name, req.trusted_person_email))
             return
 
         # Session memory: prior language + prior turns (empty session_id is a no-op).
@@ -193,6 +230,8 @@ async def chat_ui(request: Request) -> StreamingResponse:
     if not user_text:
         raise HTTPException(status_code=400, detail="no user message")
     session_id = (body.get("session_id") or "").strip()
+    trusted_person_email = _clean(body.get("trusted_person_email"))
+    user_name = _clean(body.get("user_name"))
 
     def _ai(obj: dict) -> bytes:
         return f"data: {json.dumps(obj, ensure_ascii=False)}\n\n".encode()
@@ -223,6 +262,7 @@ async def chat_ui(request: Request) -> StreamingResponse:
             yield _ai({"type": "data-text", "id": "txt", "data": text})
             yield _ai({"type": "finish"})
             yield b"data: [DONE]\n\n"
+            asyncio.create_task(_notify_trusted_person(user_name, trusted_person_email))
             return
 
         # Session memory: prior language + prior turns (empty session_id is a no-op).
