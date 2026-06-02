@@ -21,6 +21,7 @@ import { Composer } from './components/Composer'
 import { IdleNudge, IdlePresence } from './components/IdlePresence'
 import { useTextToSpeech } from './hooks/useTextToSpeech'
 import { useIdlePresence } from './hooks/useIdlePresence'
+import { API_URL } from './lib/api'
 import type { SakinaDataTypes, SakinaUIMessage, Emotion, LangCode } from './lib/types'
 import { EMOTION_COLORS, DEFAULT_EMOTION } from './lib/emotion'
 
@@ -84,7 +85,7 @@ export default function App() {
   const sessionIdRef = useRef<string>(getSessionId())
   const { messages, sendMessage, status, setMessages, stop } = useChat<SakinaUIMessage>({
     transport: new DefaultChatTransport({
-      api: `${import.meta.env.VITE_API_URL}/chat/ui`,
+      api: `${API_URL}/chat/ui`,
       // Server is the source of truth for history → send only the latest message +
       // the session id; prior turns are loaded from Redis by session_id.
       prepareSendMessagesRequest: ({ messages }) => ({

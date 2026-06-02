@@ -52,8 +52,19 @@ class RAGRetriever:
         from sentence_transformers import CrossEncoder, SentenceTransformer
 
         logger.info("rag_loading", embed=EMBED_MODEL, reranker=RERANKER_MODEL)
-        self._embedder = SentenceTransformer(EMBED_MODEL, device="cpu")
-        self._reranker = CrossEncoder(RERANKER_MODEL, device="cpu", max_length=512)
+        self._embedder = SentenceTransformer(
+            EMBED_MODEL,
+            device="cpu",
+            cache_folder=str(settings.sentence_transformers_cache_dir),
+            model_kwargs={"low_cpu_mem_usage": True},
+        )
+        self._reranker = CrossEncoder(
+            RERANKER_MODEL,
+            device="cpu",
+            max_length=512,
+            cache_folder=str(settings.sentence_transformers_cache_dir),
+            model_kwargs={"low_cpu_mem_usage": True},
+        )
         self._qc = QdrantClient(
             url=settings.qdrant_url, api_key=settings.qdrant_api_key, timeout=60
         )

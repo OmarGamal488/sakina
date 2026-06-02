@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _API_DIR = Path(__file__).resolve().parent.parent
+_REPO_ROOT = _API_DIR.parent
 ARTIFACTS_DIR = Path(__file__).resolve().parent / "models" / "artifacts"
 
 
@@ -41,6 +43,7 @@ class Settings(BaseSettings):
 
     # comma-separated str (pydantic-settings JSON-decodes list fields, tripping on plain values)
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
+    model_cache_dir: Path = _REPO_ROOT / "downloaded_models"
 
     # --- Redis (conversation memory + cache) ---
     redis_url: str = ""  # empty OR unreachable → in-process fallback
@@ -60,6 +63,18 @@ class Settings(BaseSettings):
         return ARTIFACTS_DIR
 
     @property
+    def hf_home_dir(self) -> Path:
+        return self.model_cache_dir / "huggingface"
+
+    @property
+    def hf_hub_cache_dir(self) -> Path:
+        return self.hf_home_dir / "hub"
+
+    @property
+    def sentence_transformers_cache_dir(self) -> Path:
+        return self.model_cache_dir / "sentence_transformers"
+
+    @property
     def cors_origins_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
@@ -72,3 +87,13 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+settings.model_cache_dir.mkdir(parents=True, exist_ok=True)
+settings.hf_home_dir.mkdir(parents=True, exist_ok=True)
+settings.hf_hub_cache_dir.mkdir(parents=True, exist_ok=True)
+settings.sentence_transformers_cache_dir.mkdir(parents=True, exist_ok=True)
+os.environ["HF_HOME"] = str(settings.hf_home_dir)
+os.environ["HF_HUB_CACHE"] = str(settings.hf_hub_cache_dir)
+os.environ["TRANSFORMERS_CACHE"] = str(settings.hf_hub_cache_dir)
+os.environ["SENTENCE_TRANSFORMERS_HOME"] = str(settings.sentence_transformers_cache_dir)
+os.environ["HF_HUB_DISABLE_XET"] = "1"
+os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"

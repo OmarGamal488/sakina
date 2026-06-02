@@ -28,3 +28,6 @@ frontend/src/test/
 # --- Python caches ---
 __pycache__/
 *.pyc
+
+# --- Large local model downloads ---
+downloaded_models/
