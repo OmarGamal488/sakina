@@ -1,13 +1,7 @@
 """Speech-to-text via Groq Whisper (OpenAI-compatible endpoint).
 
-The browser records audio (MediaRecorder) and POSTs it to ``/stt``; this module
-calls Groq's hosted Whisper **server-side** so the API key never reaches the
-client.  Groq accepts common container formats (webm/ogg/wav/mp3/m4a/…), so the
-browser's native ``audio/webm`` recording is sent through as-is — no transcoding.
-
-Lightning's Omni model was evaluated first but its deployment 500s on audio input
-(text-only serving), so STT is delegated to Groq.  Returns plain text; the existing
-text pipeline (language → emotion → intent → RAG) runs on the transcript unchanged.
+Called server-side so the API key never reaches the client. Browser audio (webm/ogg/
+wav/…) is sent through as-is. Returns plain text fed to the unchanged text pipeline.
 """
 
 from __future__ import annotations

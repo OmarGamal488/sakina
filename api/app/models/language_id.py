@@ -1,26 +1,9 @@
-"""Language identification module for Sakina.
+"""Language identification for Sakina.
 
-Loads a pre-trained sklearn TF-IDF + calibrated LinearSVC pipeline and wraps it
-with a chat-input robustness guard.  The guard handles short tokens, non-Latin
-scripts, and low-confidence cases that trip up the bare classifier on real chat
-messages without touching the ~0.996 test accuracy on full-length text.
-
-Public API
-----------
-LanguageResult
-    Frozen dataclass: (lang, confidence, source).
-
-LanguageDetector
-    Wraps the joblib artifact.  Call `detect(text, prior_lang)` → LanguageResult.
-
-get_detector() → LanguageDetector
-    Module-level lazy singleton.  Lingua builds a compiled Rust model at init —
-    call this once at FastAPI startup, not per request.
-
-Algorithm: verbatim port of ``detect_with_fallback`` from
-``notebooks/01_language_detection.ipynb`` §9 (cell 21).  Params are read from
-``metadata["robustness_guard"]`` at load time so the module stays in sync with
-the artifact version.
+Pre-trained TF-IDF + calibrated LinearSVC pipeline wrapped with a chat-input
+robustness guard (short tokens, non-Latin scripts, low-confidence cases).
+Logic hand-ported from NB01; guard params read from
+``metadata["robustness_guard"]`` at load time.
 """
 
 from __future__ import annotations
@@ -40,10 +23,7 @@ if TYPE_CHECKING:
 
 logger = structlog.get_logger(__name__)
 
-# ---------------------------------------------------------------------------
-# Text preprocessing (must match the pipeline's training-time preprocessing)
-# ---------------------------------------------------------------------------
-
+# Text preprocessing must match the pipeline's training-time preprocessing.
 _URL_RE = re.compile(r"https?://\S+|www\.\S+")
 _LETTERS_RE = re.compile(r"[^\W\d_]", re.UNICODE)
 
@@ -53,11 +33,6 @@ def _clean(text: str) -> str:
     text = _URL_RE.sub(" ", text)
     text = unicodedata.normalize("NFKC", text)
     return text.lower()
-
-
-# ---------------------------------------------------------------------------
-# Script detection helpers
-# ---------------------------------------------------------------------------
 
 
 def _char_script(ch: str) -> str | None:
@@ -87,12 +62,10 @@ def _dominant_script(
     script_map: dict[str, list[str]],
     ratio: float,
 ) -> str:
-    """Return the dominant Unicode script in *text*, or ``"latin"``/``"none"``.
+    """Return the dominant Unicode script in *text*.
 
-    Returns ``"none"`` when there are no letter characters at all.
-    Returns a script key from *script_map* only when that script accounts for
-    strictly more than *ratio* of all letter characters (handles code-switching).
-    Falls back to ``"latin"`` in all other cases.
+    ``"none"`` if no letters; a *script_map* key only when it exceeds *ratio* of
+    all letters (handles code-switching); otherwise ``"latin"``.
     """
     counts: dict[str, int] = {}
     total = 0
@@ -121,26 +94,11 @@ def _restricted_argmax(
     return str(classes[best]), float(proba[best])
 
 
-# ---------------------------------------------------------------------------
-# Public result type
-# ---------------------------------------------------------------------------
-
-
 @dataclass(frozen=True)
 class LanguageResult:
-    """Immutable detection result.
+    """Immutable detection result: (lang, confidence, source).
 
-    Attributes
-    ----------
-    lang:
-        ISO 639-1 code, always one of the 20 supported languages.
-    confidence:
-        Calibrated probability from the pipeline, or 0.0 when the result was
-        determined by a guard rule (prior, script shortcut, no-signal).
-    source:
-        Which branch produced the prediction.  One of:
-        ``no-signal``, ``script``, ``prior``, ``lingua-short``, ``default``,
-        ``tfidf``, ``lingua``.
+    ``confidence`` is 0.0 when a guard rule (not the classifier) decided.
     """
 
     lang: str
@@ -148,11 +106,7 @@ class LanguageResult:
     source: str
 
 
-# ---------------------------------------------------------------------------
-# Detector
-# ---------------------------------------------------------------------------
-
-# Default guard parameters (fallback values when keys are absent from metadata)
+# Default guard parameters (fallback when keys are absent from metadata).
 _DEFAULT_GUARD: dict = {
     "short_letters_threshold": 7,
     "lingua_min_confidence": 0.55,
@@ -171,30 +125,18 @@ _DEFAULT_GUARD: dict = {
 
 
 class LanguageDetector:
-    """Wraps the Sakina language-identification artifact with a robustness guard.
+    """Wraps the lang-ID artifact with a chat-input robustness guard.
 
-    The guard adds three closed-set layers on top of the raw TF-IDF classifier:
-
-    1. **No-signal** — emoji / digits only → return session language or default.
-    2. **Script shortcut** — decisive non-Latin script → restrict to that script's
-       languages so short tokens can never be mislabelled across scripts.
-    3. **Short Latin guard** — fewer than ``short_letters_threshold`` letters →
-       trust session prior first, then lingua, then default ``en``.
-    4. **Normal-length** — TF-IDF above ``confidence_threshold`` → tfidf; else
-       defer to lingua.
-
-    All paths return one of the 20 supported ISO codes; ``"unknown"`` / ``None``
-    are never returned.
+    Closed-set layers over the raw TF-IDF classifier: no-signal (emoji/digits) →
+    prior/default; decisive non-Latin script → restrict to that script's langs;
+    short Latin → prior → lingua → ``en``; normal-length → TF-IDF, else lingua.
+    Always returns one of the 20 supported ISO codes.
     """
 
     def __init__(self, artifact_path: Path | str | None = None) -> None:
         """Load the joblib artifact and build the lingua detector.
 
-        Parameters
-        ----------
-        artifact_path:
-            Path to ``lang_id.joblib``.  Defaults to the ``artifacts/``
-            directory co-located with this module.
+        Defaults ``artifact_path`` to ``artifacts/lang_id.joblib`` beside this module.
         """
         if artifact_path is None:
             artifact_path = Path(__file__).parent / "artifacts" / "lang_id.joblib"
@@ -208,12 +150,11 @@ class LanguageDetector:
         # Classes come from the pipeline — authoritative for proba ordering.
         self._classes: np.ndarray = self._pipeline.named_steps["clf"].classes_
 
-        # Confidence threshold lives at the top level of metadata.
         self._confidence_threshold: float = float(
             metadata.get("confidence_threshold", 0.6)
         )
 
-        # All other tunables come from robustness_guard (fall back to literals).
+        # Other tunables come from robustness_guard (fall back to literals).
         self._short_letters_threshold: int = int(
             guard.get(
                 "short_letters_threshold",
@@ -241,14 +182,13 @@ class LanguageDetector:
                 _DEFAULT_GUARD["script_dominance_ratio"],
             )
         )
-        # script_map values may be lists or tuples in metadata; normalise to list[str].
+        # script_map values may be lists or tuples; normalise to list[str].
         raw_script_map: dict = guard.get("script_map", _DEFAULT_GUARD["script_map"])
         self._script_map: dict[str, list[str]] = {
             k: list(v) for k, v in raw_script_map.items()
         }
 
-        # Build lingua detector closed over the 20 supported languages.
-        # This compiles Rust models — done once here, never at request time.
+        # Build lingua detector once here (compiles Rust models — never per request).
         from lingua import Language, LanguageDetectorBuilder
 
         fallback_codes: list[str] = metadata.get(
@@ -272,29 +212,11 @@ class LanguageDetector:
             n_classes=len(self._classes),
         )
 
-    # ------------------------------------------------------------------
-    # Core detection
-    # ------------------------------------------------------------------
-
     def detect(self, text: str, prior_lang: str | None = None) -> LanguageResult:
         """Detect the language of *text* with a chat-input robustness guard.
 
-        Verbatim port of ``detect_with_fallback`` from notebook §9 (cell 21).
-        Param values are read from the artifact's metadata at init time.
-
-        Parameters
-        ----------
-        text:
-            Input string (raw, as received from the user).
-        prior_lang:
-            The session's already-established language (ISO 639-1 code from the
-            previous turn).  Helps recover short non-English tokens.
-
-        Returns
-        -------
-        LanguageResult
-            Always one of the 20 supported ISO codes.  ``confidence`` is 0.0
-            when a guard rule (not the classifier) decided the outcome.
+        *prior_lang* is the session's established ISO code (helps recover short
+        non-English tokens). Returns one of the 20 supported ISO codes.
         """
         # n_letters is computed on RAW text (before cleaning).
         n_letters = len(_LETTERS_RE.findall(text))
@@ -357,30 +279,17 @@ class LanguageDetector:
         return LanguageResult(lang=detected_lang, confidence=top_conf, source="lingua")
 
 
-# ---------------------------------------------------------------------------
-# Module-level lazy singleton
-# ---------------------------------------------------------------------------
-
 _detector_instance: LanguageDetector | None = None
 
 
 def get_detector() -> LanguageDetector:
-    """Return the module-level singleton ``LanguageDetector``.
-
-    Builds the instance on first call (expensive: loads the joblib artifact and
-    compiles the Rust lingua models).  Subsequent calls return the cached object.
-    FastAPI startup should call this once; request handlers should not
-    construct new instances.
-    """
+    """Module-level lazy singleton. Loads the artifact + compiles lingua on first
+    call — warm it once at FastAPI startup, never per request."""
     global _detector_instance
     if _detector_instance is None:
         _detector_instance = LanguageDetector()
     return _detector_instance
 
-
-# ---------------------------------------------------------------------------
-# Smoke test
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     detector = get_detector()

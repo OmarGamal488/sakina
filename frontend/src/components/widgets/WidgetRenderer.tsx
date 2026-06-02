@@ -4,30 +4,25 @@
  */
 
 import type { Emotion, WidgetType } from '../../lib/types'
-import { BreathingExercise } from './BreathingExercise'
-import { GroundingExercise } from './GroundingExercise'
-import { MoodCheckin } from './MoodCheckin'
+// DEACTIVATED widgets — backend no longer selects them; component files kept dormant for
+// easy reactivation: BreathingExercise (box breathing), MoodCheckin ("How are you feeling?"),
+// GroundingExercise (5-4-3-2-1 grounding), SuggestedActions ("What would help most?").
 import { MoodChart } from './MoodChart'
-import { SuggestedActions } from './SuggestedActions'
 
 interface WidgetRendererProps {
   type: WidgetType
+  // Kept in the contract for the dormant action/grounding widgets; unused while
+  // mood_chart is the only active widget.
   onAction: (text: string) => void
   sessionEmotions: Emotion[]
 }
 
-export function WidgetRenderer({ type, onAction, sessionEmotions }: WidgetRendererProps) {
+export function WidgetRenderer({ type, sessionEmotions }: WidgetRendererProps) {
   switch (type) {
-    case 'breathing':
-      return <BreathingExercise />
-    case 'grounding':
-      return <GroundingExercise onAction={onAction} />
-    case 'mood_checkin':
-      return <MoodCheckin onAction={onAction} />
+    // Only 'mood_chart' is active; breathing/mood_checkin/grounding/actions deactivated
+    // → fall through to default (render nothing).
     case 'mood_chart':
       return <MoodChart emotions={sessionEmotions} />
-    case 'actions':
-      return <SuggestedActions onAction={onAction} />
     default:
       return null
   }

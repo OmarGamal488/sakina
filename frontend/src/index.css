@@ -338,8 +338,17 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 @keyframes caret-blink { 50% { opacity: 0; } }
 
-/* Emotion chip (assistant messages) */
-.emo-tag {
+/* Emotion + detected-language chips (assistant messages) */
+.meta-tags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+.emo-tag,
+.lang-tag {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -347,7 +356,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   font-size: 10px;
   letter-spacing: 0.05em;
   color: var(--ink-fade);
-  margin-top: 6px;
   text-transform: uppercase;
 }
 .emo-tag .swatch {

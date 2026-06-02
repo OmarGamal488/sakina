@@ -1,13 +1,9 @@
 """Pipeline orchestrator: language → emotion → intent → route(RAG) → compose.
 
-Real modules wired behind lazy ``get_*()`` singletons.  Blocking inference (local
-models, sync OpenAI client) is offloaded to a threadpool so the async event loop
-stays responsive; emotion (local) and intent (network) run concurrently.
-
-Generation uses ONE parameterized empathetic prompt — {emotion, intent, retrieved
-notes, language} — not a 30-template matrix.  The reply is composed in the user's
-DETECTED language; ``build_text`` adds an English pane via the emotion module's NLLB.
-RAG sources are retrieved only for ``asking_mental_health_question``.
+Emotion (local) and intent (network) run concurrently; blocking inference is
+offloaded to a threadpool. The reply is composed in the user's DETECTED language,
+but RAG retrieves on the English query. RAG runs only for
+``asking_mental_health_question``.
 """
 
 from __future__ import annotations
@@ -98,9 +94,8 @@ async def analyze(
     )
 
     # RAG only for mental-health questions; retrieve on the English query.
-    # Cache (Redis-backed, TTL'd) keyed by the English query — skips the whole
-    # BM25+dense+RRF+rerank pass for repeated questions. Safe to cache: retrieval
-    # is deterministic; we do NOT cache the generated empathetic reply.
+    # Cache keyed by the English query skips the BM25+dense+RRF+rerank pass for
+    # repeated questions (retrieval is deterministic; the reply is NOT cached).
     sources: list[dict] = []
     if intent_res.intent == "asking_mental_health_question":
         mem = memory.get_memory()
@@ -144,8 +139,7 @@ def _compose_messages(
         "Do not diagnose, prescribe, or give medical advice. Gently invite them to share "
         "more. Never claim to be a licensed professional."
     )
-    # Prior turns (from session memory) go between the system prompt and the
-    # current message, so the reply is aware of the conversation so far.
+    # Prior turns go between the system prompt and the current message for context.
     msgs: list[dict] = [{"role": "system", "content": system}]
     for turn in history or []:
         role = turn.get("role")
@@ -160,8 +154,7 @@ async def stream_reply(
     message: str, result: PipelineResult, history: list[dict] | None = None
 ) -> AsyncIterator[str]:
     """Compose an empathetic reply in the user's language (one LLM call), streamed as
-    small word-chunks for the SSE ``delta`` UX.  ``history`` is the prior conversation
-    turns (from session memory), injected so the reply has multi-turn context."""
+    small word-chunks for the SSE ``delta`` UX. ``history`` injects prior turns."""
     messages = _compose_messages(message, result, history)
 
     def _call() -> str:

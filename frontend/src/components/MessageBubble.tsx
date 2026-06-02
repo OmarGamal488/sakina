@@ -18,6 +18,7 @@ import { useState } from 'react'
 import { Square, Volume2 } from 'lucide-react'
 import { isDataUIPart } from 'ai'
 import type { SakinaUIMessage, SakinaDataTypes, Emotion, LangCode, ChatStatus } from '../lib/types'
+import { LANG_NAMES } from '../lib/types'
 import { EMOTION_COLORS, EMOTION_LABELS } from '../lib/emotion'
 import { SourcesPanel } from './SourcesPanel'
 import { SakinaAvatar } from './SakinaAvatar'
@@ -135,6 +136,7 @@ function AssistantBubble({
 
   const emoColor = EMOTION_COLORS[emotion] ?? '#E4B363'
   const emoLabel = EMOTION_LABELS.en?.[emotion] ?? emotion
+  const langLabel = LANG_NAMES[lang] ?? lang.toUpperCase()
 
   const bodyText = getDisplayText(lang, showEn, textData, streamingText)
 
@@ -186,14 +188,19 @@ function AssistantBubble({
         {/* Crisis hotline card — shown when the safety gate fired (meta.kind === 'crisis') */}
         {meta?.kind === 'crisis' && <CrisisCard lang={lang} />}
 
-        {/* Emotion chip — shown once meta arrives and loading dots are gone */}
+        {/* Emotion + detected-language chips — shown once meta arrives and loading dots are gone */}
         {meta && !loading && (
-          <div
-            className="emo-tag"
-            style={{ '--emo-c': emoColor } as unknown as React.CSSProperties}
-          >
-            <span className="swatch" aria-hidden />
-            <span>{emoLabel}</span>
+          <div className="meta-tags">
+            <span
+              className="emo-tag"
+              style={{ '--emo-c': emoColor } as unknown as React.CSSProperties}
+            >
+              <span className="swatch" aria-hidden />
+              <span>{emoLabel}</span>
+            </span>
+            <span className="lang-tag" title="Detected language">
+              {langLabel}
+            </span>
           </div>
         )}
 

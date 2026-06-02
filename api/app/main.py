@@ -1,14 +1,8 @@
 """Sakina FastAPI app — ``/chat`` (SSE) + ``/healthz``.
 
-Pipeline (see ``orchestrator.py``): language detection → emotion → intent →
-RAG (for mental-health questions) → LLM compose.  Models load lazily via
-``get_*()`` singletons; the lifespan is where they'd be warmed.
-
-Crisis safety: a model-free regex gate (``safety.py``) runs FIRST in both ``/chat``
-and ``/chat/ui`` — if it fires, the turn short-circuits to a ``kind="crisis"`` card
-with hotlines and **no** RAG/LLM call.  See ``safety.py`` for scope/limitations
-(English + Arabic; the regional AR hotline number in ``config.py`` is a placeholder
-pending verification).
+Pipeline: language → emotion → intent → RAG → LLM compose. A model-free crisis
+regex gate runs FIRST in ``/chat`` and ``/chat/ui``, short-circuiting to a crisis
+card with no RAG/LLM call.
 """
 
 from __future__ import annotations
@@ -37,7 +31,7 @@ logger = structlog.get_logger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """App lifespan — warm the model singletons once at startup (not per request)."""
+    """App lifespan — warm the model singletons once at startup."""
     logger.info("sakina_api_start", model=settings.lightning_model)
     await run_in_threadpool(orchestrator.warmup)
     logger.info("sakina_api_ready")
@@ -71,10 +65,7 @@ async def healthz() -> dict:
 
 @app.post("/stt")
 async def stt(audio: UploadFile = File(...)) -> dict:
-    """Transcribe an uploaded audio recording → text via Groq Whisper (mic button).
-
-    The Groq key stays server-side; the browser only uploads the recording.
-    """
+    """Transcribe an uploaded audio recording → text via Groq Whisper."""
     data = await audio.read()
     if not data:
         raise HTTPException(status_code=400, detail="empty audio upload")
@@ -91,10 +82,7 @@ async def stt(audio: UploadFile = File(...)) -> dict:
 
 @app.post("/tts")
 async def tts(req: TTSRequest) -> Response:
-    """Synthesize an assistant reply to speech via Groq Orpheus (en + Saudi-ar voices).
-
-    Returns ``audio/wav``.  The Groq key stays server-side.
-    """
+    """Synthesize an assistant reply to speech via Groq Orpheus. Returns ``audio/wav``."""
     text = req.text.strip()
     if not text:
         raise HTTPException(status_code=400, detail="empty text")
@@ -111,8 +99,7 @@ async def chat(req: ChatRequest):
     """Stream the assistant turn as Server-Sent Events: meta → delta* → done."""
 
     async def gen():
-        # Crisis-safety gate — fires BEFORE any model call (language/emotion/intent/
-        # RAG/LLM). Model-free, so it works even if Lightning/Qdrant are down.
+        # Crisis-safety gate — fires BEFORE any model call. Model-free.
         # FALSE POSITIVES ACCEPTABLE, FALSE NEGATIVES NOT. See app/safety.py.
         crisis = safety.check_crisis(req.message)
         if crisis.triggered:
@@ -138,8 +125,7 @@ async def chat(req: ChatRequest):
             )
             return
 
-        # Session memory (Redis-backed, in-process fallback): prior language +
-        # prior turns. Memory ops never raise; an empty session_id is a no-op.
+        # Session memory: prior language + prior turns (empty session_id is a no-op).
         mem = memory.get_memory()
         sid = req.session_id or ""
         session_lang = req.session_lang or mem.get_prior_lang(sid)
@@ -147,7 +133,7 @@ async def chat(req: ChatRequest):
         result = await orchestrator.analyze(
             req.message, lang_hint=req.lang, session_lang=session_lang
         )
-        # 1. meta — everything known before generation.
+        # meta — everything known before generation.
         yield _sse(
             "meta",
             {
@@ -158,12 +144,12 @@ async def chat(req: ChatRequest):
                 "kind": None,
             },
         )
-        # 2. delta — stream the reply in the user's language.
+        # delta — stream the reply in the user's language.
         parts: list[str] = []
         async for tok in orchestrator.stream_reply(req.message, result, history):
             parts.append(tok)
             yield _sse("delta", {"text": tok})
-        # 3. done — the complete, language-keyed message.
+        # done — the complete, language-keyed message.
         full = "".join(parts)
         text = await orchestrator.build_text(full, result.language)
         yield _sse(
@@ -177,7 +163,7 @@ async def chat(req: ChatRequest):
                 "kind": None,
             },
         )
-        # Persist this turn AFTER the reply completes (mental-health PII → TTL'd).
+        # Persist this turn AFTER the reply completes.
         if sid:
             mem.append_turn(sid, "user", req.message)
             mem.append_turn(sid, "assistant", full)
@@ -188,11 +174,10 @@ async def chat(req: ChatRequest):
 
 @app.post("/chat/ui")
 async def chat_ui(request: Request) -> StreamingResponse:
-    """Vercel AI SDK (v5) UI-message-stream variant of /chat — for the generative-UI frontend.
+    """Vercel AI SDK (v5) UI-message-stream variant of /chat for the generative-UI frontend.
 
-    Consumes the ``@ai-sdk/react`` ``useChat`` request ({messages:[{role, parts}]}) and emits
-    the UI message stream protocol: a streamed ``text`` part (the reply) + custom ``data-*``
-    parts for emotion/intent/sources, the bilingual text dict, and the LLM-selected widget.
+    Emits a streamed ``text`` part plus custom ``data-*`` parts for emotion/intent/sources,
+    the bilingual text dict, and the LLM-selected widget.
     """
     body = await request.json()
     msgs = body.get("messages", [])
@@ -240,8 +225,7 @@ async def chat_ui(request: Request) -> StreamingResponse:
             yield b"data: [DONE]\n\n"
             return
 
-        # Session memory: prior language + prior turns (Redis-backed, safe no-op
-        # on empty session_id or backend failure).
+        # Session memory: prior language + prior turns (empty session_id is a no-op).
         mem = memory.get_memory()
         prior_lang = mem.get_prior_lang(session_id)
         history = mem.get_history(session_id)
@@ -280,7 +264,7 @@ async def chat_ui(request: Request) -> StreamingResponse:
         text_dict = await orchestrator.build_text(full, result.language)
         yield _ai({"type": "data-text", "id": "txt", "data": text_dict})
 
-        # Persist this turn AFTER the reply completes (mental-health PII → TTL'd).
+        # Persist this turn AFTER the reply completes.
         if session_id:
             mem.append_turn(session_id, "user", user_text)
             mem.append_turn(session_id, "assistant", full)

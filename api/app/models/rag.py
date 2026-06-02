@@ -1,14 +1,9 @@
 """RAG retriever for Sakina — hybrid BM25 + bge-m3 dense → RRF → bge-reranker → top-k.
 
 Loads ``bm25_index.pkl`` (NB04), connects to the Qdrant cloud collection, and loads
-``BAAI/bge-m3`` (dense query embedding) + ``BAAI/bge-reranker-v2-m3`` (cross-encoder).
-Returns grounded counseling passages for ``asking_mental_health_question`` turns.
-
-Retrieval runs on the ENGLISH query (the emotion module already translates non-English
-input to English) — the corpus is English counselor responses.
-
-Follows the loader conventions in :mod:`app.models.language_id`.
-Public API: :class:`Passage`, :class:`RAGRetriever`, :func:`get_retriever`.
+``BAAI/bge-m3`` (dense embedding) + ``BAAI/bge-reranker-v2-m3`` (cross-encoder).
+Retrieval runs on the ENGLISH query (corpus is English counselor responses; emotion
+module already translates non-English input).
 """
 
 from __future__ import annotations

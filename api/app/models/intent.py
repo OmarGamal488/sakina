@@ -1,12 +1,7 @@
 """Intent classification for Sakina — plain few-shot prompting (no DSPy).
 
-Loads the system prompt + demos from ``artifacts/intent_few_shot.json`` (NB03) and
-calls the Lightning ``gpt-oss`` LLM.  Returns one of the 5 intents.  Costs one LLM
-call per message (shares the 15 req/min budget with RAG).
-
-Follows the loader conventions in :mod:`app.models.language_id`.
-
-Public API: :class:`IntentResult`, :class:`IntentClassifier`, :func:`get_classifier`.
+Loads prompt + demos from ``artifacts/intent_few_shot.json`` (NB03) and calls the
+Lightning ``gpt-oss`` LLM. Returns one of the 5 intents (one LLM call per message).
 """
 
 from __future__ import annotations

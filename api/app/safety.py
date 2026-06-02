@@ -1,32 +1,15 @@
 """Crisis-safety gate for Sakina — a model-free regex pre-filter (English + Arabic).
 
-Runs on **every** message **before** any model call (language / emotion / intent /
-RAG / LLM).  On a match the pipeline short-circuits to a crisis card with hotlines —
-no retrieval, no generation.
+Model-free; runs before any model call, short-circuiting to a crisis card on a match.
+Design principle: false positives are ACCEPTABLE, false negatives are NOT (recall-first,
+no negation/context handling). Scope is English + Arabic only — the two languages with
+localized hotlines; crises in the other 18 languages will not fire here. Arabic matching
+normalizes input + lexicon (NFKC + strip harakat/tatweel + unify alef/yaa/teh) because
+NFKC alone is insufficient for Arabic.
 
-Design principle (from the brief): **false positives are ACCEPTABLE, false negatives
-are NOT.**  The patterns therefore lean toward recall; we do *not* do negation/context
-handling ("I don't want to kill myself" firing is fine — missing a real one is not).
-
-The check is intentionally **dependency- and model-free** so the crisis path keeps
-working even if Lightning AI / Qdrant are down or slow.  The matched pattern's script
-also tells us which localized card to show (Arabic vs English) without running the
-language detector.
-
-Scope: **English + Arabic only** — the two languages with localized hotlines.  A crisis
-expressed in the other 18 supported languages will **not** fire here.  This is a
-conscious limitation that keeps the gate instant and model-free.
-
-Arabic matching first **normalizes** both the input and the lexicon (NFKC, strip
-harakat/tatweel, unify alef/yaa/teh variants) so undiacritized and hamza-variant
-spellings still match — NFKC alone is insufficient for Arabic.
-
-KNOWN LIMITATIONS: misses Arabizi / Latin-script Arabic ("3ayez amoot", "bdy moot"),
-novel metaphor, risk implied across multiple turns without keywords, and Maghrebi /
-Sudanese dialect gaps.  The Arabic lexicon was drafted with an Arabic-NLP specialist but
-**must be reviewed by a native-speaker licensed clinician before production**, alongside
-verifying the regional AR hotline number in ``config.py`` (currently a placeholder).
-This is one layer of a defense-in-depth system, never the sole safeguard.
+KNOWN LIMITATIONS: misses Arabizi / dialect gaps; the AR hotline number in ``config.py``
+is a placeholder; the Arabic lexicon MUST be reviewed by a native-speaker clinician before
+production. This is one layer of a defense-in-depth system, never the sole safeguard.
 """
 
 from __future__ import annotations
@@ -39,10 +22,7 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-# --------------------------------------------------------------------------- #
-# Supportive copy shown with the crisis card (reused verbatim from the
-# frontend CrisisCard component — already-reviewed wording).
-# --------------------------------------------------------------------------- #
+# Supportive copy shown with the crisis card (reused verbatim from the frontend).
 SUPPORTIVE_LINE: dict[str, str] = {
     "en": (
         "I'm really glad you told me. You don't have to go through this alone — "
@@ -54,20 +34,14 @@ SUPPORTIVE_LINE: dict[str, str] = {
     ),
 }
 
-# --------------------------------------------------------------------------- #
-# Normalization — applied to BOTH the input and the Arabic lexicon so they
-# match consistently.  harakat (U+064B–U+0652), superscript alef (U+0670),
+# Normalization — applied to BOTH input and Arabic lexicon so they match consistently.
+# char class: harakat (U+064B–U+0652), superscript alef (U+0670),
 # Quranic marks (U+0653–U+0655), tatweel (U+0640).
-# --------------------------------------------------------------------------- #
 _AR_DIACRITICS = re.compile(r"[ـً-ْٰٓ-ٕ]")
 
 
 def _normalize(text: str) -> str:
-    """NFKC + strip Arabic diacritics/tatweel + unify alef/yaa/teh + lowercase.
-
-    Diacritized / hamza-variant Arabic and any-case English both collapse to the
-    form the patterns are written in.  Letter swaps only touch Arabic characters.
-    """
+    """NFKC + strip Arabic diacritics/tatweel + unify alef/yaa/teh + lowercase."""
     text = unicodedata.normalize("NFKC", text)
     text = text.replace("’", "'")  # curly → straight apostrophe (don't/can't)
     text = _AR_DIACRITICS.sub("", text)
@@ -78,11 +52,8 @@ def _normalize(text: str) -> str:
     return text.lower()
 
 
-# --------------------------------------------------------------------------- #
-# English patterns — recall-first, including indirect/passive phrasings that
-# naive keyword lists miss (death-wish, burdensomeness, "can't go on").
+# English patterns — recall-first, including indirect/passive phrasings.
 # Operate on the normalized (lowercased) input.
-# --------------------------------------------------------------------------- #
 _EN_PARTS: list[str] = [
     r"kill(?:ing)?\s+my\s*self",
     r"end(?:ing)?\s+my\s+life",
@@ -113,12 +84,9 @@ _EN_PARTS: list[str] = [
 ]
 _EN_PATTERN = re.compile("|".join(_EN_PARTS), re.IGNORECASE)
 
-# --------------------------------------------------------------------------- #
-# Arabic lexicon — drafted with the arabic-nlp-specialist.  MSA + Egyptian/Gulf/
-# Levant; includes high-risk indirect phrasings.  Each phrase is run through the
-# SAME normalizer at build time (so ى/ة/أ etc. align with normalized input), and
-# spaces are matched flexibly.
-# --------------------------------------------------------------------------- #
+# Arabic lexicon — MSA + Egyptian/Gulf/Levant, incl. high-risk indirect phrasings.
+# Each phrase is normalized at build time so ى/ة/أ etc. align with normalized input,
+# and spaces are matched flexibly.
 _AR_PHRASES: list[str] = [
     # explicit suicide
     "انتحار", "انتحر", "انتحاري", "ينتحر", "هانتحر", "هنتحر", "بنتحر", "بانتحر",
@@ -157,15 +125,9 @@ _AR_PATTERN = re.compile(
 class CrisisResult:
     """Outcome of the crisis check.
 
-    Attributes
-    ----------
-    triggered:
-        True when a self-harm / suicide pattern matched.
-    lang_hint:
-        ``"ar"`` when an Arabic pattern matched, else ``"en"``.  Drives which
-        localized crisis card is shown — derived from the match, no detector.
-    pattern:
-        The matched substring (for logging; never user-facing).
+    triggered: a self-harm/suicide pattern matched. lang_hint: ``"ar"``/``"en"`` from the
+    matched script (drives the localized card, no detector). pattern: matched substring
+    (logging only; never user-facing).
     """
 
     triggered: bool

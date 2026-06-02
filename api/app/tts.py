@@ -1,15 +1,9 @@
 """Text-to-speech via Groq Orpheus (OpenAI-compatible ``/audio/speech``).
 
-Orpheus offers an expressive English voice and an authentic Saudi-Arabic voice —
-the two UI/reply-priority languages for Sakina.  For any other detected language
-the caller sends the English translation, spoken by the English voice.
-
 Two Orpheus constraints handled here:
   * **200-character input limit** — replies are split into <=200-char chunks on
     sentence boundaries, synthesized separately, and the WAV segments are merged.
   * model + voice are chosen by language (``ar`` → Saudi model/voice, else English).
-
-The Groq key stays server-side; the browser only receives the finished audio.
 """
 
 from __future__ import annotations

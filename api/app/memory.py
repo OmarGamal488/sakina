@@ -1,47 +1,17 @@
 """Redis-backed session memory and cache for Sakina.
 
-Design
-------
-Conversation history, per-session prior language, and a short-lived response cache
-are stored in Redis when available.  If ``settings.redis_url`` is empty **or** the
-server is unreachable at startup, the module silently falls back to an in-process
-implementation backed by plain Python dicts.
+History, per-session prior language, and a short-lived response cache live in Redis when
+available; if ``settings.redis_url`` is empty or the server is unreachable at startup, the
+module silently falls back to an in-process dict implementation (TTLs honoured via lazy
+expiry on read).
 
-Graceful-fallback contract
---------------------------
-* No public method ever raises — a Redis error is logged as a warning and treated
-  as a miss (reads) or a no-op (writes) so that a cache/memory failure can never
-  break a chat turn.
-* The active backend is logged exactly once at singleton construction time
-  (``memory_backend=redis`` or ``memory_backend=memory``).
-* Importing this module is cheap: the ``redis`` package is imported **lazily**
-  inside ``SessionMemory.__init__``, so the fallback path has no hard Redis
-  dependency and tests that never touch Redis incur no overhead.
+Graceful-fallback contract: no public method ever raises — a Redis error is logged and
+treated as a miss (reads) / no-op (writes) so a cache/memory failure can never break a chat
+turn.
 
-PII / TTL note
---------------
-Conversation history contains mental-health content (sensitive personal data).
-Every key is given an explicit TTL so that content cannot accumulate indefinitely:
-
-* ``sakina:hist:<sid>`` — session_ttl_seconds (default 24 h)
-* ``sakina:lang:<sid>`` — session_ttl_seconds (default 24 h)
-* ``sakina:cache:<key>`` — cache_ttl_seconds (default 1 h), overridable per call
-
-The in-process fallback honours TTLs via lazy expiry on read (no background thread).
-
-Thread safety
--------------
-The Redis client (``redis.Redis``) is thread-safe by design.  The in-process
-fallback is NOT guarded by a lock; concurrent appends from the FastAPI threadpool
-may produce non-deterministic trim boundaries.  For the current single-worker
-development use case this is acceptable; add a ``threading.Lock`` if the app moves
-to multi-threaded production deployment with the fallback backend.
-
-Redis layout
-------------
-``sakina:hist:<sid>``  — LIST  (RPUSH / LTRIM / LRANGE / EXPIRE)
-``sakina:lang:<sid>``  — STRING (SETEX)
-``sakina:cache:<key>`` — STRING (SETEX)
+PII/TTL: history holds sensitive mental-health content, so every key is TTL'd (hist/lang =
+session_ttl_seconds; cache = cache_ttl_seconds, overridable per call) and cannot accumulate
+indefinitely.
 """
 
 from __future__ import annotations
@@ -60,27 +30,16 @@ if TYPE_CHECKING:
 
 logger = structlog.get_logger(__name__)
 
-# ---------------------------------------------------------------------------
-# Public helpers
-# ---------------------------------------------------------------------------
-
 
 def new_session_id() -> str:
     """Return a new unguessable, URL-safe session identifier (128-bit entropy)."""
     return secrets.token_urlsafe(16)
 
 
-# ---------------------------------------------------------------------------
-# In-process fallback implementation
-# ---------------------------------------------------------------------------
-
-
 class _InProcessBackend:
     """Pure-Python in-memory store that honours TTLs via lazy expiry on read.
 
-    Values are stored as ``(value, expiry_timestamp)`` tuples; a value whose
-    expiry_timestamp <= time.time() is treated as absent (miss / no-op on read,
-    deleted from the dict on next access).
+    Values are ``(value, expiry_ts)`` tuples; an expired value is treated as absent.
     """
 
     def __init__(self) -> None:
@@ -99,10 +58,7 @@ class _InProcessBackend:
         # trim from the front so only the newest max_turns entries remain
         if len(lst) > max_turns:
             del lst[: len(lst) - max_turns]
-        # TTL is not enforced per-element here (whole session expires on lang read).
-        # We store expiry alongside lang and check it at get_history time.
-        # Re-use the lang key expiry to prune history lazily if needed — but the
-        # simplest correct approach: store an expiry per session in a side dict.
+        # session expiry is stored in the lang slot and checked at get_history time
         self._lang.setdefault(sid, ("", time.time() + ttl))
 
     def hist_get(self, sid: str, max_turns: int) -> list[dict]:
@@ -154,28 +110,17 @@ class _InProcessBackend:
         self._cache[key] = (value, time.time() + ttl)
 
 
-# ---------------------------------------------------------------------------
-# Public SessionMemory class
-# ---------------------------------------------------------------------------
-
 _HIST_PREFIX = "sakina:hist:"
 _LANG_PREFIX = "sakina:lang:"
 _CACHE_PREFIX = "sakina:cache:"
 
 
 class SessionMemory:
-    """Session history, prior language, and response cache backed by Redis or
-    an in-process fallback.
+    """Session history, prior language, and response cache backed by Redis or an
+    in-process fallback.
 
-    Do not construct directly in application code — use :func:`get_memory` to
-    obtain the module-level singleton.
-
-    Parameters
-    ----------
-    redis_url:
-        Redis connection URL (e.g. ``redis://localhost:6379/0``).  An empty string
-        or an unreachable URL activates the in-process fallback.  Defaults to
-        ``settings.redis_url``.
+    Use :func:`get_memory` rather than constructing directly. An empty or unreachable
+    ``redis_url`` (default ``settings.redis_url``) activates the in-process fallback.
     """
 
     def __init__(self, redis_url: str | None = None) -> None:
@@ -206,20 +151,12 @@ class SessionMemory:
             logger.info("memory_backend_active", memory_backend="memory", reason="redis_url_empty")
             self._fallback = _InProcessBackend()
 
-    # ------------------------------------------------------------------
-    # Internal helpers
-    # ------------------------------------------------------------------
-
     @property
     def _using_redis(self) -> bool:
         return self._redis is not None
 
     def _max_turns(self, max_turns: int | None) -> int:
         return max_turns if max_turns is not None else settings.memory_max_turns
-
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
 
     def get_history(self, session_id: str, max_turns: int | None = None) -> list[dict]:
         """Return conversation history for *session_id*, oldest first.
@@ -331,30 +268,20 @@ class SessionMemory:
             self._fallback.cache_set(key, value, effective_ttl)
 
 
-# ---------------------------------------------------------------------------
 # Module-level lazy singleton
-# ---------------------------------------------------------------------------
-
 _memory_instance: SessionMemory | None = None
 
 
 def get_memory() -> SessionMemory:
-    """Return the module-level singleton :class:`SessionMemory`.
-
-    Constructs the instance on first call (connects to Redis or activates the
-    in-process fallback).  Subsequent calls return the cached object.  FastAPI
-    startup should call this once; request handlers call this to obtain the singleton.
-    """
+    """Return the module-level singleton :class:`SessionMemory`, constructing it on
+    first call (connects to Redis or activates the in-process fallback)."""
     global _memory_instance
     if _memory_instance is None:
         _memory_instance = SessionMemory()
     return _memory_instance
 
 
-# ---------------------------------------------------------------------------
 # Smoke test (in-process fallback only — no Redis required)
-# ---------------------------------------------------------------------------
-
 if __name__ == "__main__":
     import sys
 

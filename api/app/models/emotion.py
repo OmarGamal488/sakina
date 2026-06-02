@@ -1,17 +1,10 @@
 """Emotion classification for Sakina — translate-then-classify (no fine-tuning).
 
-Non-English text is translated to English with **NLLB-200-distilled-1.3B** (FLORES
-codes), then classified by the pretrained **DistilBERT** emotion model into one of
-the 6 DAIR labels.  English passes through untranslated.  All local — **zero API
-calls** (keeps the 15 req/min Lightning budget for intent + RAG).
-
-The NLLB translator is exposed via :meth:`translate` so the response composer can
-reuse this one instance (no second ~5.5 GB load).
-
-Config + model ids come from ``artifacts/emotion_config.json`` (NB02).  Follows the
-loader conventions in :mod:`app.models.language_id`.
-
-Public API: :class:`EmotionResult`, :class:`EmotionClassifier`, :func:`get_classifier`.
+Non-English text is translated to English via NLLB-200-distilled-1.3B (FLORES
+codes), then classified by a pretrained DistilBERT model into one of the 6 DAIR
+labels; English passes through untranslated. All local — zero API calls. NLLB is
+exposed via :meth:`translate` so the composer reuses this instance (no second load).
+Config + model ids come from ``artifacts/emotion_config.json`` (NB02).
 """
 
 from __future__ import annotations
@@ -29,17 +22,8 @@ logger = structlog.get_logger(__name__)
 
 @dataclass(frozen=True)
 class EmotionResult:
-    """Immutable emotion result.
-
-    Attributes
-    ----------
-    emotion:
-        One of the 6 DAIR labels (sadness/joy/love/anger/fear/surprise).
-    confidence:
-        DistilBERT softmax probability of the chosen label.
-    translated_text:
-        The English text actually classified (== input when already English).
-    """
+    """Immutable emotion result: one of the 6 DAIR labels, its DistilBERT softmax
+    confidence, and the English text actually classified (== input if English)."""
 
     emotion: str
     confidence: float
@@ -86,12 +70,10 @@ class EmotionClassifier:
 
         logger.info("emotion_loaded", n_labels=len(self._labels))
 
-    # ------------------------------------------------------------------
     def translate(self, text: str, src_code: str, tgt_code: str | None = None) -> str:
         """Translate *text* from FLORES *src_code* to *tgt_code* (default English).
 
-        Reused by the response composer to fill the other-language pane — that's
-        why NLLB lives here and not in a separate module.
+        Reused by the response composer to fill the other-language pane.
         """
         tgt_code = tgt_code or self._eng_code
         self._nllb_tok.src_lang = src_code

@@ -1,14 +1,9 @@
 """Pydantic schemas for the Sakina ``/chat`` API and its SSE event payloads.
 
-The streamed contract:
-    event: meta   → {emotion, intent, language, sources, kind}
-    event: delta  → {text}      (reply in the user's language, token by token)
-    event: done   → {id, role, emotion, time, text:{<lang>: reply, "en": english}, kind}
-
-The system supports 20 languages (not just en/ar — the demo's two panes were a
-design reference).  The reply is generated in the user's DETECTED language; the
-``text`` dict is keyed by that language code, and also carries an ``"en"``
-version as a universal fallback (== the reply when the user is already English).
+SSE contract: meta → {emotion, intent, language, sources, kind};
+delta → {text}; done → {id, role, emotion, time, text, kind}.
+The reply is generated in the user's DETECTED language (20-language scope); the
+``text`` dict is keyed by that language code and also carries an ``"en"`` fallback.
 """
 
 from __future__ import annotations

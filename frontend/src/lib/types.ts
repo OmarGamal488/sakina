@@ -28,6 +28,14 @@ export type ChatStatus = 'ready' | 'submitted' | 'streaming' | 'error'
 // RTL languages
 export const RTL_LANGS: ReadonlySet<LangCode> = new Set(['ar', 'ur'])
 
+// Human-readable names for the detected-language label (shown under each reply)
+export const LANG_NAMES: Record<LangCode, string> = {
+  ar: 'Arabic',  bg: 'Bulgarian', de: 'German',     el: 'Greek',   en: 'English',
+  es: 'Spanish', fr: 'French',    hi: 'Hindi',      it: 'Italian', ja: 'Japanese',
+  nl: 'Dutch',   pl: 'Polish',    pt: 'Portuguese', ru: 'Russian', sw: 'Swahili',
+  th: 'Thai',    tr: 'Turkish',   ur: 'Urdu',       vi: 'Vietnamese', zh: 'Chinese',
+}
+
 // ─── AI SDK v6 typed data-parts ──────────────────────────────────────────────
 
 /** Widget types emitted by the backend in a data-widget part */

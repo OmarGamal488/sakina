@@ -22,23 +22,24 @@ export const EMOTION_COLORS: Record<Emotion, string> = {
   surprise: '#E5B0A4',
 }
 
-// Human-readable labels in EN / AR (from demo/data.jsx)
+// Emotion display labels — the canonical DAIR-emotion dataset label names
+// (sadness · joy · love · anger · fear · surprise), shown verbatim in the UI.
 export const EMOTION_LABELS: Record<string, Record<Emotion, string>> = {
   en: {
-    sadness:  'sad',
-    joy:      'lighter',
-    love:     'warm',
-    anger:    'angry',
-    fear:     'attentive',
-    surprise: 'surprised',
+    sadness:  'sadness',
+    joy:      'joy',
+    love:     'love',
+    anger:    'anger',
+    fear:     'fear',
+    surprise: 'surprise',
   },
   ar: {
-    sadness:  'حزين',
-    joy:      'أخف',
-    love:     'دافئ',
-    anger:    'غاضب',
-    fear:     'حذِر',
-    surprise: 'متفاجئ',
+    sadness:  'حزن',
+    joy:      'فرح',
+    love:     'حب',
+    anger:    'غضب',
+    fear:     'خوف',
+    surprise: 'مفاجأة',
   },
 }
 
