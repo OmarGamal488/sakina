@@ -159,8 +159,10 @@ export default function App() {
   return (
     <div className="app-shell" style={appStyle} dir="ltr" lang="en">
       <div className={`chat-card${idleStage >= 1 ? ' idle-attentive' : ''}`}>
-        <TopBar onClear={onClear} />
-        <PresenceHeader emotion={currentEmotion} isSpeaking={isSpeaking} />
+        <div className="chat-header-shell">
+          <TopBar onClear={onClear} />
+          <PresenceHeader emotion={currentEmotion} isSpeaking={isSpeaking} />
+        </div>
 
         {hasMessages ? (
           <div

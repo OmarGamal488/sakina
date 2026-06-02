@@ -53,6 +53,10 @@
 /* ─── Base reset ─── */
 *, *::before, *::after { box-sizing: border-box; }
 
+html, body, #root {
+  height: 100%;
+}
+
 html, body {
   margin: 0; padding: 0;
   background: #E5DFCC;
@@ -60,6 +64,7 @@ html, body {
   font-family: var(--font-en);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow: hidden;
 }
 
 button { font-family: inherit; color: inherit; }
@@ -75,10 +80,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 /* ─── App shell ─── */
 .app-shell {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--cream);
+  overflow: hidden;
 }
 
 /* Chat card (single column) */
@@ -87,6 +94,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   max-width: 100%;
   flex: 1;
   height: 100vh;
+  height: 100dvh;
   background: var(--cream);
   color: var(--ink);
   overflow: hidden;
@@ -94,6 +102,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   flex-direction: column;
   position: relative;
   transition: background 400ms ease;
+}
+
+.chat-header-shell {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--cream);
+  flex-shrink: 0;
 }
 
 /* ─── TOP BAR ─── */
