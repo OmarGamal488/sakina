@@ -9,6 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _API_DIR = Path(__file__).resolve().parent.parent
 _REPO_ROOT = _API_DIR.parent
+_FRONTEND_DIR = _REPO_ROOT / "frontend"
 ARTIFACTS_DIR = Path(__file__).resolve().parent / "models" / "artifacts"
 
 
@@ -16,7 +17,7 @@ class Settings(BaseSettings):
     """Runtime configuration, read from environment / ``api/.env``."""
 
     model_config = SettingsConfigDict(
-        env_file=str(_API_DIR / ".env"),
+        env_file=(str(_API_DIR / ".env"), str(_FRONTEND_DIR / ".env.local")),
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,
@@ -40,6 +41,8 @@ class Settings(BaseSettings):
     qdrant_url: str = ""
     qdrant_api_key: str = ""
     qdrant_collection: str = "sakina_counseling"
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-2.5-flash"
 
     # comma-separated str (pydantic-settings JSON-decodes list fields, tripping on plain values)
     cors_origins: str = "http://localhost:5173,http://localhost:3000"

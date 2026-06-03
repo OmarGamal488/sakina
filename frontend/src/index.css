@@ -268,7 +268,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 
 .panel-card,
-.letter-card {
+.letter-card,
+.soundscape-card,
+.scribble-card {
   border: 1px solid var(--line);
   border-radius: 24px;
   background: linear-gradient(180deg, #fcfbf7 0%, #f5efdf 100%);
@@ -432,6 +434,301 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 .letter-card {
   padding: 18px;
+}
+
+.soundscape-card {
+  padding: 18px;
+}
+
+.scribble-card {
+  padding: 18px;
+}
+
+.soundscape-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.soundscape-card__title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.soundscape-card__title-icon {
+  color: var(--sage);
+  flex: 0 0 auto;
+}
+
+.soundscape-card__title {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.2;
+  font-weight: 600;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.soundscape-card__sub {
+  margin: 12px 0 14px;
+  font-size: 0.96rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.sound-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.sound-tile {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--sand-soft);
+  color: var(--ink);
+  padding: 14px;
+  border-radius: 14px;
+  font: inherit;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: border-color 200ms, background 200ms;
+}
+
+.sound-tile:hover {
+  background: var(--sand);
+}
+
+.sound-tile.on {
+  border-color: var(--sage);
+  background: rgba(92, 131, 116, 0.08);
+}
+
+.sound-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sound-meta b {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sound-meta span {
+  font-size: 11px;
+  color: var(--ink-fade);
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+.sviz {
+  width: 60px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-soft);
+  flex-shrink: 0;
+}
+
+.sound-tile.on .sviz {
+  color: var(--sage);
+}
+
+.sviz svg {
+  width: 100%;
+  height: 100%;
+}
+
+.sviz-drop {
+  animation: sviz-rain 0.8s linear infinite;
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+.sviz.on .sviz-drop {
+  animation-play-state: running;
+}
+
+.sviz:not(.on) .sviz-drop {
+  animation: none;
+  opacity: 0.5;
+  transform: translateY(0);
+}
+
+@keyframes sviz-rain {
+  0% { transform: translateY(-12px); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(12px); opacity: 0; }
+}
+
+.sviz-wave {
+  animation: sviz-wave 3s ease-in-out infinite;
+}
+
+.sviz-wave.delay {
+  animation-delay: 1.5s;
+}
+
+.sviz:not(.on) .sviz-wave {
+  animation: none;
+}
+
+@keyframes sviz-wave {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-6px); }
+}
+
+.sviz-steam {
+  animation: sviz-steam 2s ease-in-out infinite;
+}
+
+.sviz:not(.on) .sviz-steam {
+  animation: none;
+  opacity: 0.5;
+}
+
+@keyframes sviz-steam {
+  0% { opacity: 0; transform: translateY(0); }
+  50% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+
+.sviz-bird {
+  animation: sviz-bird 4s ease-in-out infinite;
+}
+
+.sviz:not(.on) .sviz-bird {
+  animation: none;
+  opacity: 0.7;
+}
+
+@keyframes sviz-bird {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(8px, -2px); }
+}
+
+.soundscape-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.scribble-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.scribble-card__title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.scribble-card__title-icon {
+  color: var(--sage);
+  flex: 0 0 auto;
+}
+
+.scribble-card__title {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.2;
+  font-weight: 600;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.scribble-card__sub {
+  margin: 12px 0 14px;
+  font-size: 0.96rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.scribble-card__canvas {
+  width: 100%;
+  height: 220px;
+  display: block;
+  margin-bottom: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f0e9d6;
+  cursor: crosshair;
+  touch-action: none;
+  box-sizing: border-box;
+}
+
+.scribble-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.scribble-card__btn {
+  min-height: 36px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.scribble-card__btn--ghost {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--ink-soft);
+}
+
+.scribble-card__btn--ghost:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.scribble-card__btn--primary {
+  background: var(--sage);
+  color: #fff;
+}
+
+.scribble-card__btn--primary:hover:enabled {
+  background: var(--sage-deep);
+}
+
+.scribble-card__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.scribble-card__mirror {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--sand-soft);
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--ink);
+  border-inline-start: 3px solid #b97f86;
+}
+
+.scribble-card__avatar {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
 }
 
 .letter-card__header {
@@ -1191,17 +1488,26 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .panel-card__title {
     font-size: 22px;
   }
+  .side-menu__tabs {
+    grid-template-columns: 1fr;
+  }
   .letter-card__when {
     align-items: stretch;
     flex-direction: column;
   }
+  .sound-grid {
+    grid-template-columns: 1fr;
+  }
   .letter-card__radio-row {
     width: 100%;
   }
-  .letter-card__actions {
+  .letter-card__actions,
+  .soundscape-card__actions,
+  .scribble-card__actions {
     flex-direction: column-reverse;
   }
   .letter-card__btn,
+  .scribble-card__btn,
   .drawer-btn {
     width: 100%;
   }

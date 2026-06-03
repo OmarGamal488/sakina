@@ -37,6 +37,18 @@ class TTSRequest(BaseModel):
     lang: str = "en"  # 'ar' → Saudi Arabic voice; anything else → English voice
 
 
+class ScribbleRequest(BaseModel):
+    """Canvas snapshot sent for gentle reflection."""
+
+    image_data_url: str = Field(..., min_length=32)
+
+
+class ScribbleResponse(BaseModel):
+    """Gemini reflection over a drawn scribble."""
+
+    reflection: str
+
+
 class Source(BaseModel):
     """A retrieved RAG passage surfaced in the ``meta`` frame."""
 

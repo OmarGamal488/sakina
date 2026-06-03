@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Mail, Save, Send, Settings2, Trash2, X } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Mail, Pause, PenLine, Play, Save, Send, Settings2, Trash2, Volume2, X } from 'lucide-react'
 import {
   getSavedTrustedPersonEmail,
   getSavedUserEmail,
@@ -8,11 +8,13 @@ import {
   USER_EMAIL_KEY,
   USER_NAME_KEY,
 } from '../lib/userSettings'
+import { ScribbleCard } from './ScribbleCard'
 
 const WEBHOOK_URL = 'https://ahmedgamal7207.app.n8n.cloud/webhook/letter-forward'
 
-type DrawerView = 'settings' | 'letter-forward'
+type DrawerView = 'settings' | 'soundscape' | 'scribble' | 'letter-forward'
 type DeliveryOption = '1m' | '1d' | '1mo'
+type SoundKey = 'rain' | 'ocean' | 'cafe' | 'forest'
 
 interface SideMenuProps {
   isOpen: boolean
@@ -24,6 +26,18 @@ const DELIVERY_OPTIONS: Record<DeliveryOption, string> = {
   '1d': 'in a day',
   '1mo': 'in a month',
 }
+
+const SOUNDS: Array<{
+  key: SoundKey
+  title: string
+  subtitle: string
+  src: string
+}> = [
+  { key: 'rain', title: 'Rain', subtitle: 'steady, hushed', src: '/sounds/rain.mp3' },
+  { key: 'ocean', title: 'Ocean', subtitle: 'long slow waves', src: '/sounds/ocean.mp3' },
+  { key: 'cafe', title: 'Cafe', subtitle: 'distant murmurs', src: '/sounds/cafe.mp3' },
+  { key: 'forest', title: 'Forest', subtitle: 'breeze and birds', src: '/sounds/forest.mp3' },
+]
 
 function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
@@ -69,6 +83,63 @@ function formatReadable(date: Date): string {
   }).format(date)
 }
 
+function SoundVisual({ sound, active }: { sound: SoundKey; active: boolean }) {
+  if (sound === 'rain') {
+    return (
+      <span className={`sviz${active ? ' on' : ''}`} aria-hidden>
+        <svg viewBox="0 0 60 40" fill="none">
+          {[8, 18, 28, 38, 48].map((x, index) => (
+            <path
+              key={x}
+              className="sviz-drop"
+              d={`M${x} 10L${x - 2} 28`}
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              style={{ animationDelay: `${index * 120}ms` }}
+            />
+          ))}
+        </svg>
+      </span>
+    )
+  }
+
+  if (sound === 'ocean') {
+    return (
+      <span className={`sviz${active ? ' on' : ''}`} aria-hidden>
+        <svg viewBox="0 0 60 40" fill="none">
+          <path className="sviz-wave" d="M4 24C11 20 18 20 25 24C32 28 39 28 56 22" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+          <path className="sviz-wave delay" d="M4 28C11 24 18 24 25 28C32 32 39 32 56 26" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" opacity="0.75" />
+        </svg>
+      </span>
+    )
+  }
+
+  if (sound === 'cafe') {
+    return (
+      <span className={`sviz${active ? ' on' : ''}`} aria-hidden>
+        <svg viewBox="0 0 60 40" fill="none">
+          <path d="M18 15H32C33.1 15 34 15.9 34 17V26C34 28.2 32.2 30 30 30H20C17.8 30 16 28.2 16 26V17C16 15.9 16.9 15 18 15Z" fill="currentColor" opacity="0.85" />
+          <path d="M34 18H37.5C39.4 18 41 19.6 41 21.5C41 23.4 39.4 25 37.5 25H34" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path className="sviz-steam" d="M22 12C22 10.8 22.8 9.9 23.8 9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          <path className="sviz-steam" d="M27 11C27 9.8 27.8 8.9 28.8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" style={{ animationDelay: '280ms' }} />
+        </svg>
+      </span>
+    )
+  }
+
+  return (
+    <span className={`sviz${active ? ' on' : ''}`} aria-hidden>
+      <svg viewBox="0 0 60 40" fill="none">
+        <path d="M18 30L24 17L30 30H18Z" fill="currentColor" opacity="0.85" />
+        <path d="M30 30L37 13L44 30H30Z" fill="currentColor" opacity="0.6" />
+        <path className="sviz-bird" d="M16 12C18 10 20 10 22 12" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+        <path className="sviz-bird" d="M28 9C30 7 32 7 34 9" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" style={{ animationDelay: '900ms' }} />
+      </svg>
+    </span>
+  )
+}
+
 export function SideMenu({ isOpen, onClose }: SideMenuProps) {
   const [activeView, setActiveView] = useState<DrawerView>('settings')
   const [now, setNow] = useState(() => new Date())
@@ -83,6 +154,10 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
   const [when, setWhen] = useState<DeliveryOption>('1m')
   const [submitState, setSubmitState] = useState<'idle' | 'saving' | 'success' | 'error'>('idle')
   const [submitMessage, setSubmitMessage] = useState<string | null>(null)
+  const [activeSound, setActiveSound] = useState<SoundKey | null>(null)
+  const [soundState, setSoundState] = useState<'stopped' | 'playing' | 'paused'>('stopped')
+  const [soundMessage, setSoundMessage] = useState<string | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     const email = getSavedUserEmail()
@@ -102,6 +177,13 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
       setSubmitMessage(null)
     }
   }, [isOpen])
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause()
+      audioRef.current = null
+    }
+  }, [])
 
   useEffect(() => {
     const updateNow = () => setNow(new Date())
@@ -209,6 +291,56 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
     }
   }
 
+  const playSound = async (sound: (typeof SOUNDS)[number]) => {
+    try {
+      if (!audioRef.current) {
+        audioRef.current = new Audio(sound.src)
+        audioRef.current.loop = true
+      }
+
+      if (activeSound !== sound.key) {
+        audioRef.current.pause()
+        audioRef.current.src = sound.src
+        audioRef.current.currentTime = 0
+      }
+
+      await audioRef.current.play()
+      setActiveSound(sound.key)
+      setSoundState('playing')
+      setSoundMessage(`${sound.title} is now playing in the background.`)
+    } catch {
+      setSoundMessage('Could not start the soundscape. Try again once more.')
+    }
+  }
+
+  const handlePauseResume = async () => {
+    if (!audioRef.current || !activeSound) return
+
+    if (soundState === 'playing') {
+      audioRef.current.pause()
+      setSoundState('paused')
+      setSoundMessage('Soundscape paused.')
+      return
+    }
+
+    try {
+      await audioRef.current.play()
+      setSoundState('playing')
+      setSoundMessage('Soundscape resumed.')
+    } catch {
+      setSoundMessage('Could not resume the soundscape.')
+    }
+  }
+
+  const handleStopSound = () => {
+    if (!audioRef.current) return
+    audioRef.current.pause()
+    audioRef.current.currentTime = 0
+    setActiveSound(null)
+    setSoundState('stopped')
+    setSoundMessage('Soundscape stopped.')
+  }
+
   return (
     <div className={`side-menu-shell${isOpen ? ' is-open' : ''}`} aria-hidden={!isOpen}>
       <button
@@ -246,6 +378,26 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
           >
             <Settings2 size={16} aria-hidden />
             <span>Settings</span>
+          </button>
+          <button
+            type="button"
+            className={`side-menu__tab${activeView === 'soundscape' ? ' is-active' : ''}`}
+            onClick={() => setActiveView('soundscape')}
+            role="tab"
+            aria-selected={activeView === 'soundscape'}
+          >
+            <Volume2 size={16} aria-hidden />
+            <span>Soundscape</span>
+          </button>
+          <button
+            type="button"
+            className={`side-menu__tab${activeView === 'scribble' ? ' is-active' : ''}`}
+            onClick={() => setActiveView('scribble')}
+            role="tab"
+            aria-selected={activeView === 'scribble'}
+          >
+            <PenLine size={16} aria-hidden />
+            <span>Scribble</span>
           </button>
           <button
             type="button"
@@ -375,6 +527,72 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
 
               {settingsNotice ? <p className="status-note">{settingsNotice}</p> : null}
             </section>
+          ) : activeView === 'soundscape' ? (
+            <section className="soundscape-card" aria-label="Soundscape">
+              <div className="soundscape-card__header">
+                <div className="soundscape-card__title-wrap">
+                  <div className="letter-card__title-icon-wrap">
+                    <Volume2 size={18} className="soundscape-card__title-icon" aria-hidden />
+                  </div>
+                  <div>
+                    <p className="panel-card__label">Soundscape</p>
+                    <h3 className="soundscape-card__title">A quiet sound behind the words</h3>
+                  </div>
+                </div>
+              </div>
+
+              <p className="soundscape-card__sub">
+                Choose one background sound whenever you want the space to feel softer.
+              </p>
+
+              <div className="sound-grid">
+                {SOUNDS.map(sound => {
+                  const isActive = activeSound === sound.key
+                  return (
+                    <button
+                      key={sound.key}
+                      type="button"
+                      className={`sound-tile${isActive ? ' on' : ''}`}
+                      onClick={() => void playSound(sound)}
+                    >
+                      <SoundVisual sound={sound.key} active={isActive && soundState === 'playing'} />
+                      <span className="sound-meta">
+                        <b>{sound.title}</b>
+                        <span>{sound.subtitle}</span>
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="soundscape-card__actions">
+                <button
+                  type="button"
+                  className="letter-card__btn letter-card__btn--ghost"
+                  disabled={!activeSound}
+                  onClick={() => void handlePauseResume()}
+                >
+                  {soundState === 'playing' ? <Pause size={15} aria-hidden /> : <Play size={15} aria-hidden />}
+                  <span>{soundState === 'playing' ? 'Pause' : 'Resume'}</span>
+                </button>
+                <button
+                  type="button"
+                  className="letter-card__btn letter-card__btn--primary"
+                  disabled={!activeSound && soundState === 'stopped'}
+                  onClick={handleStopSound}
+                >
+                  <span>Stop</span>
+                </button>
+              </div>
+
+              {soundMessage ? (
+                <p className="status-note">{soundMessage}</p>
+              ) : (
+                <p className="inline-note">Selected sounds loop in the background until you pause or stop them.</p>
+              )}
+            </section>
+          ) : activeView === 'scribble' ? (
+            <ScribbleCard />
           ) : (
             <section className="letter-card" aria-label="Letter to future self">
               <div className="letter-card__header">

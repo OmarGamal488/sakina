@@ -22,10 +22,11 @@ from sse_starlette.sse import EventSourceResponse
 from starlette.concurrency import run_in_threadpool
 
 from app import memory, orchestrator, safety, widgets
+from app import scribble as scribble_service
 from app import stt as stt_service
 from app import tts as tts_service
 from app.config import settings
-from app.schemas import ChatRequest, TTSRequest
+from app.schemas import ChatRequest, ScribbleRequest, ScribbleResponse, TTSRequest
 
 logger = structlog.get_logger(__name__)
 
@@ -128,6 +129,18 @@ async def tts(req: TTSRequest) -> Response:
         logger.warning("tts_error", error=str(e)[:200])
         raise HTTPException(status_code=502, detail="speech synthesis failed") from e
     return Response(content=audio, media_type="audio/wav")
+
+
+@app.post("/scribble/reflect", response_model=ScribbleResponse)
+async def scribble_reflect(req: ScribbleRequest) -> ScribbleResponse:
+    """Reflect gently on a user's emotional scribble via Gemini image understanding."""
+    try:
+        reflection = await run_in_threadpool(
+            scribble_service.reflect_scribble, req.image_data_url
+        )
+    except scribble_service.ScribbleError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return ScribbleResponse(reflection=reflection)
 
 
 @app.post("/chat")
