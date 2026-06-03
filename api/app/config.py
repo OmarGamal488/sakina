@@ -58,7 +58,7 @@ class Settings(BaseSettings):
     crisis_en_text: str = "Text HOME to 741741"
     crisis_ar_number: str = "8001717"  # TODO: verify regional AR crisis line
     crisis_help_webhook_url: str = (
-        "https://ahmedgamal7207.app.n8n.cloud/webhook-test/letter-forward"
+        "https://ahmedgamal7207.app.n8n.cloud/webhook/letter-forward"
     )
 
     @property

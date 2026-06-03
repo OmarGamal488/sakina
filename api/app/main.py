@@ -62,10 +62,12 @@ def _clean(value: str | None) -> str:
     return (value or "").strip()
 
 
-def _post_crisis_help_webhook(name: str, email: str) -> None:
-    payload = json.dumps(
-        {"intent": "help", "name": name, "email": email}, ensure_ascii=False
-    ).encode("utf-8")
+def _post_crisis_help_webhook(name: str | None, email: str) -> None:
+    payload_dict = {"intent": "help", "email": email}
+    clean_name = _clean(name)
+    if clean_name:
+        payload_dict["name"] = clean_name
+    payload = json.dumps(payload_dict, ensure_ascii=False).encode("utf-8")
     req = urlrequest.Request(
         settings.crisis_help_webhook_url,
         data=payload,
@@ -78,17 +80,15 @@ def _post_crisis_help_webhook(name: str, email: str) -> None:
 
 
 async def _notify_trusted_person(name: str | None, email: str | None) -> None:
-    clean_name = _clean(name)
     clean_email = _clean(email)
-    if not clean_name or not clean_email:
+    if not clean_email:
         logger.info(
             "crisis_help_webhook_skipped",
-            has_name=bool(clean_name),
             has_email=bool(clean_email),
         )
         return
     try:
-        await run_in_threadpool(_post_crisis_help_webhook, clean_name, clean_email)
+        await run_in_threadpool(_post_crisis_help_webhook, name, clean_email)
     except Exception as exc:  # noqa: BLE001
         logger.warning("crisis_help_webhook_error", error=str(exc)[:200], email=clean_email)
 
