@@ -29,4 +29,5 @@ frontend/src/test/
 __pycache__/
 *.pyc
 
+# --- Large local model downloads ---
 downloaded_models/

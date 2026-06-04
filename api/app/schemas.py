@@ -26,6 +26,8 @@ class ChatRequest(BaseModel):
     lang: str | None = None          # optional UI language hint (ISO 639-1)
     session_lang: str | None = None  # the previous turn's detected language (robustness prior)
     session_id: str | None = None    # session key for Redis conversation memory + prior_lang
+    trusted_person_email: str | None = None
+    user_name: str | None = None
 
 
 class TTSRequest(BaseModel):
@@ -33,6 +35,18 @@ class TTSRequest(BaseModel):
 
     text: str = Field(..., min_length=1)
     lang: str = "en"  # 'ar' → Saudi Arabic voice; anything else → English voice
+
+
+class ScribbleRequest(BaseModel):
+    """Canvas snapshot sent for gentle reflection."""
+
+    image_data_url: str = Field(..., min_length=32)
+
+
+class ScribbleResponse(BaseModel):
+    """Gemini reflection over a drawn scribble."""
+
+    reflection: str
 
 
 class Source(BaseModel):

@@ -15,7 +15,7 @@ from pathlib import Path
 
 import structlog
 
-from app.config import ARTIFACTS_DIR
+from app.config import ARTIFACTS_DIR, settings
 
 logger = structlog.get_logger(__name__)
 
@@ -58,15 +58,27 @@ class EmotionClassifier:
 
         self._clf = pipeline(
             "text-classification",
-            model=AutoModelForSequenceClassification.from_pretrained(emo_id),
-            tokenizer=AutoTokenizer.from_pretrained(emo_id),
+            model=AutoModelForSequenceClassification.from_pretrained(
+                emo_id,
+                cache_dir=settings.hf_hub_cache_dir,
+                low_cpu_mem_usage=True,
+            ),
+            tokenizer=AutoTokenizer.from_pretrained(
+                emo_id, cache_dir=settings.hf_hub_cache_dir
+            ),
             device=-1,  # CPU
             truncation=True,
             max_length=self._max_len,
             top_k=None,
         )
-        self._nllb_tok = AutoTokenizer.from_pretrained(nllb_id)
-        self._nllb = AutoModelForSeq2SeqLM.from_pretrained(nllb_id).eval()
+        self._nllb_tok = AutoTokenizer.from_pretrained(
+            nllb_id, cache_dir=settings.hf_hub_cache_dir
+        )
+        self._nllb = AutoModelForSeq2SeqLM.from_pretrained(
+            nllb_id,
+            cache_dir=settings.hf_hub_cache_dir,
+            low_cpu_mem_usage=True,
+        ).eval()
 
         logger.info("emotion_loaded", n_labels=len(self._labels))
 

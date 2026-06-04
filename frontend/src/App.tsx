@@ -10,10 +10,11 @@
  * (Arabic reply reads RTL inside a left-anchored bubble).
  */
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport, isDataUIPart } from 'ai'
 import { TopBar } from './components/TopBar'
+import { SideMenu } from './components/SideMenu'
 import { PresenceHeader } from './components/PresenceHeader'
 import { MessageBubble } from './components/MessageBubble'
 import { TypingIndicator } from './components/TypingIndicator'
@@ -21,8 +22,10 @@ import { Composer } from './components/Composer'
 import { IdleNudge, IdlePresence } from './components/IdlePresence'
 import { useTextToSpeech } from './hooks/useTextToSpeech'
 import { useIdlePresence } from './hooks/useIdlePresence'
+import { API_URL } from './lib/api'
 import type { SakinaDataTypes, SakinaUIMessage, Emotion, LangCode } from './lib/types'
 import { EMOTION_COLORS, DEFAULT_EMOTION } from './lib/emotion'
+import { getSavedTrustedPersonEmail, getSavedUserName } from './lib/userSettings'
 
 const SESSION_KEY = 'sakina_session_id'
 
@@ -78,17 +81,23 @@ function extractTTSText(msg: SakinaUIMessage, lang: LangCode): string {
 }
 
 export default function App() {
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
   // Unguessable session id (persisted) → sent with every /chat/ui request so the
   // backend keys Redis conversation memory. Held in a ref so request-building always
   // reads the current value (survives rotation when the user starts a new chat).
   const sessionIdRef = useRef<string>(getSessionId())
   const { messages, sendMessage, status, setMessages, stop } = useChat<SakinaUIMessage>({
     transport: new DefaultChatTransport({
-      api: `${import.meta.env.VITE_API_URL}/chat/ui`,
+      api: `${API_URL}/chat/ui`,
       // Server is the source of truth for history → send only the latest message +
       // the session id; prior turns are loaded from Redis by session_id.
       prepareSendMessagesRequest: ({ messages }) => ({
-        body: { messages: messages.slice(-1), session_id: sessionIdRef.current },
+        body: {
+          messages: messages.slice(-1),
+          session_id: sessionIdRef.current,
+          trusted_person_email: getSavedTrustedPersonEmail(),
+          user_name: getSavedUserName(),
+        },
       }),
     }),
   })
@@ -158,8 +167,10 @@ export default function App() {
   return (
     <div className="app-shell" style={appStyle} dir="ltr" lang="en">
       <div className={`chat-card${idleStage >= 1 ? ' idle-attentive' : ''}`}>
-        <TopBar onClear={onClear} />
-        <PresenceHeader emotion={currentEmotion} isSpeaking={isSpeaking} />
+        <div className="chat-header-shell">
+          <TopBar onClear={onClear} onMenuToggle={() => setIsSideMenuOpen(true)} />
+          <PresenceHeader emotion={currentEmotion} isSpeaking={isSpeaking} />
+        </div>
 
         {hasMessages ? (
           <div
@@ -228,6 +239,7 @@ export default function App() {
           <IdlePresence lang={idleLang} emotion={DEFAULT_EMOTION} onDismiss={dismissIdle} />
         )}
       </div>
+      <SideMenu isOpen={isSideMenuOpen} onClose={() => setIsSideMenuOpen(false)} />
     </div>
   )
 }
