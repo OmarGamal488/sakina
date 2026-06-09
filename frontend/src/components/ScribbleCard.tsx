@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } f
 import { Brush, Loader2, Sparkles } from 'lucide-react'
 import { API_URL } from '../lib/api'
 import { SakinaAvatar } from './SakinaAvatar'
+import type { Emotion } from '../lib/types'
+import { DEFAULT_EMOTION, EMOTION_ORDER } from '../lib/emotion'
 
 function drawSetup(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
   const rect = canvas.getBoundingClientRect()
@@ -37,6 +39,7 @@ export function ScribbleCard() {
   const [hasDrawing, setHasDrawing] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [reflection, setReflection] = useState('')
+  const [emotion, setEmotion] = useState<Emotion>(DEFAULT_EMOTION)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -116,7 +119,11 @@ export function ScribbleCard() {
         }),
       })
 
-      const payload = (await response.json().catch(() => null)) as { reflection?: string; detail?: string } | null
+      const payload = (await response.json().catch(() => null)) as {
+        reflection?: string
+        emotion?: string
+        detail?: string
+      } | null
 
       if (!response.ok) {
         throw new Error(payload?.detail || 'Sakina could not reflect on the drawing right now.')
@@ -127,6 +134,9 @@ export function ScribbleCard() {
       }
 
       setReflection(payload.reflection.trim())
+      // Drive the avatar with the emotion Gemini labeled the drawing with.
+      const labeled = payload.emotion as Emotion | undefined
+      setEmotion(labeled && EMOTION_ORDER.includes(labeled) ? labeled : DEFAULT_EMOTION)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not read the scribble right now.')
     } finally {
@@ -186,7 +196,7 @@ export function ScribbleCard() {
       {reflection ? (
         <div className="scribble-card__mirror">
           <div className="scribble-card__avatar" aria-hidden>
-            <SakinaAvatar emotion="love" size="xs" breathe={false} />
+            <SakinaAvatar emotion={emotion} size="xs" breathe={false} />
           </div>
           <span>{reflection}</span>
         </div>

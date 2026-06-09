@@ -10,7 +10,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { Emotion } from '../lib/types'
-import { EMOTION_COLORS, SR_LABELS } from '../lib/emotion'
+import { EMOTION_COLORS, NEUTRAL_COLOR, SR_LABELS } from '../lib/emotion'
 
 interface SizePreset {
   px: number
@@ -26,7 +26,9 @@ const SIZE_PRESETS: Record<string, SizePreset> = {
 }
 
 interface SakinaAvatarProps {
-  emotion?: Emotion
+  /** `null` → blank presence: a faceless neutral disc (reply pending, emotion
+   *  not yet detected). `undefined` falls back to joy. */
+  emotion?: Emotion | null
   size?: 'xs' | 'sm' | 'md' | 'lg'
   isSpeaking?: boolean
   label?: string
@@ -76,6 +78,24 @@ function FaceCrossfade({ src, emotion, size }: { src: string; emotion: string; s
   )
 }
 
+/** Faceless resting disc shown while no emotion has been detected yet. */
+function BlankFace({ size }: { size: number }) {
+  return (
+    <span className="sakina-fade in" aria-hidden>
+      <span
+        style={{
+          display: 'block',
+          width: size,
+          height: size,
+          borderRadius: '50%',
+          background: '#F0E6D2',
+          userSelect: 'none',
+        }}
+      />
+    </span>
+  )
+}
+
 export function SakinaAvatar({
   emotion = 'joy',
   size = 'md',
@@ -85,10 +105,12 @@ export function SakinaAvatar({
 }: SakinaAvatarProps) {
   const preset = SIZE_PRESETS[size] ?? SIZE_PRESETS.md
   const { px, ring, glow } = preset
-  const color = EMOTION_COLORS[emotion] ?? EMOTION_COLORS.joy
+  // Blank presence: no detected emotion yet → neutral color, faceless disc.
+  const isBlank = emotion == null
+  const color = isBlank ? NEUTRAL_COLOR : (EMOTION_COLORS[emotion] ?? EMOTION_COLORS.joy)
   const ringGap = Math.max(2, Math.round(px / 30))
   const faceSize = px - (ring + ringGap) * 2
-  const src = `/avatars/sakina_${emotion}.svg`
+  const srLabel = (!isBlank && SR_LABELS[emotion]) || 'Sakina'
 
   const breatheClass = !breathe
     ? ''
@@ -111,18 +133,18 @@ export function SakinaAvatar({
       className="sakina-av"
       style={wrapStyle}
       role="img"
-      aria-label={label ?? SR_LABELS[emotion] ?? 'Sakina'}
+      aria-label={label ?? srLabel}
     >
-      <span className="sr-only">{SR_LABELS[emotion] ?? 'Sakina'}</span>
+      <span className="sr-only">{srLabel}</span>
       {isSpeaking && <span className="sakina-av-ping" aria-hidden />}
       <span className="sakina-av-glow" aria-hidden />
       <span className="sakina-av-ring" aria-hidden />
       <span className={`sakina-av-face ${breatheClass}`} aria-hidden>
-        <FaceCrossfade
-          src={src}
-          emotion={emotion}
-          size={faceSize}
-        />
+        {isBlank ? (
+          <BlankFace size={faceSize} />
+        ) : (
+          <FaceCrossfade src={`/avatars/sakina_${emotion}.svg`} emotion={emotion} size={faceSize} />
+        )}
       </span>
     </div>
   )

@@ -1,15 +1,17 @@
 import { SakinaAvatar } from './SakinaAvatar'
 import type { Emotion } from '../lib/types'
-import { EMOTION_COLORS, EMOTION_LABELS } from '../lib/emotion'
+import { EMOTION_COLORS, EMOTION_LABELS, NEUTRAL_COLOR } from '../lib/emotion'
 
 interface PresenceHeaderProps {
-  emotion: Emotion
+  // `null` while a reply is pending and no emotion has been detected yet.
+  emotion: Emotion | null
   isSpeaking: boolean
 }
 
 export function PresenceHeader({ emotion, isSpeaking }: PresenceHeaderProps) {
-  const emoLabel = EMOTION_LABELS.en?.[emotion] ?? emotion
-  const emoColor = EMOTION_COLORS[emotion]
+  // Blank presence while pending: neutral color, no emotion name in the label.
+  const emoLabel = emotion ? (EMOTION_LABELS.en?.[emotion] ?? emotion) : null
+  const emoColor = emotion ? EMOTION_COLORS[emotion] : NEUTRAL_COLOR
 
   const style = {
     '--emo': emoColor,
@@ -22,7 +24,7 @@ export function PresenceHeader({ emotion, isSpeaking }: PresenceHeaderProps) {
       <div className="presence-meta">
         <div className="presence-emo">
           <span className="swatch" aria-hidden />
-          <span>Sakina · {emoLabel}</span>
+          <span>{emoLabel ? `Sakina · ${emoLabel}` : 'Sakina'}</span>
         </div>
       </div>
     </div>

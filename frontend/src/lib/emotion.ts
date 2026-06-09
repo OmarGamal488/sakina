@@ -12,6 +12,10 @@ export const EMOTION_ORDER: Emotion[] = [
 
 export const DEFAULT_EMOTION: Emotion = 'joy'
 
+// Neutral "blank" presence color — used while a reply is pending and no emotion
+// has been detected yet (avatar shows a faceless resting disc, not a joy face).
+export const NEUTRAL_COLOR = '#CFC4B4'
+
 // Exact colors per CLAUDE.md cross-cutting invariants
 export const EMOTION_COLORS: Record<Emotion, string> = {
   sadness:  '#6B8FB5',

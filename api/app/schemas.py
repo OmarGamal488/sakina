@@ -44,9 +44,10 @@ class ScribbleRequest(BaseModel):
 
 
 class ScribbleResponse(BaseModel):
-    """Gemini reflection over a drawn scribble."""
+    """Gemini reflection over a drawn scribble + the DAIR emotion it conveys."""
 
     reflection: str
+    emotion: str = "love"
 
 
 class Source(BaseModel):

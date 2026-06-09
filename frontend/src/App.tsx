@@ -24,7 +24,7 @@ import { useTextToSpeech } from './hooks/useTextToSpeech'
 import { useIdlePresence } from './hooks/useIdlePresence'
 import { API_URL } from './lib/api'
 import type { SakinaDataTypes, SakinaUIMessage, Emotion, LangCode } from './lib/types'
-import { EMOTION_COLORS, DEFAULT_EMOTION } from './lib/emotion'
+import { EMOTION_COLORS, DEFAULT_EMOTION, NEUTRAL_COLOR } from './lib/emotion'
 import { getSavedTrustedPersonEmail, getSavedUserName } from './lib/userSettings'
 
 const SESSION_KEY = 'sakina_session_id'
@@ -46,14 +46,15 @@ const STARTER_PROMPTS = [
   "I just need someone to talk to",
 ]
 
-/** Extract meta.emotion from an assistant message's parts */
-function extractEmotion(msg: SakinaUIMessage): Emotion {
+/** Extract meta.emotion from an assistant message's parts, or null if the
+ *  emotion hasn't been detected yet (meta part not streamed in). */
+function extractEmotion(msg: SakinaUIMessage): Emotion | null {
   for (const p of msg.parts) {
     if (isDataUIPart(p) && p.type === 'data-meta') {
       return (p.data as SakinaDataTypes['meta']).emotion
     }
   }
-  return DEFAULT_EMOTION
+  return null
 }
 
 /** Extract detected language from the meta part */
@@ -108,14 +109,26 @@ export default function App() {
   const bottomRef = useRef<HTMLDivElement>(null)
   const hasMessages = messages.length > 0
 
-  // Derive current emotion from the latest assistant message (direct, no useEffect)
+  // Derive the presence emotion. `null` means "blank" — show a faceless neutral
+  // avatar while a turn is in flight and the emotion hasn't been detected yet,
+  // instead of flashing the default joy face until meta arrives.
+  //   • no messages          → joy (resting welcome presence)
+  //   • newest is the user    → blank (reply pending, no emotion yet)
+  //   • newest is assistant   → its detected emotion, or blank until meta streams in
+  const newestMsg = messages[messages.length - 1]
   const lastAssistant = [...messages].reverse().find(m => m.role === 'assistant')
-  const currentEmotion: Emotion = lastAssistant ? extractEmotion(lastAssistant) : DEFAULT_EMOTION
+  const currentEmotion: Emotion | null = !newestMsg
+    ? DEFAULT_EMOTION
+    : newestMsg.role === 'assistant'
+      ? extractEmotion(newestMsg)
+      : null
 
-  // Session emotion array for MoodChart — one entry per assistant message in order
+  // Session emotion array for MoodChart — one entry per assistant message that
+  // already has a detected emotion (skip any still-pending message).
   const sessionEmotions: Emotion[] = messages
     .filter(m => m.role === 'assistant')
     .map(m => extractEmotion(m))
+    .filter((e): e is Emotion => e !== null)
 
   const isSpeaking = status === 'streaming' || status === 'submitted' || speakingId !== null
 
@@ -158,7 +171,7 @@ export default function App() {
     el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' })
   }, [messages])
 
-  const emoColor = EMOTION_COLORS[currentEmotion] ?? '#E4B363'
+  const emoColor = currentEmotion ? EMOTION_COLORS[currentEmotion] : NEUTRAL_COLOR
   const appStyle = {
     '--emo': emoColor,
     '--emo-soft': `${emoColor}22`,
