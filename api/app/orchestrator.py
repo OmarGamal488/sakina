@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import random
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 
@@ -42,6 +43,85 @@ _INTENT_GUIDANCE = {
 }
 
 _FALLBACK = "I'm here with you. Would you like to tell me a little more about how you're feeling?"
+
+# Fixed replies per non-mental-health intent (random variant each turn for variety);
+# language adapted via LLM/NLLB. Mental-health turns get the full compose, not these.
+_CANNED = {
+    "greeting": [
+        "Hello, I'm really glad you're here. I'm Sakina — a calm, safe space to talk. "
+        "How are you feeling right now?",
+        "Hi, it's good to see you. I'm Sakina, and I'm here to listen. What's on your mind today?",
+        "Welcome. I'm Sakina — there's no rush here. How are you doing right now?",
+    ],
+    "goodbye": [
+        "Take gentle care of yourself. I'm here whenever you'd like to talk again — "
+        "you're never alone.",
+        "Be kind to yourself today. I'll be right here whenever you want to come back.",
+        "Take care for now. Whenever you need a calm space, I'll be here waiting.",
+    ],
+    "gratitude": [
+        "I'm really glad it helped. I'm here for you anytime — what you feel always matters.",
+        "It means a lot that you shared that. I'm always here whenever you need me.",
+        "I'm touched — thank you. You can come back anytime; your feelings always matter here.",
+    ],
+    "out_of_scope": [
+        "I hear you, though that's a little outside what I'm here for. I'm Sakina — here to "
+        "support how you're feeling. Is there anything on your mind you'd like to share?",
+        "That's a bit beyond what I can help with, but I'm glad you're here. I'm Sakina — "
+        "how are you feeling right now?",
+        "I may not be the right place for that one. What I'm here for is you — is there "
+        "something you'd like to talk through?",
+    ],
+}
+
+
+def _localize_canned(intent: str, language: str) -> str:
+    """A random variant for *intent*, rendered in *language* (LLM, NLLB fallback, base
+    English last). Cached per (intent, variant, language)."""
+    variants = _CANNED[intent]
+    idx = random.randrange(len(variants))
+    base = variants[idx]
+    if language == "en":
+        return base
+
+    mem = memory.get_memory()
+    cache_key = f"canned:{intent}:{idx}:{language}"
+    cached = mem.cache_get(cache_key)
+    if cached:
+        return cached
+
+    lang_name = LANG_NAMES.get(language, "the user's language")
+    reply = ""
+    try:
+        r = _get_llm().chat.completions.create(
+            model=settings.lightning_model,
+            temperature=0.0,
+            max_tokens=512,
+            messages=[
+                {"role": "system", "content": (
+                    f"Translate the user's message into {lang_name}, preserving its warm, "
+                    "gentle tone. Output ONLY the translated message — no quotes, no notes."
+                )},
+                {"role": "user", "content": base},
+            ],
+        )
+        reply = (r.choices[0].message.content or "").strip()
+    except Exception as e:  # noqa: BLE001
+        logger.warning("canned_localize_llm_error", error=str(e)[:100], intent=intent, lang=language)
+
+    if not reply:
+        # LLM unavailable/empty → local NLLB (still localized, never English to a non-EN user).
+        try:
+            emo = emotion_mod.get_classifier()
+            tgt = emo.flores_code(language)
+            if tgt:
+                reply = emo.translate(base, emo.flores_code("en"), tgt)
+        except Exception as e:  # noqa: BLE001
+            logger.warning("canned_localize_nllb_error", error=str(e)[:100], lang=language)
+
+    reply = reply or base
+    mem.cache_set(cache_key, reply)
+    return reply
 
 
 @dataclass
@@ -109,12 +189,16 @@ async def analyze(
             sources = [p.as_dict() for p in passages]
             mem.cache_set(cache_key, json.dumps(sources))
 
+    # Non-mental-health turns keep a steady joy face (avatar doesn't mirror the mood).
+    is_mh = intent_res.intent == "asking_mental_health_question"
+    emotion_label = emo.emotion if is_mh else "joy"
+
     logger.info(
-        "analyze", language=lang, emotion=emo.emotion,
+        "analyze", language=lang, emotion=emotion_label,
         intent=intent_res.intent, n_sources=len(sources),
     )
     return PipelineResult(
-        language=lang, emotion=emo.emotion, intent=intent_res.intent,
+        language=lang, emotion=emotion_label, intent=intent_res.intent,
         english_query=emo.translated_text, sources=sources,
     )
 
@@ -153,21 +237,27 @@ def _compose_messages(
 async def stream_reply(
     message: str, result: PipelineResult, history: list[dict] | None = None
 ) -> AsyncIterator[str]:
-    """Compose an empathetic reply in the user's language (one LLM call), streamed as
-    small word-chunks for the SSE ``delta`` UX. ``history`` injects prior turns."""
-    messages = _compose_messages(message, result, history)
+    """Reply in the user's language, streamed as small word-chunks for the SSE ``delta``
+    UX. Non-mental-health intents return a fixed (localized) message; mental-health turns
+    get a full emotion- and RAG-shaped LLM compose. ``history`` injects prior turns."""
+    # Non-mental-health intents → fixed, language-adapted message (no free composition).
+    if result.intent in _CANNED:
+        reply = await run_in_threadpool(_localize_canned, result.intent, result.language)
+    else:
+        messages = _compose_messages(message, result, history)
 
-    def _call() -> str:
-        try:
-            r = _get_llm().chat.completions.create(
-                model=settings.lightning_model, temperature=0.6, max_tokens=400, messages=messages
-            )
-            return (r.choices[0].message.content or "").strip() or _FALLBACK
-        except Exception as e:  # noqa: BLE001
-            logger.warning("compose_error", error=str(e)[:100])
-            return _FALLBACK
+        def _call() -> str:
+            try:
+                r = _get_llm().chat.completions.create(
+                    model=settings.lightning_model, temperature=0.6, max_tokens=400,
+                    messages=messages,
+                )
+                return (r.choices[0].message.content or "").strip() or _FALLBACK
+            except Exception as e:  # noqa: BLE001
+                logger.warning("compose_error", error=str(e)[:100])
+                return _FALLBACK
 
-    reply = await run_in_threadpool(_call)
+        reply = await run_in_threadpool(_call)
     words = reply.split(" ")
     for i in range(0, len(words), 3):
         chunk = " ".join(words[i:i + 3])

@@ -11,6 +11,15 @@ export type Intent =
   | 'asking_mental_health_question'
   | 'out_of_scope'
 
+// Human-readable names for the detected-intent chip (shown beside emotion + language)
+export const INTENT_LABELS: Record<Intent, string> = {
+  greeting: 'Greeting',
+  goodbye: 'Goodbye',
+  gratitude: 'Gratitude',
+  asking_mental_health_question: 'Mental-health question',
+  out_of_scope: 'Out of scope',
+}
+
 // 20 languages supported by the backend
 export type LangCode =
   | 'ar' | 'bg' | 'de' | 'el' | 'en' | 'es' | 'fr' | 'hi' | 'it' | 'ja'

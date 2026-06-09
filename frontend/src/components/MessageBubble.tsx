@@ -18,7 +18,7 @@ import { useState } from 'react'
 import { Square, Volume2 } from 'lucide-react'
 import { isDataUIPart } from 'ai'
 import type { SakinaUIMessage, SakinaDataTypes, Emotion, LangCode, ChatStatus } from '../lib/types'
-import { LANG_NAMES } from '../lib/types'
+import { LANG_NAMES, INTENT_LABELS } from '../lib/types'
 import { EMOTION_COLORS, EMOTION_LABELS } from '../lib/emotion'
 import { SourcesPanel } from './SourcesPanel'
 import { SakinaAvatar } from './SakinaAvatar'
@@ -137,6 +137,7 @@ function AssistantBubble({
   const emoColor = EMOTION_COLORS[emotion] ?? '#E4B363'
   const emoLabel = EMOTION_LABELS.en?.[emotion] ?? emotion
   const langLabel = LANG_NAMES[lang] ?? lang.toUpperCase()
+  const intentLabel = meta?.intent ? (INTENT_LABELS[meta.intent] ?? meta.intent) : null
 
   const bodyText = getDisplayText(lang, showEn, textData, streamingText)
 
@@ -201,6 +202,11 @@ function AssistantBubble({
             <span className="lang-tag" title="Detected language">
               {langLabel}
             </span>
+            {intentLabel && (
+              <span className="intent-tag" title="Detected intent">
+                {intentLabel}
+              </span>
+            )}
           </div>
         )}
 

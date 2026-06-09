@@ -150,9 +150,8 @@ class LanguageDetector:
         # Classes come from the pipeline — authoritative for proba ordering.
         self._classes: np.ndarray = self._pipeline.named_steps["clf"].classes_
 
-        self._confidence_threshold: float = float(
-            metadata.get("confidence_threshold", 0.6)
-        )
+        # Trust TF-IDF outright only at >= 0.8 (raised from 0.6) so short phrases defer to lingua.
+        self._confidence_threshold: float = 0.8
 
         # Other tunables come from robustness_guard (fall back to literals).
         self._short_letters_threshold: int = int(
