@@ -1,0 +1,2918 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sakina Technical Keynote</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050816;
+      --ink: #f7fbff;
+      --muted: #aeb9d4;
+      --dim: #73809d;
+      --cyan: #33d6ff;
+      --blue: #3388ff;
+      --purple: #9d5cff;
+      --magenta: #ff4fd8;
+      --rose: #ff6f91;
+      --green: #38f8ad;
+      --gold: #ffd166;
+      --panel: rgba(12, 18, 42, 0.58);
+      --panel-strong: rgba(18, 27, 61, 0.72);
+      --line: rgba(156, 188, 255, 0.22);
+      --line-bright: rgba(99, 215, 255, 0.52);
+      --shadow: 0 28px 80px rgba(0, 0, 0, 0.46);
+      --ease: cubic-bezier(.16, 1, .3, 1);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    body {
+      position: relative;
+      font-size: 16px;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    #particle-canvas,
+    .aurora,
+    .grid-layer,
+    .light-field {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    #particle-canvas {
+      z-index: 0;
+      opacity: .72;
+      filter: saturate(1.08);
+    }
+
+    .aurora {
+      z-index: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 16% 12%, rgba(47, 214, 255, .26), transparent 36%),
+        radial-gradient(ellipse at 84% 14%, rgba(157, 92, 255, .24), transparent 38%),
+        radial-gradient(ellipse at 60% 88%, rgba(56, 248, 173, .13), transparent 34%),
+        linear-gradient(135deg, #050816 0%, #071029 42%, #050816 100%);
+    }
+
+    .aurora::before,
+    .aurora::after {
+      content: "";
+      position: absolute;
+      inset: -22%;
+      background:
+        conic-gradient(from 130deg at 50% 50%,
+          transparent 0deg,
+          rgba(51, 214, 255, .13) 48deg,
+          rgba(157, 92, 255, .2) 96deg,
+          rgba(255, 79, 216, .09) 142deg,
+          transparent 214deg,
+          rgba(56, 248, 173, .09) 296deg,
+          transparent 360deg);
+      filter: blur(52px);
+      transform-origin: 50% 50%;
+      animation: meshSpin 28s linear infinite;
+      opacity: .78;
+    }
+
+    .aurora::after {
+      animation-duration: 37s;
+      animation-direction: reverse;
+      opacity: .5;
+      filter: blur(80px);
+    }
+
+    .grid-layer {
+      z-index: 1;
+      opacity: .24;
+      background-image:
+        linear-gradient(rgba(99, 215, 255, .12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 215, 255, .12) 1px, transparent 1px);
+      background-size: 68px 68px;
+      mask-image: radial-gradient(circle at center, rgba(0, 0, 0, .7), transparent 72%);
+      animation: gridDrift 18s linear infinite;
+    }
+
+    .light-field {
+      z-index: 2;
+      background:
+        linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, .07) 45%, transparent 58%);
+      transform: translateX(-70%);
+      animation: lightSweep 10s var(--ease) infinite;
+      mix-blend-mode: screen;
+      opacity: .38;
+    }
+
+    #deck {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      perspective: 1400px;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: start center;
+      overflow: auto;
+      overflow-x: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate3d(5%, 0, -80px) scale(.96);
+      filter: blur(18px);
+      transition: none;
+    }
+
+    body.deck-ready .slide {
+      transition:
+        opacity 900ms var(--ease),
+        transform 1100ms var(--ease),
+        filter 900ms var(--ease);
+    }
+
+    .slide.prev {
+      transform: translate3d(-5%, 0, -120px) scale(.96);
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate3d(0, 0, 0) scale(1);
+      filter: blur(0);
+    }
+
+    .slide-shell {
+      width: min(1240px, calc(100vw - 64px));
+      min-height: min(760px, calc(100dvh - 64px));
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 22px;
+      padding: 36px 0 48px;
+    }
+
+    .slide-grid > *,
+    .split-lanes > *,
+    .retrieval-row > *,
+    .feature-grid > *,
+    .metric-grid > *,
+    .storage-map > *,
+    .principles > *,
+    .glass {
+      min-width: 0;
+    }
+
+    .slide-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 30px;
+      color: #dce8ff;
+      font-weight: 700;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 18px var(--green);
+    }
+
+    .slide-count {
+      font-variant-numeric: tabular-nums;
+      color: var(--dim);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      max-width: 980px;
+      font-size: 4.9rem;
+      line-height: .96;
+      font-weight: 820;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      max-width: 1000px;
+      font-size: 3.05rem;
+      line-height: 1.02;
+      font-weight: 780;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+    }
+
+    h3 {
+      font-size: 1rem;
+      line-height: 1.25;
+      font-weight: 760;
+      color: #f6faff;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 1.28rem;
+      line-height: 1.55;
+    }
+
+    .accent-text {
+      background: linear-gradient(95deg, #ffffff 0%, #9ceeff 42%, #c69bff 78%, #ffd166 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 38px rgba(51, 214, 255, .2);
+    }
+
+    .slide-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.03fr) minmax(320px, .97fr);
+      gap: 28px;
+      align-items: center;
+    }
+
+    .slide-grid.wide-left {
+      grid-template-columns: minmax(0, 1.18fr) minmax(300px, .82fr);
+    }
+
+    .slide-grid.wide-right {
+      grid-template-columns: minmax(300px, .82fr) minmax(0, 1.18fr);
+    }
+
+    .stack {
+      display: grid;
+      gap: 20px;
+    }
+
+    .copy-stack {
+      display: grid;
+      gap: 22px;
+      align-content: start;
+    }
+
+    .glass,
+    .metric,
+    .route-node,
+    .module-card,
+    .feature-tile {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, .105), rgba(255, 255, 255, .035)),
+        var(--panel);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, .12);
+      backdrop-filter: blur(22px) saturate(1.25);
+      overflow: hidden;
+    }
+
+    .glass::after,
+    .metric::after,
+    .module-card::after,
+    .feature-tile::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, .13) 42%, transparent 62%);
+      transform: translateX(-120%);
+      animation: cardSheen 7s var(--ease) infinite;
+      pointer-events: none;
+      opacity: .42;
+    }
+
+    .panel {
+      padding: 26px;
+    }
+
+    .panel.large {
+      padding: 32px;
+    }
+
+    .quiet {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .tiny {
+      color: var(--dim);
+      font-size: .79rem;
+      line-height: 1.42;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 7px 11px;
+      border: 1px solid rgba(99, 215, 255, .25);
+      border-radius: 999px;
+      background: rgba(12, 18, 42, .44);
+      color: #d8e7ff;
+      font-size: .78rem;
+      white-space: nowrap;
+      box-shadow: inset 0 0 24px rgba(51, 214, 255, .04);
+    }
+
+    .pill.hot {
+      border-color: rgba(255, 111, 145, .4);
+      color: #ffdce5;
+      box-shadow: 0 0 24px rgba(255, 111, 145, .12);
+    }
+
+    .pill.green {
+      border-color: rgba(56, 248, 173, .4);
+      color: #d8ffef;
+      box-shadow: 0 0 24px rgba(56, 248, 173, .1);
+    }
+
+    .pill.gold {
+      border-color: rgba(255, 209, 102, .4);
+      color: #fff0c9;
+      box-shadow: 0 0 24px rgba(255, 209, 102, .1);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      min-height: 118px;
+      padding: 20px;
+      display: grid;
+      align-content: center;
+      gap: 8px;
+    }
+
+    .metric-value {
+      font-size: 2.1rem;
+      line-height: 1;
+      font-weight: 820;
+      color: #f8fbff;
+      text-shadow: 0 0 26px rgba(51, 214, 255, .28);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.35;
+    }
+
+    .key-list {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .key-list li {
+      display: grid;
+      grid-template-columns: 10px 1fr;
+      gap: 12px;
+      align-items: baseline;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .key-list li::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 18px rgba(51, 214, 255, .8);
+      transform: translateY(-1px);
+    }
+
+    .key-list li.hot::before {
+      background: var(--rose);
+      box-shadow: 0 0 18px rgba(255, 111, 145, .8);
+    }
+
+    .key-list li.green::before {
+      background: var(--green);
+      box-shadow: 0 0 18px rgba(56, 248, 173, .8);
+    }
+
+    .cue {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 36px;
+      color: var(--dim);
+      font-size: .79rem;
+    }
+
+    .cue .line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(99, 215, 255, .38), transparent);
+    }
+
+    .hero-frame {
+      position: relative;
+      min-height: 520px;
+      padding: 36px;
+      display: grid;
+      align-content: end;
+      isolation: isolate;
+    }
+
+    .hero-frame::before {
+      content: "";
+      position: absolute;
+      width: 78%;
+      aspect-ratio: 1;
+      left: 12%;
+      top: 2%;
+      border: 1px solid rgba(99, 215, 255, .18);
+      border-radius: 50%;
+      box-shadow:
+        inset 0 0 64px rgba(51, 214, 255, .08),
+        0 0 120px rgba(157, 92, 255, .13);
+      animation: slowRotate 26s linear infinite;
+      z-index: -1;
+    }
+
+    .hero-frame::after {
+      content: "";
+      position: absolute;
+      width: 52%;
+      aspect-ratio: 1;
+      right: 3%;
+      top: 12%;
+      border: 1px dashed rgba(255, 209, 102, .2);
+      border-radius: 50%;
+      animation: slowRotate 36s linear infinite reverse;
+      z-index: -1;
+    }
+
+    .hero-core {
+      min-height: 230px;
+      display: grid;
+      align-content: end;
+      gap: 26px;
+    }
+
+    .hero-badges {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .hero-badge {
+      min-height: 92px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .055);
+    }
+
+    .hero-badge strong {
+      display: block;
+      font-size: 1.55rem;
+      line-height: 1.05;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .hero-badge span {
+      display: block;
+      color: var(--muted);
+      font-size: .78rem;
+      line-height: 1.35;
+    }
+
+    .team-stage {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(420px, 1.1fr);
+      gap: 28px;
+      align-items: center;
+    }
+
+    .team-orb {
+      position: relative;
+      min-height: 250px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .team-orb::before,
+    .team-orb::after {
+      content: "";
+      position: absolute;
+      width: 72%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 1px solid rgba(99, 215, 255, .24);
+      box-shadow: inset 0 0 70px rgba(51, 214, 255, .08), 0 0 90px rgba(157, 92, 255, .16);
+      animation: slowRotate 24s linear infinite;
+    }
+
+    .team-orb::after {
+      width: 52%;
+      border-color: rgba(255, 79, 216, .22);
+      border-style: dashed;
+      animation-duration: 34s;
+      animation-direction: reverse;
+    }
+
+    .team-mark {
+      position: relative;
+      z-index: 1;
+      width: min(150px, 48%);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 36% 26%, rgba(255, 255, 255, .36), transparent 28%),
+        radial-gradient(circle, rgba(51, 214, 255, .3), rgba(157, 92, 255, .18) 58%, rgba(5, 8, 22, .92) 100%);
+      border: 1px solid rgba(255, 255, 255, .22);
+      box-shadow: 0 0 90px rgba(51, 214, 255, .24), 0 0 140px rgba(157, 92, 255, .2);
+      font-size: 2.8rem;
+      font-weight: 860;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .member-card {
+      min-height: 124px;
+      padding: 18px;
+      display: grid;
+      align-content: space-between;
+      gap: 12px;
+      transform: translateY(18px) scale(.96);
+      opacity: 0;
+      transition: transform 900ms var(--ease), opacity 900ms var(--ease);
+      transition-delay: calc(var(--i) * 95ms);
+    }
+
+    .slide.active .member-card {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .member-card .initials {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      border: 1px solid rgba(99, 215, 255, .3);
+      background: rgba(51, 214, 255, .09);
+      color: #eaf8ff;
+      font-weight: 820;
+      box-shadow: 0 0 30px rgba(51, 214, 255, .14);
+    }
+
+    .member-card strong {
+      color: #fff;
+      font-size: 1.12rem;
+      line-height: 1.18;
+    }
+
+    .member-card span {
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    .explain-launch {
+      width: 46px;
+      height: 46px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid rgba(99, 215, 255, .3);
+      border-radius: 50%;
+      background: rgba(51, 214, 255, .08);
+      color: #eaf8ff;
+      box-shadow: 0 0 34px rgba(51, 214, 255, .18), inset 0 1px 0 rgba(255, 255, 255, .1);
+      text-decoration: none;
+      transition: transform 200ms ease, border-color 200ms ease, background 200ms ease;
+    }
+
+    .explain-launch:hover {
+      transform: translateY(-2px);
+      border-color: rgba(99, 215, 255, .66);
+      background: rgba(51, 214, 255, .14);
+    }
+
+    .explain-launch svg {
+      width: 21px;
+      height: 21px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .orbit-system {
+      position: relative;
+      width: min(440px, 100%);
+      aspect-ratio: 1;
+      margin: auto;
+      transform-style: preserve-3d;
+      animation: floatLayer 9s ease-in-out infinite;
+    }
+
+    .orbit-ring {
+      position: absolute;
+      inset: 14%;
+      border: 1px solid rgba(99, 215, 255, .34);
+      border-radius: 50%;
+      box-shadow: 0 0 38px rgba(51, 214, 255, .18), inset 0 0 42px rgba(157, 92, 255, .1);
+      transform: rotateX(68deg) rotateZ(18deg);
+      animation: slowRotate 22s linear infinite;
+    }
+
+    .orbit-ring:nth-child(2) {
+      inset: 22%;
+      border-color: rgba(255, 79, 216, .28);
+      transform: rotateX(65deg) rotateZ(-24deg);
+      animation-duration: 30s;
+      animation-direction: reverse;
+    }
+
+    .orbit-ring:nth-child(3) {
+      inset: 30%;
+      border-color: rgba(255, 209, 102, .22);
+      transform: rotateX(72deg) rotateZ(72deg);
+      animation-duration: 38s;
+    }
+
+    .core-mark {
+      position: absolute;
+      inset: 32%;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .34), transparent 30%),
+        radial-gradient(circle, rgba(51, 214, 255, .32), rgba(157, 92, 255, .16) 56%, rgba(5, 8, 22, .9) 100%);
+      border: 1px solid rgba(255, 255, 255, .22);
+      box-shadow: 0 0 90px rgba(51, 214, 255, .34), 0 0 130px rgba(157, 92, 255, .24);
+      font-weight: 820;
+      font-size: 2.9rem;
+    }
+
+    .node-label {
+      position: absolute;
+      min-width: 112px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(13, 21, 48, .68);
+      color: #dce8ff;
+      text-align: center;
+      font-size: .78rem;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, .32);
+    }
+
+    .node-label:nth-child(5) { left: 0; top: 18%; }
+    .node-label:nth-child(6) { right: 0; top: 22%; }
+    .node-label:nth-child(7) { right: 8%; bottom: 12%; }
+    .node-label:nth-child(8) { left: 9%; bottom: 9%; }
+
+    .runtime-map {
+      min-height: 520px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      align-content: center;
+    }
+
+    .route-node {
+      min-height: 126px;
+      padding: 18px;
+      display: grid;
+      align-content: space-between;
+      gap: 14px;
+      transform: translateY(18px) scale(.96);
+      opacity: 0;
+      transition: transform 900ms var(--ease), opacity 900ms var(--ease);
+      transition-delay: calc(var(--i) * 75ms);
+    }
+
+    .slide.active .route-node {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .route-node h3 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .route-node h3 span {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(51, 214, 255, .12);
+      color: var(--cyan);
+      font-size: .8rem;
+      box-shadow: 0 0 18px rgba(51, 214, 255, .14);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .route-node p {
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.42;
+    }
+
+    .route-node.critical {
+      border-color: rgba(255, 111, 145, .42);
+      box-shadow: 0 26px 70px rgba(0, 0, 0, .46), 0 0 44px rgba(255, 111, 145, .1);
+    }
+
+    .route-node.optional {
+      border-style: dashed;
+      opacity: .92;
+    }
+
+    .flow-line {
+      position: relative;
+      min-height: 62px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .flow-line::before {
+      content: "";
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(51, 214, 255, .1), rgba(51, 214, 255, .8), rgba(157, 92, 255, .6));
+      box-shadow: 0 0 22px rgba(51, 214, 255, .24);
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: transform 1200ms var(--ease);
+    }
+
+    .slide.active .flow-line::before {
+      transform: scaleX(1);
+    }
+
+    .split-lanes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .lane {
+      padding: 22px;
+      min-height: 230px;
+      display: grid;
+      align-content: space-between;
+    }
+
+    .lane-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: #f6faff;
+      font-weight: 760;
+    }
+
+    .lane-title small {
+      color: var(--dim);
+      font-weight: 650;
+    }
+
+    .lane-visual {
+      display: grid;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .wave {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      overflow: hidden;
+    }
+
+    .wave span {
+      width: 5px;
+      height: 18px;
+      border-radius: 4px;
+      background: linear-gradient(180deg, var(--cyan), var(--purple));
+      box-shadow: 0 0 18px rgba(51, 214, 255, .4);
+      animation: wave 1.4s ease-in-out infinite;
+      animation-delay: calc(var(--i) * 55ms);
+    }
+
+    .text-packet {
+      display: grid;
+      gap: 8px;
+    }
+
+    .text-packet span {
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(51, 214, 255, .7), rgba(157, 92, 255, .24));
+      box-shadow: 0 0 20px rgba(51, 214, 255, .14);
+    }
+
+    .text-packet span:nth-child(2) { width: 76%; }
+    .text-packet span:nth-child(3) { width: 54%; }
+
+    .gate-visual {
+      position: relative;
+      min-height: 500px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .gate-visual .shield {
+      width: 260px;
+      aspect-ratio: .82;
+      clip-path: polygon(50% 0%, 88% 16%, 82% 70%, 50% 100%, 18% 70%, 12% 16%);
+      background:
+        linear-gradient(145deg, rgba(255, 111, 145, .5), rgba(51, 214, 255, .16)),
+        rgba(15, 23, 51, .92);
+      border: 1px solid rgba(255, 255, 255, .2);
+      box-shadow: 0 0 90px rgba(255, 111, 145, .22), inset 0 0 48px rgba(255, 255, 255, .08);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 2.6rem;
+      font-weight: 850;
+      animation: pulseShield 3.8s ease-in-out infinite;
+    }
+
+    .gate-ring {
+      position: absolute;
+      width: 390px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 111, 145, .28);
+      animation: slowRotate 20s linear infinite;
+    }
+
+    .gate-ring:nth-child(2) {
+      width: 500px;
+      border-style: dashed;
+      border-color: rgba(51, 214, 255, .22);
+      animation-direction: reverse;
+      animation-duration: 32s;
+    }
+
+    .language-matrix {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .lang-chip {
+      min-height: 54px;
+      padding: 10px 8px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(99, 215, 255, .19);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .045);
+      color: #dce8ff;
+      font-weight: 760;
+      font-size: .86rem;
+      box-shadow: inset 0 0 26px rgba(51, 214, 255, .035);
+    }
+
+    .guard-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .guard-row {
+      display: grid;
+      grid-template-columns: 138px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 13px 14px;
+      border: 1px solid rgba(99, 215, 255, .18);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .045);
+    }
+
+    .guard-row strong {
+      color: #fff;
+      font-size: .82rem;
+    }
+
+    .guard-row span {
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.35;
+    }
+
+    .bar-chart {
+      display: grid;
+      gap: 16px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 138px 1fr 72px;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .bar-row label,
+    .bar-row output {
+      color: var(--muted);
+      font-size: .82rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .08);
+      overflow: hidden;
+      box-shadow: inset 0 0 18px rgba(0, 0, 0, .3);
+    }
+
+    .bar-track span {
+      display: block;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      box-shadow: 0 0 22px rgba(51, 214, 255, .42);
+      transition: width 1300ms var(--ease);
+    }
+
+    .slide.active .bar-track span {
+      width: var(--value);
+    }
+
+    .emotion-wheel {
+      position: relative;
+      width: min(430px, 100%);
+      aspect-ratio: 1;
+      margin: auto;
+      border-radius: 50%;
+      border: 1px solid rgba(99, 215, 255, .2);
+      background:
+        conic-gradient(from 270deg,
+          rgba(74, 144, 255, .92),
+          rgba(157, 92, 255, .9),
+          rgba(255, 79, 216, .82),
+          rgba(255, 209, 102, .82),
+          rgba(56, 248, 173, .82),
+          rgba(74, 144, 255, .92));
+      box-shadow: 0 0 90px rgba(157, 92, 255, .22);
+      animation: slowRotate 34s linear infinite;
+    }
+
+    .emotion-wheel::before {
+      content: "";
+      position: absolute;
+      inset: 18%;
+      border-radius: 50%;
+      background: #071029;
+      border: 1px solid rgba(255, 255, 255, .16);
+      box-shadow: inset 0 0 48px rgba(51, 214, 255, .08);
+    }
+
+    .emotion-label {
+      position: absolute;
+      min-width: 98px;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, .16);
+      border-radius: var(--radius);
+      background: rgba(5, 8, 22, .66);
+      color: #f6faff;
+      text-align: center;
+      font-size: .78rem;
+      box-shadow: 0 18px 42px rgba(0, 0, 0, .34);
+      animation: counterRotate 34s linear infinite;
+    }
+
+    .emotion-label:nth-child(1) { left: 50%; top: 2%; transform: translate(-50%, 0); }
+    .emotion-label:nth-child(2) { right: -5%; top: 24%; }
+    .emotion-label:nth-child(3) { right: 2%; bottom: 16%; }
+    .emotion-label:nth-child(4) { left: 50%; bottom: 2%; transform: translate(-50%, 0); }
+    .emotion-label:nth-child(5) { left: -4%; bottom: 21%; }
+    .emotion-label:nth-child(6) { left: -6%; top: 24%; }
+
+    .two-step {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+    }
+
+    .process-card {
+      min-height: 220px;
+      padding: 24px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+    }
+
+    .process-card .big {
+      color: #fff;
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .arrow-glow {
+      width: 74px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      box-shadow: 0 0 22px rgba(51, 214, 255, .45);
+      position: relative;
+    }
+
+    .arrow-glow::after {
+      content: "";
+      position: absolute;
+      right: -2px;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      border-top: 2px solid var(--purple);
+      border-right: 2px solid var(--purple);
+      transform: translateY(-50%) rotate(45deg);
+    }
+
+    .intent-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .intent-card {
+      min-height: 150px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .045);
+      display: grid;
+      align-content: space-between;
+      gap: 12px;
+    }
+
+    .intent-card strong {
+      color: #fff;
+      font-size: .91rem;
+      line-height: 1.2;
+    }
+
+    .intent-card span {
+      color: var(--muted);
+      font-size: .74rem;
+      line-height: 1.32;
+    }
+
+    .route-choice {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .route-choice .decision {
+      min-height: 190px;
+      padding: 22px;
+      display: grid;
+      align-content: space-between;
+      border-radius: var(--radius);
+      border: 1px solid rgba(99, 215, 255, .22);
+      background: rgba(255, 255, 255, .045);
+    }
+
+    .decision.rag {
+      border-color: rgba(56, 248, 173, .38);
+      box-shadow: 0 0 42px rgba(56, 248, 173, .08);
+    }
+
+    .decision.skip {
+      border-color: rgba(255, 209, 102, .3);
+      box-shadow: 0 0 42px rgba(255, 209, 102, .07);
+    }
+
+    .retrieval-diagram {
+      display: grid;
+      gap: 16px;
+    }
+
+    .retrieval-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .module-card {
+      min-height: 124px;
+      padding: 18px;
+      display: grid;
+      align-content: space-between;
+      gap: 14px;
+    }
+
+    .module-card .kicker {
+      color: var(--dim);
+      font-size: .76rem;
+    }
+
+    .module-card .label {
+      color: #fff;
+      font-size: 1.2rem;
+      line-height: 1.15;
+      font-weight: 820;
+    }
+
+    .module-card p {
+      color: var(--muted);
+      font-size: .8rem;
+      line-height: 1.35;
+    }
+
+    .fusion-svg {
+      width: 100%;
+      height: 198px;
+      display: block;
+      overflow: visible;
+    }
+
+    .fusion-svg path {
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-dasharray: 520;
+      stroke-dashoffset: 520;
+      filter: drop-shadow(0 0 12px rgba(51, 214, 255, .55));
+      transition: stroke-dashoffset 1500ms var(--ease);
+    }
+
+    .slide.active .fusion-svg path {
+      stroke-dashoffset: 0;
+    }
+
+    .fusion-svg circle {
+      filter: drop-shadow(0 0 16px rgba(51, 214, 255, .35));
+    }
+
+    .scoreboard {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .score-cell {
+      min-height: 126px;
+      padding: 20px;
+      border: 1px solid rgba(99, 215, 255, .18);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .045);
+      display: grid;
+      align-content: center;
+      gap: 8px;
+    }
+
+    .score-cell strong {
+      color: #fff;
+      font-size: 2rem;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .score-cell span {
+      color: var(--muted);
+      font-size: .8rem;
+      line-height: 1.35;
+    }
+
+    .prompt-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .prompt-row {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 14px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(99, 215, 255, .17);
+      background: rgba(255, 255, 255, .045);
+    }
+
+    .prompt-row b {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(51, 214, 255, .12);
+      color: var(--cyan);
+      font-size: .83rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .prompt-row span {
+      color: var(--muted);
+      font-size: .86rem;
+      line-height: 1.4;
+    }
+
+    .stream-visual {
+      padding: 24px;
+      min-height: 420px;
+      display: grid;
+      align-content: center;
+      gap: 18px;
+    }
+
+    .chat-bubble {
+      max-width: 82%;
+      padding: 17px 18px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .075);
+      border: 1px solid rgba(99, 215, 255, .18);
+      color: #ecf6ff;
+      line-height: 1.45;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, .22);
+      overflow-wrap: anywhere;
+    }
+
+    .chat-bubble.user {
+      justify-self: end;
+      border-color: rgba(157, 92, 255, .28);
+    }
+
+    .typing-stream {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+    }
+
+    .typing-stream span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 14px rgba(51, 214, 255, .7);
+      animation: typingDot 1.2s ease-in-out infinite;
+      animation-delay: calc(var(--i) * 150ms);
+    }
+
+    .memory-loop {
+      position: relative;
+      min-height: 440px;
+      display: grid;
+      place-items: center;
+    }
+
+    .loop-ring {
+      width: min(410px, 92%);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 1px solid rgba(99, 215, 255, .25);
+      box-shadow: inset 0 0 54px rgba(51, 214, 255, .08), 0 0 60px rgba(157, 92, 255, .12);
+      animation: slowRotate 24s linear infinite;
+    }
+
+    .loop-chip {
+      position: absolute;
+      width: 150px;
+      min-height: 64px;
+      padding: 12px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(13, 21, 48, .76);
+      color: #e7f1ff;
+      font-size: .82rem;
+      line-height: 1.28;
+      box-shadow: 0 16px 38px rgba(0, 0, 0, .34);
+    }
+
+    .loop-chip:nth-child(2) { top: 8%; left: 50%; transform: translateX(-50%); }
+    .loop-chip:nth-child(3) { right: 4%; top: 43%; }
+    .loop-chip:nth-child(4) { bottom: 9%; left: 50%; transform: translateX(-50%); }
+    .loop-chip:nth-child(5) { left: 4%; top: 43%; }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .feature-tile {
+      min-height: 172px;
+      padding: 20px;
+      display: grid;
+      align-content: space-between;
+      gap: 14px;
+    }
+
+    .feature-tile .icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      border: 1px solid rgba(99, 215, 255, .26);
+      color: var(--cyan);
+      background: rgba(51, 214, 255, .08);
+      box-shadow: 0 0 28px rgba(51, 214, 255, .12);
+    }
+
+    .feature-tile p {
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.38;
+    }
+
+    .storage-map {
+      min-height: 470px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      align-items: center;
+    }
+
+    .storage-column {
+      min-height: 360px;
+      padding: 22px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .storage-column svg {
+      width: 82px;
+      height: 82px;
+      margin: 0 auto;
+      overflow: visible;
+    }
+
+    .storage-column h3 {
+      font-size: 1.18rem;
+    }
+
+    .storage-column p {
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.4;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+    }
+
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 108px 1fr 140px;
+      gap: 16px;
+      align-items: center;
+      min-height: 58px;
+      padding: 11px 14px;
+      border: 1px solid rgba(99, 215, 255, .16);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .04);
+      transform: translateX(-18px);
+      opacity: 0;
+      transition: transform 800ms var(--ease), opacity 800ms var(--ease);
+      transition-delay: calc(var(--i) * 70ms);
+    }
+
+    .slide.active .timeline-row {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .timeline-row time {
+      color: var(--cyan);
+      font-weight: 780;
+      font-size: .82rem;
+    }
+
+    .timeline-row strong {
+      color: #fff;
+      font-size: .9rem;
+    }
+
+    .timeline-row span {
+      color: var(--dim);
+      font-size: .78rem;
+      text-align: right;
+    }
+
+    .avatar-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .avatar {
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      padding: 6px;
+      border: 1px solid rgba(99, 215, 255, .22);
+      background: rgba(255, 255, 255, .06);
+      box-shadow: 0 0 30px rgba(51, 214, 255, .12);
+      animation: avatarFloat 5s ease-in-out infinite;
+      animation-delay: calc(var(--i) * 130ms);
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 50%;
+    }
+
+    .dot-sphere {
+      position: relative;
+      width: min(360px, 100%);
+      aspect-ratio: 1;
+      margin: auto;
+      transform-style: preserve-3d;
+      animation: sphereSpin 28s linear infinite;
+    }
+
+    .dot-sphere .dot {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: var(--size);
+      height: var(--size);
+      border-radius: 50%;
+      background: rgba(165, 235, 255, var(--alpha));
+      box-shadow: 0 0 12px rgba(51, 214, 255, .45);
+      transform: translate3d(var(--x), var(--y), var(--z));
+    }
+
+    .closing-stack {
+      min-height: 540px;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      text-align: center;
+      gap: 28px;
+    }
+
+    .principles {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      width: min(920px, 100%);
+    }
+
+    .principle {
+      min-height: 150px;
+      padding: 22px;
+      display: grid;
+      align-content: center;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .045);
+    }
+
+    .principle strong {
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .principle span {
+      color: var(--muted);
+      font-size: .8rem;
+      line-height: 1.35;
+    }
+
+    .progress {
+      position: fixed;
+      left: 24px;
+      right: 24px;
+      bottom: 18px;
+      z-index: 20;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .09);
+      overflow: hidden;
+    }
+
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--purple), var(--magenta));
+      box-shadow: 0 0 18px rgba(51, 214, 255, .8);
+      transition: width 550ms var(--ease);
+    }
+
+    .controls {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 21;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .control {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(99, 215, 255, .26);
+      border-radius: 50%;
+      background: rgba(9, 16, 36, .62);
+      color: #eaf7ff;
+      cursor: pointer;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, .3), inset 0 1px 0 rgba(255, 255, 255, .1);
+      backdrop-filter: blur(14px);
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .control:hover {
+      transform: translateY(-2px);
+      border-color: rgba(99, 215, 255, .56);
+      background: rgba(20, 32, 70, .74);
+    }
+
+    .control svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .dots {
+      position: fixed;
+      left: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 21;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      max-height: calc(100dvh - 120px);
+      overflow: hidden;
+    }
+
+    .dot-nav {
+      width: 8px;
+      height: 8px;
+      border: 0;
+      padding: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .28);
+      cursor: pointer;
+      transition: height 350ms var(--ease), background 250ms ease, box-shadow 250ms ease;
+    }
+
+    .dot-nav.active {
+      height: 28px;
+      background: var(--cyan);
+      box-shadow: 0 0 16px rgba(51, 214, 255, .8);
+    }
+
+    @keyframes meshSpin {
+      from { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.08); }
+      to { transform: rotate(360deg) scale(1); }
+    }
+
+    @keyframes gridDrift {
+      from { background-position: 0 0; }
+      to { background-position: 68px 68px; }
+    }
+
+    @keyframes lightSweep {
+      0%, 22% { transform: translateX(-78%) skewX(-12deg); }
+      54%, 100% { transform: translateX(78%) skewX(-12deg); }
+    }
+
+    @keyframes cardSheen {
+      0%, 58% { transform: translateX(-130%); }
+      100% { transform: translateX(130%); }
+    }
+
+    @keyframes slowRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes floatLayer {
+      0%, 100% { transform: translate3d(0, -6px, 0) rotateX(0deg); }
+      50% { transform: translate3d(0, 10px, 0) rotateX(4deg); }
+    }
+
+    @keyframes wave {
+      0%, 100% { height: 18px; opacity: .58; }
+      50% { height: 58px; opacity: 1; }
+    }
+
+    @keyframes pulseShield {
+      0%, 100% { transform: scale(1); filter: saturate(1); }
+      50% { transform: scale(1.035); filter: saturate(1.2); }
+    }
+
+    @keyframes counterRotate {
+      from { rotate: 0deg; }
+      to { rotate: -360deg; }
+    }
+
+    @keyframes typingDot {
+      0%, 100% { transform: translateY(0); opacity: .45; }
+      50% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    @keyframes avatarFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+
+    @keyframes sphereSpin {
+      from { transform: rotateX(64deg) rotateZ(0deg); }
+      to { transform: rotateX(64deg) rotateZ(360deg); }
+    }
+
+    @media (max-width: 1020px) {
+      .slide-shell {
+        width: min(100% - 36px, 900px);
+        min-height: calc(100dvh - 48px);
+        padding: 32px 0 48px;
+      }
+
+      h1 {
+        font-size: 3.35rem;
+      }
+
+      h2 {
+        font-size: 2.45rem;
+      }
+
+      .lead {
+        font-size: 1.05rem;
+      }
+
+      .slide-grid,
+      .slide-grid.wide-left,
+      .slide-grid.wide-right {
+        grid-template-columns: 1fr;
+      }
+
+      .runtime-map,
+      .intent-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .team-stage {
+        grid-template-columns: 1fr;
+      }
+
+      .storage-map,
+      .principles {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-frame,
+      .gate-visual,
+      .memory-loop {
+        min-height: 390px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      body {
+        font-size: 15px;
+      }
+
+      .slide {
+        justify-items: start;
+      }
+
+      .slide-shell {
+        width: min(366px, calc(100% - 24px));
+        margin-left: 12px;
+        margin-right: 12px;
+        gap: 20px;
+        padding: 22px 0 56px;
+      }
+
+      .slide-top {
+        font-size: .72rem;
+      }
+
+      h1 {
+        font-size: 2.55rem;
+      }
+
+      h2 {
+        font-size: 2rem;
+      }
+
+      .metric-grid,
+      .split-lanes,
+      .hero-badges,
+      .language-matrix,
+      .two-step,
+      .route-choice,
+      .retrieval-row,
+      .scoreboard,
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .runtime-map {
+        grid-template-columns: 1fr;
+      }
+
+      .team-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .team-orb {
+        min-height: 300px;
+      }
+
+      .arrow-glow {
+        width: 2px;
+        height: 46px;
+        margin: auto;
+      }
+
+      .arrow-glow::after {
+        right: 50%;
+        top: auto;
+        bottom: -2px;
+        transform: translateX(50%) rotate(135deg);
+      }
+
+      .bar-row {
+        grid-template-columns: 100px 1fr 54px;
+        gap: 10px;
+      }
+
+      .chat-bubble {
+        max-width: 100%;
+      }
+
+      .guard-row,
+      .prompt-row,
+      .timeline-row {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline-row span {
+        text-align: left;
+      }
+
+      .controls {
+        display: none;
+      }
+
+      .dots,
+      .progress {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="grid-layer" aria-hidden="true"></div>
+  <div class="light-field" aria-hidden="true"></div>
+
+  <main id="deck" aria-live="polite">
+    <section class="slide active" data-title="Team">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Sakina Project Team</span>
+          <span class="slide-count">01 / 21</span>
+        </div>
+        <div class="team-stage">
+          <div class="copy-stack">
+            <h1><span class="accent-text">Built by</span><br />the Sakina engineering team.</h1>
+            <p class="lead">A multilingual, emotion-aware, safety-first mental-health support system designed, evaluated, and presented as a complete NLP final project.</p>
+            <div class="pill-row">
+              <span class="pill green">ITI AI Track</span>
+              <span class="pill">NLP Final Project</span>
+              <span class="pill gold">Sakina</span>
+              <a class="explain-launch" href="explaining.html" target="_blank" rel="noopener" title="Open interactive pipeline explanations" aria-label="Open interactive pipeline explanations">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5V5.8A2.8 2.8 0 0 1 6.8 3H20v15H7a3 3 0 0 0-3 1.5z"/><path d="M7 18h13"/><path d="M9 7h7M9 11h5"/></svg>
+              </a>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="glass team-orb">
+              <div class="team-mark">S</div>
+            </div>
+            <div class="team-grid">
+              <div class="glass member-card" style="--i:0">
+                <div class="initials">AM</div>
+                <strong>Abdullah Mohamed</strong>
+                <span>Engineering Team</span>
+              </div>
+              <div class="glass member-card" style="--i:1">
+                <div class="initials">AG</div>
+                <strong>Ahmed Gamal</strong>
+                <span>Engineering Team</span>
+              </div>
+              <div class="glass member-card" style="--i:2">
+                <div class="initials">HH</div>
+                <strong>Hamza Hesham</strong>
+                <span>Engineering Team</span>
+              </div>
+              <div class="glass member-card" style="--i:3">
+                <div class="initials">OG</div>
+                <strong>Omar Gamal</strong>
+                <span>Engineering Team</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cue"><span>Four engineers.</span><span class="line"></span><span>One routed, safety-aware AI support system.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Sakina">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Sakina Technical Keynote</span>
+          <span class="slide-count">01 / 20</span>
+        </div>
+        <div class="slide-grid wide-left">
+          <div class="copy-stack">
+            <h1><span class="accent-text">Sakina</span><br />a multilingual safety-first AI companion.</h1>
+            <p class="lead">A production-style mental-health support pipeline that detects language, reads emotion, routes intent, grounds answers with RAG, and streams empathetic replies in the user's language.</p>
+            <div class="pill-row">
+              <span class="pill green">20 languages</span>
+              <span class="pill">6 emotions</span>
+              <span class="pill">5 intents</span>
+              <span class="pill hot">crisis-first gate</span>
+              <span class="pill gold">hybrid RAG</span>
+            </div>
+          </div>
+          <div class="glass hero-frame">
+            <div class="orbit-system" aria-hidden="true">
+              <div class="orbit-ring"></div>
+              <div class="orbit-ring"></div>
+              <div class="orbit-ring"></div>
+              <div class="core-mark">S</div>
+              <div class="node-label">Language</div>
+              <div class="node-label">Emotion</div>
+              <div class="node-label">Intent</div>
+              <div class="node-label">Grounding</div>
+            </div>
+            <div class="hero-core">
+              <div class="hero-badges">
+                <div class="hero-badge"><strong data-count data-target="120" data-suffix="b">0</strong><span>Lightning generation model</span></div>
+                <div class="hero-badge"><strong data-count data-target="3" data-suffix="">0</strong><span>final RAG passages</span></div>
+                <div class="hero-badge"><strong data-count data-target="0.6" data-decimals="1">0</strong><span>reply temperature</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cue"><span>Voice or text enters one shared intelligence path.</span><span class="line"></span><span>Safety comes before every model call.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Runtime Map">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Ordered Runtime Modules</span>
+          <span class="slide-count">02 / 20</span>
+        </div>
+        <div class="copy-stack">
+          <h2>The turn is a cinematic pipeline, not a single prompt.</h2>
+          <p class="lead">Every module has a clear responsibility, and the route changes only when the intent or crisis state demands it.</p>
+        </div>
+        <div class="runtime-map">
+          <div class="route-node optional" style="--i:0"><h3>Input <span>1</span></h3><p>Text goes to /chat. Voice first becomes text through /stt.</p></div>
+          <div class="route-node optional" style="--i:1"><h3>Speech <span>2</span></h3><p>Groq Whisper returns deterministic plain text.</p></div>
+          <div class="route-node critical" style="--i:2"><h3>Crisis <span>3</span></h3><p>Regex safety gate can stop the normal AI path immediately.</p></div>
+          <div class="route-node" style="--i:3"><h3>Language <span>4</span></h3><p>TF-IDF + calibrated LinearSVC with runtime guards.</p></div>
+          <div class="route-node" style="--i:4"><h3>Emotion <span>5</span></h3><p>NLLB to English, then DistilBERT emotion labels.</p></div>
+          <div class="route-node" style="--i:5"><h3>Intent <span>6</span></h3><p>Few-shot LLM classifier decides whether retrieval is needed.</p></div>
+          <div class="route-node" style="--i:6"><h3>RAG <span>7</span></h3><p>BM25 + bge-m3 + RRF + reranker for counseling notes.</p></div>
+          <div class="route-node" style="--i:7"><h3>Reply <span>8</span></h3><p>Lightning gpt-oss-120b composes and streams the answer.</p></div>
+          <div class="route-node optional" style="--i:8"><h3>TTS <span>9</span></h3><p>Optional Groq Orpheus voice output after text exists.</p></div>
+          <div class="route-node optional" style="--i:9"><h3>Memory <span>10</span></h3><p>Messages, prior language, and RAG cache are written after stream.</p></div>
+          <div class="route-node optional" style="--i:10"><h3>Adjacent</h3><p>Scribble, letter forward, and soundscape stay outside chat inference.</p></div>
+          <div class="route-node optional" style="--i:11"><h3>Storage</h3><p>Redis or fallback memory, Qdrant vectors, client-side settings.</p></div>
+        </div>
+        <div class="cue"><span>One shared path for typed and transcribed text.</span><span class="line"></span><span>Only mental-health questions activate RAG.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Intake">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">User Input Intake</span>
+          <span class="slide-count">03 / 20</span>
+        </div>
+        <div class="slide-grid">
+          <div class="copy-stack">
+            <h2>Two entrances. One canonical text pipeline.</h2>
+            <p class="lead">Typed messages go straight to chat. Voice is converted once, then follows the exact same crisis, language, emotion, intent, RAG, and generation path.</p>
+            <ul class="key-list">
+              <li><span>Text entry: <strong>/chat</strong> or <strong>/chat/ui</strong>.</span></li>
+              <li><span>Audio entry: <strong>POST /stt</strong> in <strong>api/app/stt.py</strong>.</span></li>
+              <li><span>STT model: <strong>whisper-large-v3-turbo</strong> through Groq.</span></li>
+              <li><span>Temperature is <strong>0.0</strong>; language is auto-detected by Whisper.</span></li>
+            </ul>
+          </div>
+          <div class="split-lanes">
+            <div class="glass lane">
+              <div class="lane-title">Voice <small>optional</small></div>
+              <div class="lane-visual">
+                <div class="wave" aria-hidden="true">
+                  <span style="--i:0"></span><span style="--i:1"></span><span style="--i:2"></span><span style="--i:3"></span><span style="--i:4"></span><span style="--i:5"></span><span style="--i:6"></span><span style="--i:7"></span><span style="--i:8"></span><span style="--i:9"></span><span style="--i:10"></span><span style="--i:11"></span>
+                </div>
+                <div class="flow-line"></div>
+                <p class="quiet">bytes -> Groq Whisper -> plain text</p>
+              </div>
+            </div>
+            <div class="glass lane">
+              <div class="lane-title">Text <small>default</small></div>
+              <div class="lane-visual">
+                <div class="text-packet" aria-hidden="true"><span></span><span></span><span></span></div>
+                <div class="flow-line"></div>
+                <p class="quiet">message -> crisis gate -> analysis</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cue"><span>STT is a preprocessor, not a second assistant.</span><span class="line"></span><span>Returned text joins the normal Sakina route.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Crisis Gate">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Crisis Management Gate</span>
+          <span class="slide-count">04 / 20</span>
+        </div>
+        <div class="slide-grid wide-left">
+          <div class="copy-stack">
+            <h2>The first decision is safety, before intelligence.</h2>
+            <p class="lead">The crisis gate is model-free and recall-first. If it triggers, no language detector, emotion model, intent model, RAG, or LLM generation runs for that turn.</p>
+            <div class="metric-grid">
+              <div class="metric"><div class="metric-value">0</div><div class="metric-label">model calls before crisis screening</div></div>
+              <div class="metric"><div class="metric-value">2</div><div class="metric-label">supported regex languages: English, Arabic</div></div>
+              <div class="metric"><div class="metric-value">1</div><div class="metric-label">fixed supportive crisis stream</div></div>
+            </div>
+            <ul class="key-list">
+              <li class="hot"><span>English and Arabic self-harm / suicide patterns in <strong>api/app/safety.py</strong>.</span></li>
+              <li><span>Arabic normalization removes diacritics and tatweel, unifies alef, yaa, and teh variants.</span></li>
+              <li><span>Metadata streams as <strong>kind = crisis</strong>, <strong>emotion = sadness</strong>, no sources.</span></li>
+              <li><span>Trusted-person email triggers async n8n webhook with <strong>intent = help</strong>.</span></li>
+            </ul>
+          </div>
+          <div class="glass gate-visual">
+            <div class="gate-ring"></div>
+            <div class="gate-ring"></div>
+            <div class="shield">SAFE</div>
+          </div>
+        </div>
+        <div class="cue"><span>False positives are acceptable.</span><span class="line"></span><span>False negatives are the failure mode the gate is designed against.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Language Detection">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Language Detection</span>
+          <span class="slide-count">05 / 20</span>
+        </div>
+        <div class="slide-grid">
+          <div class="copy-stack">
+            <h2>Language is state, routing context, and UX contract.</h2>
+            <p class="lead">The detector returns <strong>lang</strong>, <strong>confidence</strong>, and <strong>source</strong>, then the rest of the system uses that signal for translation, response language, and short-message recovery.</p>
+            <div class="glass panel">
+              <div class="language-matrix">
+                <span class="lang-chip">ar</span><span class="lang-chip">bg</span><span class="lang-chip">de</span><span class="lang-chip">el</span><span class="lang-chip">en</span>
+                <span class="lang-chip">es</span><span class="lang-chip">fr</span><span class="lang-chip">hi</span><span class="lang-chip">it</span><span class="lang-chip">ja</span>
+                <span class="lang-chip">nl</span><span class="lang-chip">pl</span><span class="lang-chip">pt</span><span class="lang-chip">ru</span><span class="lang-chip">sw</span>
+                <span class="lang-chip">th</span><span class="lang-chip">tr</span><span class="lang-chip">ur</span><span class="lang-chip">vi</span><span class="lang-chip">zh</span>
+              </div>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="glass panel large">
+              <h3>Runtime model</h3>
+              <ul class="key-list">
+                <li><span><strong>TfidfVectorizer</strong> with <strong>char_wb</strong> n-grams 1 to 4.</span></li>
+                <li><span>Calibrated <strong>LinearSVC</strong> exported to <strong>lang_id.joblib</strong>.</span></li>
+                <li><span>Preprocess: strip URLs, Unicode NFKC normalization, lowercase.</span></li>
+                <li><span>Warmed once at FastAPI startup through <strong>orchestrator.warmup()</strong>.</span></li>
+              </ul>
+            </div>
+            <div class="glass panel">
+              <h3>Why it matters</h3>
+              <p class="quiet">Sakina can reply in the user's language, translate emotions correctly, store prior language, and handle ambiguous follow-ups like "ok", emojis, or short replies.</p>
+            </div>
+          </div>
+        </div>
+        <div class="cue"><span>Traditional NLP by requirement.</span><span class="line"></span><span>Production behavior comes from the guard around the classifier.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Language Guard">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Language Guard and Notebook</span>
+          <span class="slide-count">06 / 20</span>
+        </div>
+        <div class="slide-grid">
+          <div class="copy-stack">
+            <h2>The classifier was excellent. Chat text was not.</h2>
+            <p class="lead">Clean sentence-length test data hid real chat risks: short tokens, emojis, digits, and mixed scripts. The runtime guard closes that gap.</p>
+            <div class="metric-grid">
+              <div class="metric"><div class="metric-value" data-count data-target="0.9959" data-decimals="4">0</div><div class="metric-label">LinearSVC macro-F1 on 10k test rows</div></div>
+              <div class="metric"><div class="metric-value" data-count data-target="3.53" data-decimals="2" data-suffix=" ms">0</div><div class="metric-label">median latency</div></div>
+              <div class="metric"><div class="metric-value" data-count data-target="1.000" data-decimals="3">0</div><div class="metric-label">guard + prior chat check</div></div>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="glass panel large">
+              <h3>Guard order</h3>
+              <div class="guard-stack">
+                <div class="guard-row"><strong>No signal</strong><span>Use prior language if present; otherwise English.</span></div>
+                <div class="guard-row"><strong>Non-Latin</strong><span>Restrict candidates by Unicode script: Arabic, Cyrillic, Greek, Thai, Devanagari, Han/Japanese.</span></div>
+                <div class="guard-row"><strong>Short Latin</strong><span>Below 7 letters: prior language, then Lingua >= 0.55, then English.</span></div>
+                <div class="guard-row"><strong>Normal text</strong><span>Trust TF-IDF >= 0.6; otherwise fall back to Lingua.</span></div>
+              </div>
+            </div>
+            <div class="glass panel">
+              <h3>Notebook selection</h3>
+              <div class="bar-chart">
+                <div class="bar-row"><label>LogReg</label><div class="bar-track"><span style="--value:99.53%"></span></div><output>0.9953</output></div>
+                <div class="bar-row"><label>Naive Bayes</label><div class="bar-track"><span style="--value:99.50%"></span></div><output>0.9950</output></div>
+                <div class="bar-row"><label>LinearSVC</label><div class="bar-track"><span style="--value:99.59%"></span></div><output>0.9959</output></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cue"><span>Dataset: papluca/language-identification, balanced 20-language split.</span><span class="line"></span><span>Swahili was the weakest class: F1 0.9708.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Emotion">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Emotion Classifier</span>
+          <span class="slide-count">07 / 20</span>
+        </div>
+        <div class="slide-grid wide-right">
+          <div class="glass panel large">
+            <div class="emotion-wheel" aria-hidden="true">
+              <span class="emotion-label">sadness</span>
+              <span class="emotion-label">joy</span>
+              <span class="emotion-label">love</span>
+              <span class="emotion-label">anger</span>
+              <span class="emotion-label">fear</span>
+              <span class="emotion-label">surprise</span>
+            </div>
+          </div>
+          <div class="copy-stack">
+            <h2>Emotion is multilingual through translation, not retraining.</h2>
+            <p class="lead">After language detection, emotion and intent run concurrently. Emotion translates non-English text to English, classifies six DAIR labels, and passes the English text forward.</p>
+            <div class="two-step">
+              <div class="glass process-card">
+                <span class="tiny">Translation</span>
+                <span class="big">NLLB-200 distilled 1.3B</span>
+                <p class="quiet">Detected language -> English on CPU.</p>
+              </div>
+              <div class="arrow-glow" aria-hidden="true"></div>
+              <div class="glass process-card">
+                <span class="tiny">Classification</span>
+                <span class="big">DistilBERT emotion</span>
+                <p class="quiet">bhadresh-savani/distilbert-base-uncased-emotion.</p>
+              </div>
+            </div>
+            <ul class="key-list">
+              <li><span>Returns <strong>emotion</strong>, <strong>confidence</strong>, and <strong>translated_text</strong>.</span></li>
+              <li><span><strong>translated_text</strong> becomes the English RAG query.</span></li>
+              <li><span>NLLB is also reused to build the English reveal text in the UI.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="cue"><span>English skips translation.</span><span class="line"></span><span>Non-English enters the same English classifier after NLLB.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Emotion Metrics">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Emotion Evaluation</span>
+          <span class="slide-count">08 / 20</span>
+        </div>
+        <div class="slide-grid">
+          <div class="copy-stack">
+            <h2>Macro-F1 mattered because the emotion dataset was imbalanced.</h2>
+            <p class="lead">DAIR is English-only and heavily skewed. Sakina chose translate-then-classify because it held up better across the 20-language evaluation slice.</p>
+            <div class="metric-grid">
+              <div class="metric"><div class="metric-value" data-count data-target="0.9270" data-decimals="4">0</div><div class="metric-label">English DAIR accuracy</div></div>
+              <div class="metric"><div class="metric-value" data-count data-target="0.8825" data-decimals="4">0</div><div class="metric-label">English macro-F1</div></div>
+              <div class="metric"><div class="metric-value" data-count data-target="0.8975" data-decimals="4">0</div><div class="metric-label">pooled multilingual macro-F1</div></div>
+            </div>
+          </div>
+          <div class="glass panel large">
+            <h3>Translator comparison by pooled macro-F1</h3>
+            <div class="bar-chart">
+              <div class="bar-row"><label>NLLB 1.3B</label><div class="bar-track"><span style="--value:89.75%"></span></div><output>0.8975</output></div>
+              <div class="bar-row"><label>NLLB 600M</label><div class="bar-track"><span style="--value:88.06%"></span></div><output>0.8806</output></div>
+              <div class="bar-row"><label>OSS 120B trans</label><div class="bar-track"><span style="--value:87.59%"></span></div><output>0.8759</output></div>
+              <div class="bar-row"><label>OSS 20B trans</label><div class="bar-track"><span style="--value:79.83%"></span></div><output>0.7983</output></div>
+              <div class="bar-row"><label>OSS 20B direct</label><div class="bar-track"><span style="--value:49.19%"></span></div><output>0.4919</output></div>
+            </div>
+            <p class="quiet" style="margin-top:18px">Known limitation: translation can distort emotional tone; surprise remains the weakest class in English F1.</p>
+          </div>
+        </div>
+        <div class="cue"><span>DAIR train imbalance is about 9.4x.</span><span class="line"></span><span>Multilingual eval: 60 DAIR rows per language, 1,200 rows total.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Intent">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Intent Classifier / Router</span>
+          <span class="slide-count">09 / 20</span>
+        </div>
+        <div class="copy-stack">
+          <h2>Intent is the switchboard for the rest of the turn.</h2>
+          <p class="lead">A deterministic few-shot LLM prompt produces one of five labels. Only one label unlocks retrieval.</p>
+        </div>
+        <div class="intent-grid">
+          <div class="intent-card"><strong>greeting</strong><span>Hello, salutations, opening check-in.</span></div>
+          <div class="intent-card"><strong>goodbye</strong><span>Closing the conversation or leaving.</span></div>
+          <div class="intent-card"><strong>gratitude</strong><span>Thanks or appreciation for help.</span></div>
+          <div class="intent-card"><strong>asking_mental_health_question</strong><span>Feelings, stress, anxiety, sleep, relationships, support.</span></div>
+          <div class="intent-card"><strong>out_of_scope</strong><span>Coding, weather, sports, math, current events, factual tasks.</span></div>
+        </div>
+        <div class="slide-grid">
+          <div class="glass panel">
+            <h3>Runtime details</h3>
+            <ul class="key-list">
+              <li><span>Implemented in <strong>api/app/models/intent.py</strong>.</span></li>
+              <li><span>Prompt artifact: <strong>intent_few_shot.json</strong>.</span></li>
+              <li><span>Model: <strong>lightning-ai/gpt-oss-120b</strong>.</span></li>
+              <li><span><strong>temperature = 0.0</strong>, <strong>max_tokens = 512</strong>.</span></li>
+            </ul>
+          </div>
+          <div class="glass panel">
+            <h3>Parser contract</h3>
+            <ul class="key-list">
+              <li><span>Lowercase the response.</span></li>
+              <li><span>Search for allowed labels.</span></li>
+              <li><span>If multiple labels appear, the last label wins.</span></li>
+              <li><span>If parsing or API fails, return <strong>out_of_scope</strong>.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="cue"><span>Classifier and router are the same module because the label changes the path.</span><span class="line"></span><span>Emotion runs in parallel after language detection.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Intent Journey">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Prompt Journey</span>
+          <span class="slide-count">10 / 20</span>
+        </div>
+        <div class="slide-grid">
+          <div class="copy-stack">
+            <h2>The simplest prompt beat the heavier optimizer.</h2>
+            <p class="lead">The notebook designed, evaluated, and exported a prompt rather than training a deployed intent model.</p>
+            <div class="metric-grid">
+              <div class="metric"><div class="metric-value" data-count data-target="100" data-suffix="%">0</div><div class="metric-label">held-out test accuracy on 24 examples</div></div>
+              <div class="metric"><div class="metric-value" data-count data-target="450">0</div><div class="metric-label">synthetic multilingual probe messages</div></div>
+              <div class="metric"><div class="metric-value" data-count data-target="0.92" data-decimals="2">0</div><div class="metric-label">probe accuracy</div></div>
+            </div>
+          </div>
+          <div class="glass panel large">
+            <h3>Design choices</h3>
+            <ul class="key-list">
+              <li><span>English and Arabic examples are included in the demonstration bank.</span></li>
+              <li><span>Train examples only are used for few-shot demonstrations.</span></li>
+              <li><span>DSPy/MIPROv2 was removed because it scored lower and added runtime dependency.</span></li>
+              <li><span>Main probe weakness: synthetic compound greetings.</span></li>
+            </ul>
+            <div class="bar-chart" style="margin-top:20px">
+              <div class="bar-row"><label>mental health</label><div class="bar-track"><span style="--value:100%"></span></div><output>1.000</output></div>
+              <div class="bar-row"><label>gratitude</label><div class="bar-track"><span style="--value:100%"></span></div><output>1.000</output></div>
+              <div class="bar-row"><label>out of scope</label><div class="bar-track"><span style="--value:100%"></span></div><output>1.000</output></div>
+              <div class="bar-row"><label>goodbye</label><div class="bar-track"><span style="--value:91.1%"></span></div><output>0.911</output></div>
+              <div class="bar-row"><label>greeting</label><div class="bar-track"><span style="--value:68.9%"></span></div><output>0.689</output></div>
+            </div>
+          </div>
+        </div>
+        <div class="cue"><span>User template: Message: {message} / Intent:</span><span class="line"></span><span>The model is asked to output only the label.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="RAG Routing">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Q&A RAG Activation</span>
+          <span class="slide-count">11 / 20</span>
+        </div>
+        <div class="slide-grid">
+          <div class="copy-stack">
+            <h2>Retrieval is not global. It is earned by intent.</h2>
+            <p class="lead">RAG runs only for <strong>asking_mental_health_question</strong>. This keeps latency down and prevents unrelated requests from being grounded in a counseling corpus.</p>
+            <div class="route-choice">
+              <div class="decision rag">
+                <h3>Mental-health question</h3>
+                <p class="quiet">Retrieve counselor notes, then compose with grounded support.</p>
+                <span class="pill green">RAG on</span>
+              </div>
+              <div class="decision skip">
+                <h3>Greeting, goodbye, thanks, off-topic</h3>
+                <p class="quiet">Skip retrieval and use intent-specific response guidance.</p>
+                <span class="pill gold">RAG skipped</span>
+              </div>
+            </div>
+          </div>
+          <div class="glass panel large">
+            <h3>Corpus and storage</h3>
+            <div class="scoreboard" style="margin-top:18px">
+              <div class="score-cell"><strong data-count data-target="3500" data-suffix="+">0</strong><span>mental-health counseling Q&A pairs</span></div>
+              <div class="score-cell"><strong>BM25</strong><span>artifact at api/app/models/artifacts/bm25_index.pkl</span></div>
+              <div class="score-cell"><strong>Qdrant</strong><span>dense vectors in configured collection</span></div>
+              <div class="score-cell"><strong>bge-m3</strong><span>1024-dimensional dense embeddings</span></div>
+            </div>
+            <p class="quiet" style="margin-top:18px">The corpus is English, so non-English user messages reuse the NLLB-translated emotion text as the retrieval query.</p>
+          </div>
+        </div>
+        <div class="cue"><span>RAG returns notes, not the final answer.</span><span class="line"></span><span>The generator remains Lightning gpt-oss-120b.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Hybrid Retrieval">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Hybrid Retrieval Flow</span>
+          <span class="slide-count">12 / 20</span>
+        </div>
+        <div class="copy-stack">
+          <h2>Keyword precision and semantic recall converge before reranking.</h2>
+          <p class="lead">BM25 catches exact terms. Dense search catches paraphrases. RRF fuses ranked lists without comparing incompatible scores.</p>
+        </div>
+        <div class="retrieval-diagram">
+          <div class="retrieval-row">
+            <div class="module-card"><span class="kicker">Sparse</span><span class="label">BM25 top 10</span><p>Lowercase word tokenization, strong for exact words like sleep, panic, stress.</p></div>
+            <div class="module-card"><span class="kicker">Dense</span><span class="label">bge-m3 top 10</span><p>Query embedding searches Qdrant for semantic similarity.</p></div>
+            <div class="module-card"><span class="kicker">Fusion</span><span class="label">RRF K = 60</span><p>Passages near the top of either list gain fused score.</p></div>
+          </div>
+          <div class="glass panel">
+            <svg class="fusion-svg" viewBox="0 0 980 230" role="img" aria-label="Hybrid retrieval lines flowing into reranker">
+              <defs>
+                <linearGradient id="lineA" x1="0" x2="1"><stop offset="0" stop-color="#33d6ff"/><stop offset="1" stop-color="#9d5cff"/></linearGradient>
+                <linearGradient id="lineB" x1="0" x2="1"><stop offset="0" stop-color="#ffd166"/><stop offset="1" stop-color="#38f8ad"/></linearGradient>
+              </defs>
+              <path d="M90 52 C260 52 260 115 450 115 S690 115 880 60" stroke="url(#lineA)" />
+              <path d="M90 176 C260 176 260 120 450 120 S690 120 880 170" stroke="url(#lineB)" />
+              <circle cx="90" cy="52" r="20" fill="rgba(51,214,255,.28)" stroke="rgba(255,255,255,.28)" />
+              <circle cx="90" cy="176" r="20" fill="rgba(255,209,102,.24)" stroke="rgba(255,255,255,.24)" />
+              <circle cx="450" cy="118" r="28" fill="rgba(157,92,255,.26)" stroke="rgba(255,255,255,.28)" />
+              <circle cx="880" cy="60" r="20" fill="rgba(56,248,173,.22)" stroke="rgba(255,255,255,.24)" />
+              <circle cx="880" cy="170" r="20" fill="rgba(56,248,173,.22)" stroke="rgba(255,255,255,.24)" />
+              <text x="54" y="24" fill="#aeb9d4" font-size="16">BM25</text>
+              <text x="46" y="218" fill="#aeb9d4" font-size="16">Dense</text>
+              <text x="410" y="68" fill="#f7fbff" font-size="18">RRF Fusion</text>
+              <text x="814" y="24" fill="#f7fbff" font-size="18">Reranker</text>
+              <text x="808" y="212" fill="#aeb9d4" font-size="16">top 3 passages</text>
+            </svg>
+          </div>
+          <div class="retrieval-row">
+            <div class="module-card"><span class="kicker">Cross-encoder</span><span class="label">bge-reranker-v2-m3</span><p>Reads query and candidate together for relevance scoring.</p></div>
+            <div class="module-card"><span class="kicker">Output</span><span class="label">text, context, score</span><p>Final top 3 passages move into the system prompt.</p></div>
+            <div class="module-card"><span class="kicker">Cache</span><span class="label">rag:{english_query}</span><p>Stores retrieved source passages, not generated replies.</p></div>
+          </div>
+        </div>
+        <div class="cue"><span>The expensive reranker runs only after candidates are narrowed.</span><span class="line"></span><span>Both embedder and reranker currently run on CPU.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="RAG Metrics">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">RAG Evaluation and Cost</span>
+          <span class="slide-count">13 / 20</span>
+        </div>
+        <div class="slide-grid">
+          <div class="copy-stack">
+            <h2>Retrieval quality is measured as a smoke test, not a clinical benchmark.</h2>
+            <p class="lead">The notebook validates that the hybrid retriever can find useful evidence and that generated answers stay faithful to retrieved notes.</p>
+            <div class="scoreboard">
+              <div class="score-cell"><strong data-count data-target="0.800" data-decimals="3">0</strong><span>Hit@5 on hand-crafted probes</span></div>
+              <div class="score-cell"><strong data-count data-target="0.750" data-decimals="3">0</strong><span>MRR@5 on hand-crafted probes</span></div>
+              <div class="score-cell"><strong data-count data-target="1.000" data-decimals="3">0</strong><span>faithfulness by Lightning judge</span></div>
+              <div class="score-cell"><strong data-count data-target="1.000" data-decimals="3">0</strong><span>answer relevancy by Lightning judge</span></div>
+            </div>
+          </div>
+          <div class="glass panel large">
+            <h3>Runtime profile</h3>
+            <ul class="key-list">
+              <li><span><strong>RAGRetriever</strong> loads BM25 from disk.</span></li>
+              <li><span>Query embedder: <strong>BAAI/bge-m3</strong>.</span></li>
+              <li><span>Reranker: <strong>BAAI/bge-reranker-v2-m3</strong>.</span></li>
+              <li><span>Lazy singleton through <strong>get_retriever()</strong>, warmed at startup.</span></li>
+              <li><span>Commented runtime footprint is roughly <strong>4.6 GB</strong> for embedder + reranker.</span></li>
+            </ul>
+            <div class="dot-sphere" data-dots="88" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div class="cue"><span>Evaluation used a small manual probe set.</span><span class="line"></span><span>Useful for smoke testing, not a broad held-out clinical claim.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Composition">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Response Composition and Streaming</span>
+          <span class="slide-count">14 / 20</span>
+        </div>
+        <div class="slide-grid">
+          <div class="copy-stack">
+            <h2>The final answer is composed from structured signals.</h2>
+            <p class="lead">The orchestrator builds a prompt with language, emotion, intent guidance, recent history, and optional counselor notes, then streams chunks back to the client.</p>
+            <div class="metric-grid">
+              <div class="metric"><div class="metric-value">120B</div><div class="metric-label">Lightning gpt-oss generation model</div></div>
+              <div class="metric"><div class="metric-value" data-count data-target="0.6" data-decimals="1">0</div><div class="metric-label">temperature for conversational reply</div></div>
+              <div class="metric"><div class="metric-value">SSE</div><div class="metric-label">streamed through /chat or /chat/ui</div></div>
+            </div>
+          </div>
+          <div class="glass panel large">
+            <h3>Prompt ingredients</h3>
+            <div class="prompt-stack">
+              <div class="prompt-row"><b>01</b><span>Detected language: reply in the user's language.</span></div>
+              <div class="prompt-row"><b>02</b><span>Detected emotion: empathetic tone and UI metadata.</span></div>
+              <div class="prompt-row"><b>03</b><span>Intent guidance: greeting, gratitude, goodbye, support, or refusal boundary.</span></div>
+              <div class="prompt-row"><b>04</b><span>Recent message history from memory.</span></div>
+              <div class="prompt-row"><b>05</b><span>Optional RAG counselor notes; grounded suggestions only.</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="cue"><span>Brief, empathetic, no diagnosis, no prescriptions.</span><span class="line"></span><span>RAG grounds suggestions when sources exist.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="UI Contract">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Streaming UI Contract</span>
+          <span class="slide-count">15 / 20</span>
+        </div>
+        <div class="slide-grid wide-right">
+          <div class="glass stream-visual">
+            <div class="chat-bubble user">I feel overwhelmed and cannot sleep lately.</div>
+            <div class="chat-bubble">I hear how heavy this has been. Let's slow it down and focus on one small step tonight...</div>
+            <div class="typing-stream"><span style="--i:0"></span><span style="--i:1"></span><span style="--i:2"></span><small>streaming chunks</small></div>
+            <div class="avatar-row" aria-label="Emotion reactive avatars">
+              <div class="avatar" style="--i:0"><img src="../frontend/public/avatars/sakina_sadness.svg" alt="sadness avatar" /></div>
+              <div class="avatar" style="--i:1"><img src="../frontend/public/avatars/sakina_joy.svg" alt="joy avatar" /></div>
+              <div class="avatar" style="--i:2"><img src="../frontend/public/avatars/sakina_fear.svg" alt="fear avatar" /></div>
+              <div class="avatar" style="--i:3"><img src="../frontend/public/avatars/sakina_love.svg" alt="love avatar" /></div>
+            </div>
+          </div>
+          <div class="copy-stack">
+            <h2>The frontend receives more than words.</h2>
+            <p class="lead">Sakina streams text plus metadata that controls language display, emotion visuals, sources, crisis state, widgets, and English reveal behavior.</p>
+            <ul class="key-list">
+              <li><span>Emotion metadata updates the adaptive avatar and visual tone.</span></li>
+              <li><span>Language metadata supports RTL/LTR and localized reply rendering.</span></li>
+              <li><span>RAG sources are shown only when retrieval exists.</span></li>
+              <li><span>Final text dictionary supports original reply and English reveal.</span></li>
+              <li><span>Crisis state changes the UI path and disables normal source flow.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="cue"><span>The UI becomes an instrument panel for the pipeline.</span><span class="line"></span><span>Streaming preserves immediacy while backend analysis stays structured.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Memory">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Message / Session Memory</span>
+          <span class="slide-count">16 / 20</span>
+        </div>
+        <div class="slide-grid">
+          <div class="copy-stack">
+            <h2>Memory makes the next short message safer.</h2>
+            <p class="lead">After the assistant finishes streaming, Sakina stores the user turn, assistant turn, and prior language. Retrieval results can also be cached for repeated English queries.</p>
+            <ul class="key-list">
+              <li><span>Implemented in <strong>api/app/memory.py</strong>.</span></li>
+              <li><span>Called from <strong>api/app/main.py</strong> after response completion.</span></li>
+              <li><span>Redis is used when configured; otherwise in-process fallback.</span></li>
+              <li><span>Failures are safe misses or no-op writes, never request breakers.</span></li>
+              <li><span>RAG cache stores source passages, not assistant text.</span></li>
+            </ul>
+          </div>
+          <div class="glass memory-loop">
+            <div class="loop-ring" aria-hidden="true"></div>
+            <div class="loop-chip">recent turns</div>
+            <div class="loop-chip">prior language</div>
+            <div class="loop-chip">RAG source cache</div>
+            <div class="loop-chip">safe fallback</div>
+          </div>
+        </div>
+        <div class="cue"><span>Prior language rescues "yes", "ok", emojis, and tiny follow-ups.</span><span class="line"></span><span>Memory supports continuity without becoming a hard dependency.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Voice Out">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Text to Speech</span>
+          <span class="slide-count">17 / 20</span>
+        </div>
+        <div class="slide-grid wide-left">
+          <div class="copy-stack">
+            <h2>Voice output happens after the assistant text exists.</h2>
+            <p class="lead">TTS is optional and downstream. It never changes language detection, emotion, intent, RAG, or generation.</p>
+            <div class="split-lanes">
+              <div class="glass lane">
+                <div class="lane-title">Arabic</div>
+                <p class="quiet">Groq Orpheus Arabic model and voice.</p>
+                <div class="wave" aria-hidden="true"><span style="--i:0"></span><span style="--i:1"></span><span style="--i:2"></span><span style="--i:3"></span><span style="--i:4"></span><span style="--i:5"></span><span style="--i:6"></span></div>
+              </div>
+              <div class="glass lane">
+                <div class="lane-title">Other languages</div>
+                <p class="quiet">Groq Orpheus English model and voice.</p>
+                <div class="wave" aria-hidden="true"><span style="--i:0"></span><span style="--i:1"></span><span style="--i:2"></span><span style="--i:3"></span><span style="--i:4"></span><span style="--i:5"></span><span style="--i:6"></span></div>
+              </div>
+            </div>
+          </div>
+          <div class="glass panel large">
+            <h3>Endpoint and implementation</h3>
+            <ul class="key-list">
+              <li><span>Exposed by <strong>POST /tts</strong>.</span></li>
+              <li><span>Implemented in <strong>api/app/tts.py</strong>.</span></li>
+              <li><span>Runs after response text is available.</span></li>
+              <li><span>Voice features are adjacent to the inference path, not inside it.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="cue"><span>STT is pre-chat.</span><span class="line"></span><span>TTS is post-chat.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Adjacent Features">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Adjacent Feature Boundaries</span>
+          <span class="slide-count">18 / 20</span>
+        </div>
+        <div class="slide-grid">
+          <div class="copy-stack">
+            <h2>Not every feature belongs inside inference.</h2>
+            <p class="lead">Scribble, Letter Forward, and Soundscape are deliberately separate so the chat pipeline remains predictable.</p>
+            <div class="feature-grid">
+              <div class="feature-tile">
+                <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 19l5-1 10-10a3 3 0 0 0-4-4L5 14l-1 5z" stroke="currentColor" fill="none" stroke-width="1.8"/></svg></div>
+                <h3>Scribble</h3>
+                <p>POST /scribble/reflect sends a base64 canvas image to Gemini image understanding for tentative reflection and one DAIR-style emotion label.</p>
+              </div>
+              <div class="feature-tile">
+                <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 7l8 6 8-6" stroke="currentColor" fill="none" stroke-width="1.8"/></svg></div>
+                <h3>Letter Forward</h3>
+                <p>Future-self letters go from the client to n8n with intent = letter. Crisis help can use the same webhook with intent = help.</p>
+              </div>
+              <div class="feature-tile">
+                <div class="icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l10-2v13M9 18a3 3 0 1 1-2-2.83M19 16a3 3 0 1 1-2-2.83" stroke="currentColor" fill="none" stroke-width="1.8"/></svg></div>
+                <h3>Soundscape</h3>
+                <p>Static rain, ocean, cafe, and forest audio files loop in the browser and do not affect AI modules.</p>
+              </div>
+              <div class="feature-tile">
+                <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 3c4 0 7 1.4 7 3v12c0 1.6-3 3-7 3s-7-1.4-7-3V6c0-1.6 3-3 7-3zM5 6c0 1.6 3 3 7 3s7-1.4 7-3M5 12c0 1.6 3 3 7 3s7-1.4 7-3" stroke="currentColor" fill="none" stroke-width="1.8"/></svg></div>
+                <h3>Client settings</h3>
+                <p>Name, user email, and trusted-person email live on the client device, not in a backend database table.</p>
+              </div>
+            </div>
+          </div>
+          <div class="glass panel large">
+            <h3>Boundary rule</h3>
+            <p class="lead" style="font-size:1.05rem">Adjacent features may enrich the product, but they do not enter language detection, emotion classification, intent routing, RAG, or response generation.</p>
+            <div class="dot-sphere" data-dots="72" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div class="cue"><span>Feature isolation keeps the AI path easy to explain and debug.</span><span class="line"></span><span>The webhook layer handles future letters and crisis trusted-person contact.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Storage">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Database / Storage Topology</span>
+          <span class="slide-count">19 / 20</span>
+        </div>
+        <div class="copy-stack">
+          <h2>State is split by responsibility.</h2>
+          <p class="lead">Conversation continuity, vector retrieval, and user contact settings are intentionally stored in different places.</p>
+        </div>
+        <div class="storage-map">
+          <div class="glass storage-column">
+            <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M20 28c0-10 60-10 60 0v44c0 10-60 10-60 0z" fill="rgba(51,214,255,.12)" stroke="#33d6ff"/><path d="M20 28c0 10 60 10 60 0M20 50c0 10 60 10 60 0M20 72c0 10 60 10 60 0" fill="none" stroke="#33d6ff"/></svg>
+            <h3>Redis or fallback</h3>
+            <p>Conversation turns, prior language, and short-lived RAG cache entries.</p>
+          </div>
+          <div class="glass storage-column">
+            <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="36" fill="rgba(157,92,255,.13)" stroke="#9d5cff"/><path d="M28 50h44M50 28v44M35 35l30 30M65 35L35 65" stroke="#d7c2ff"/></svg>
+            <h3>Qdrant</h3>
+            <p>Dense bge-m3 vectors for counseling chunks in the configured collection.</p>
+          </div>
+          <div class="glass storage-column">
+            <svg viewBox="0 0 100 100" aria-hidden="true"><rect x="26" y="15" width="48" height="70" rx="8" fill="rgba(56,248,173,.11)" stroke="#38f8ad"/><circle cx="50" cy="72" r="4" fill="#38f8ad"/><path d="M38 30h24M38 43h24M38 56h16" stroke="#d8ffef"/></svg>
+            <h3>Client device</h3>
+            <p>Name, email, and trusted-person contact stored through local settings.</p>
+          </div>
+        </div>
+        <div class="cue"><span>Memory failures degrade to misses.</span><span class="line"></span><span>Vector storage remains purpose-built for retrieval.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="End-to-End">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">End-to-End Turn Timeline</span>
+          <span class="slide-count">20 / 20</span>
+        </div>
+        <div class="slide-grid wide-left">
+          <div class="copy-stack">
+            <h2>Each turn becomes a sequence of guarded commitments.</h2>
+            <p class="lead">The architecture is explainable because every transition has a precise reason: safety, language, emotion, intent, evidence, response, memory.</p>
+            <div class="timeline">
+              <div class="timeline-row" style="--i:0"><time>00</time><strong>User text or transcribed voice</strong><span>/chat or /stt</span></div>
+              <div class="timeline-row" style="--i:1"><time>01</time><strong>Crisis gate</strong><span>short-circuit if triggered</span></div>
+              <div class="timeline-row" style="--i:2"><time>02</time><strong>Language detection</strong><span>20-language guard</span></div>
+              <div class="timeline-row" style="--i:3"><time>03</time><strong>Emotion and intent</strong><span>parallel analysis</span></div>
+              <div class="timeline-row" style="--i:4"><time>04</time><strong>Optional RAG</strong><span>mental-health intent only</span></div>
+              <div class="timeline-row" style="--i:5"><time>05</time><strong>Composition stream</strong><span>gpt-oss-120b</span></div>
+              <div class="timeline-row" style="--i:6"><time>06</time><strong>TTS and memory</strong><span>optional voice, persisted context</span></div>
+            </div>
+          </div>
+          <div class="glass closing-stack">
+            <h2><span class="accent-text">Safety first.</span><br />Grounding when useful.<br />Language always respected.</h2>
+            <div class="principles">
+              <div class="principle"><strong>Protect</strong><span>Crisis gate before every model.</span></div>
+              <div class="principle"><strong>Understand</strong><span>Language, emotion, and intent as separate signals.</span></div>
+              <div class="principle"><strong>Ground</strong><span>RAG only when the user asks for support.</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="cue"><span>Sakina is not one prompt.</span><span class="line"></span><span>It is a routed, evaluated, safety-aware support system.</span></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="dots" aria-label="Slide navigation"></nav>
+  <div class="controls" aria-label="Presentation controls">
+    <button class="control" id="prev" type="button" title="Previous slide" aria-label="Previous slide">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <button class="control" id="next" type="button" title="Next slide" aria-label="Next slide">
+      <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+  <div class="progress" aria-hidden="true"><span></span></div>
+
+  <script>
+    (() => {
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const progress = document.querySelector(".progress span");
+      const dotsWrap = document.querySelector(".dots");
+      const prev = document.querySelector("#prev");
+      const next = document.querySelector("#next");
+      const slideCountLabels = Array.from(document.querySelectorAll(".slide-count"));
+      function hashIndex() {
+        const raw = Number(window.location.hash.replace("#", ""));
+        if (!Number.isFinite(raw) || raw < 1) return 0;
+        return Math.min(slides.length - 1, raw - 1);
+      }
+
+      let index = hashIndex();
+      let wheelLocked = false;
+
+      slides.forEach((slide, i) => {
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "dot-nav";
+        dot.setAttribute("aria-label", `Go to slide ${i + 1}: ${slide.dataset.title || ""}`);
+        dot.addEventListener("click", () => goTo(i));
+        dotsWrap.appendChild(dot);
+      });
+
+      const dots = Array.from(document.querySelectorAll(".dot-nav"));
+
+      slideCountLabels.forEach((label, i) => {
+        label.textContent = `${String(i + 1).padStart(2, "0")} / ${slides.length}`;
+      });
+
+      function goTo(nextIndex) {
+        const clamped = Math.max(0, Math.min(slides.length - 1, nextIndex));
+        if (clamped === index) return;
+        slides[index].classList.remove("active");
+        slides[index].classList.toggle("prev", clamped > index);
+        index = clamped;
+        activate();
+      }
+
+      function activate() {
+        slides.forEach((slide, i) => {
+          slide.classList.toggle("active", i === index);
+          slide.classList.toggle("prev", i < index);
+        });
+        dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
+        progress.style.width = `${((index + 1) / slides.length) * 100}%`;
+        document.title = `Sakina Technical Keynote - ${index + 1}/${slides.length}`;
+        const nextHash = `#${index + 1}`;
+        if (window.location.hash !== nextHash) {
+          try {
+            window.history.replaceState(null, "", nextHash);
+          } catch {
+            /* Some local file runtimes disallow history mutation. */
+          }
+        }
+        animateCounts(slides[index]);
+      }
+
+      function animateCounts(scope) {
+        const counters = scope.querySelectorAll("[data-count]");
+        counters.forEach((el) => {
+          const target = Number(el.dataset.target || "0");
+          const decimals = Number(el.dataset.decimals || "0");
+          const suffix = el.dataset.suffix || "";
+          const duration = 950;
+          const start = performance.now();
+
+          function tick(now) {
+            const t = Math.min(1, (now - start) / duration);
+            const eased = 1 - Math.pow(1 - t, 3);
+            const value = target * eased;
+            el.textContent = value.toLocaleString("en-US", {
+              minimumFractionDigits: decimals,
+              maximumFractionDigits: decimals
+            }) + suffix;
+            if (t < 1) requestAnimationFrame(tick);
+          }
+
+          requestAnimationFrame(tick);
+        });
+      }
+
+      prev.addEventListener("click", () => goTo(index - 1));
+      next.addEventListener("click", () => goTo(index + 1));
+
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+          event.preventDefault();
+          goTo(index + 1);
+        }
+        if (event.key === "ArrowLeft" || event.key === "PageUp") {
+          event.preventDefault();
+          goTo(index - 1);
+        }
+        if (event.key === "Home") goTo(0);
+        if (event.key === "End") goTo(slides.length - 1);
+      });
+
+      window.addEventListener("wheel", (event) => {
+        if (Math.abs(event.deltaY) < 24 || wheelLocked) return;
+        wheelLocked = true;
+        goTo(index + (event.deltaY > 0 ? 1 : -1));
+        setTimeout(() => { wheelLocked = false; }, 720);
+      }, { passive: true });
+
+      let touchStart = null;
+      window.addEventListener("touchstart", (event) => {
+        touchStart = event.touches[0].clientX;
+      }, { passive: true });
+      window.addEventListener("touchend", (event) => {
+        if (touchStart === null) return;
+        const delta = event.changedTouches[0].clientX - touchStart;
+        if (Math.abs(delta) > 48) goTo(index + (delta < 0 ? 1 : -1));
+        touchStart = null;
+      }, { passive: true });
+
+      window.addEventListener("hashchange", () => {
+        const nextIndex = hashIndex();
+        if (nextIndex !== index) {
+          index = nextIndex;
+          activate();
+        }
+      });
+
+      function buildSpheres() {
+        document.querySelectorAll(".dot-sphere").forEach((sphere) => {
+          const count = Number(sphere.dataset.dots || "72");
+          const size = sphere.clientWidth || 320;
+          const radius = size * 0.39;
+          const fragment = document.createDocumentFragment();
+          for (let i = 0; i < count; i += 1) {
+            const phi = Math.acos(-1 + (2 * i) / count);
+            const theta = Math.sqrt(count * Math.PI) * phi;
+            const x = radius * Math.cos(theta) * Math.sin(phi);
+            const y = radius * Math.sin(theta) * Math.sin(phi);
+            const z = radius * Math.cos(phi);
+            const depth = (z + radius) / (radius * 2);
+            const dot = document.createElement("span");
+            dot.className = "dot";
+            dot.style.setProperty("--x", `${x}px`);
+            dot.style.setProperty("--y", `${y}px`);
+            dot.style.setProperty("--z", `${z}px`);
+            dot.style.setProperty("--alpha", `${0.25 + depth * 0.7}`);
+            dot.style.setProperty("--size", `${2 + depth * 4}px`);
+            fragment.appendChild(dot);
+          }
+          sphere.replaceChildren(fragment);
+        });
+      }
+
+      function particleField() {
+        const canvas = document.querySelector("#particle-canvas");
+        const ctx = canvas.getContext("2d");
+        let width = 0;
+        let height = 0;
+        let dpr = 1;
+        let particles = [];
+        let pointerX = 0;
+        let pointerY = 0;
+
+        function resize() {
+          dpr = Math.min(2, window.devicePixelRatio || 1);
+          width = window.innerWidth;
+          height = window.innerHeight;
+          canvas.width = Math.floor(width * dpr);
+          canvas.height = Math.floor(height * dpr);
+          canvas.style.width = `${width}px`;
+          canvas.style.height = `${height}px`;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          const count = Math.min(96, Math.max(42, Math.floor((width * height) / 17000)));
+          particles = Array.from({ length: count }, (_, i) => ({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - .5) * .28,
+            vy: (Math.random() - .5) * .28,
+            r: 1.1 + Math.random() * 1.9,
+            hue: i % 3
+          }));
+        }
+
+        function draw() {
+          ctx.clearRect(0, 0, width, height);
+          const maxDistance = Math.min(150, Math.max(92, width * .11));
+          particles.forEach((p) => {
+            p.x += p.vx + pointerX * .006;
+            p.y += p.vy + pointerY * .006;
+            if (p.x < -10) p.x = width + 10;
+            if (p.x > width + 10) p.x = -10;
+            if (p.y < -10) p.y = height + 10;
+            if (p.y > height + 10) p.y = -10;
+          });
+
+          for (let i = 0; i < particles.length; i += 1) {
+            for (let j = i + 1; j < particles.length; j += 1) {
+              const a = particles[i];
+              const b = particles[j];
+              const dx = a.x - b.x;
+              const dy = a.y - b.y;
+              const distance = Math.hypot(dx, dy);
+              if (distance < maxDistance) {
+                const alpha = (1 - distance / maxDistance) * .22;
+                ctx.strokeStyle = `rgba(102, 220, 255, ${alpha})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+                ctx.stroke();
+              }
+            }
+          }
+
+          particles.forEach((p) => {
+            const color = p.hue === 0 ? "51,214,255" : p.hue === 1 ? "157,92,255" : "56,248,173";
+            ctx.beginPath();
+            ctx.fillStyle = `rgba(${color}, .74)`;
+            ctx.shadowColor = `rgba(${color}, .65)`;
+            ctx.shadowBlur = 16;
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+          });
+
+          requestAnimationFrame(draw);
+        }
+
+        window.addEventListener("resize", resize);
+        window.addEventListener("pointermove", (event) => {
+          pointerX = (event.clientX / width - .5) * 2;
+          pointerY = (event.clientY / height - .5) * 2;
+        });
+        resize();
+        draw();
+      }
+
+      buildSpheres();
+      particleField();
+      activate();
+      setTimeout(() => document.body.classList.add("deck-ready"), 80);
+      window.addEventListener("resize", buildSpheres);
+    })();
+  </script>
+</body>
+</html>

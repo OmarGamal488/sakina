@@ -12,6 +12,7 @@ AGENT_BRIEF.md
 # --- Markdown: keep ONLY README files, drop everything else ---
 *.md
 !README.md
+!PIPELINE.md
 !**/README.md
 
 # --- Docs folder (not pushed) ---
