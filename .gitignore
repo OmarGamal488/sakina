@@ -20,6 +20,9 @@ docs/
 
 # --- Test folders (not pushed) ---
 tests/
+# ...EXCEPT the backend API tests — the MLOps rubric requires them committed.
+!api/tests/
+!api/tests/**
 
 # --- Frontend co-located tests: DELETE these 3 lines if you WANT them pushed ---
 *.test.ts
