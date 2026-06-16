@@ -30,6 +30,28 @@ class ChatRequest(BaseModel):
     user_name: str | None = None
 
 
+class ChatJSONResponse(BaseModel):
+    """Single-shot reply for the rubric ``POST /chat`` contract (provided frontend).
+
+    The frontend reads ``response``; ``intent``/``emotion``/``language``/``kind`` are
+    extra fields it safely ignores but our own tooling + monitoring can use.
+    """
+
+    response: str
+    intent: Intent | None = None
+    emotion: Emotion = "joy"
+    language: str = "en"
+    kind: Literal["crisis", "journal"] | None = None
+
+
+class FeedbackRequest(BaseModel):
+    """Thumbs up/down on an assistant reply (rubric ``POST /feedback`` contract)."""
+
+    vote: Literal["up", "down"]
+    user_message: str = ""
+    bot_response: str = ""
+
+
 class TTSRequest(BaseModel):
     """Text to speak aloud via Groq Orpheus TTS."""
 

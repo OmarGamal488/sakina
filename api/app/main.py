@@ -1,14 +1,19 @@
-"""Sakina FastAPI app — ``/chat`` (SSE) + ``/healthz``.
+"""Sakina FastAPI app.
+
+Rubric (Serenity) contract: ``POST /chat`` (single JSON), ``POST /feedback``,
+``GET /health``. The richer SSE pipeline used by our own React UI lives at
+``POST /chat/stream`` and ``POST /chat/ui``.
 
 Pipeline: language → emotion → intent → RAG → LLM compose. A model-free crisis
-regex gate runs FIRST in ``/chat`` and ``/chat/ui``, short-circuiting to a crisis
-card with no RAG/LLM call.
+regex gate runs FIRST on every chat entrypoint, short-circuiting to a crisis
+response with no RAG/LLM call.
 """
 
 from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import uuid
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
@@ -26,8 +31,21 @@ from app import scribble as scribble_service
 from app import stt as stt_service
 from app import tts as tts_service
 from app.config import settings
-from app.schemas import ChatRequest, ScribbleRequest, ScribbleResponse, TTSRequest
+from app.schemas import (
+    ChatJSONResponse,
+    ChatRequest,
+    FeedbackRequest,
+    ScribbleRequest,
+    ScribbleResponse,
+    TTSRequest,
+)
 
+# Configure Python's stdlib logging (rubric: INFO/WARNING/ERROR throughout the app).
+# structlog is routed through the stdlib root logger so all records share one stream.
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
 logger = structlog.get_logger(__name__)
 
 
@@ -94,10 +112,32 @@ async def _notify_trusted_person(name: str | None, email: str | None) -> None:
         logger.warning("crisis_help_webhook_error", error=str(exc)[:200], email=clean_email)
 
 
+def _health_payload() -> dict:
+    return {"status": "ok", "service": "sakina-api", "version": "0.1.0"}
+
+
 @app.get("/healthz")
 async def healthz() -> dict:
     """Liveness probe — no models touched, returns instantly."""
-    return {"status": "ok", "service": "sakina-api", "version": "0.1.0"}
+    return _health_payload()
+
+
+@app.get("/health")
+async def health() -> dict:
+    """Rubric health endpoint — alias of ``/healthz``."""
+    return _health_payload()
+
+
+@app.post("/feedback")
+async def feedback(req: FeedbackRequest) -> dict:
+    """Thumbs up/down on an assistant reply. Logged now; metered in Phase 4."""
+    logger.info(
+        "feedback",
+        vote=req.vote,
+        user_chars=len(req.user_message),
+        bot_chars=len(req.bot_response),
+    )
+    return {"status": "ok"}
 
 
 @app.post("/stt")
@@ -141,7 +181,50 @@ async def scribble_reflect(req: ScribbleRequest) -> ScribbleResponse:
     return ScribbleResponse(reflection=reflection, emotion=emotion)
 
 
-@app.post("/chat")
+@app.post("/chat", response_model=ChatJSONResponse)
+async def chat_json(req: ChatRequest) -> ChatJSONResponse:
+    """Rubric ``/chat`` — single JSON reply for the provided frontend.
+
+    Same pipeline as the SSE route, collected into one response: crisis gate →
+    analyze → drain ``stream_reply`` → ``{response, intent, emotion, language}``.
+    """
+    # Crisis-safety gate — model-free, before any RAG/LLM call.
+    crisis = safety.check_crisis(req.message)
+    if crisis.triggered:
+        lang = crisis.lang_hint
+        line = safety.SUPPORTIVE_LINE.get(lang, safety.SUPPORTIVE_LINE["en"])
+        logger.info("crisis_gate", source="chat_json", lang=lang, pattern=crisis.pattern[:40])
+        if req.trusted_person_email:
+            asyncio.create_task(_notify_trusted_person(req.user_name, req.trusted_person_email))
+        return ChatJSONResponse(
+            response=line, intent=None, emotion="sadness", language=lang, kind="crisis"
+        )
+
+    mem = memory.get_memory()
+    sid = req.session_id or ""
+    session_lang = req.session_lang or mem.get_prior_lang(sid)
+    history = mem.get_history(sid)
+    result = await orchestrator.analyze(req.message, lang_hint=req.lang, session_lang=session_lang)
+    parts: list[str] = []
+    async for tok in orchestrator.stream_reply(req.message, result, history):
+        parts.append(tok)
+    reply = "".join(parts).strip()
+
+    if sid:
+        mem.append_turn(sid, "user", req.message)
+        mem.append_turn(sid, "assistant", reply)
+        mem.set_prior_lang(sid, result.language)
+
+    logger.info("chat_json", intent=result.intent, emotion=result.emotion, lang=result.language)
+    return ChatJSONResponse(
+        response=reply,
+        intent=result.intent,
+        emotion=result.emotion,
+        language=result.language,
+    )
+
+
+@app.post("/chat/stream")
 async def chat(req: ChatRequest):
     """Stream the assistant turn as Server-Sent Events: meta → delta* → done."""
 
