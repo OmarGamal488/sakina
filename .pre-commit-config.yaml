@@ -1,6 +1,11 @@
 # Pre-commit hooks for the Sakina backend.
 # Linter + formatter as required by the MLOps rubric (Repository Setup).
 # Pinned to a stable ruff-pre-commit release matching the project's ruff 0.7.x.
+#
+# Notebooks are exploratory research artifacts (out-of-order cells, cross-cell
+# names) and one has a malformed cell that breaks the parser — they are NOT the
+# graded backend code, so they're excluded from lint/format.
+exclude: '^notebooks/'
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.7.0

@@ -213,9 +213,7 @@ class SessionMemory:
                 val: str | None = self._redis.get(_LANG_PREFIX + session_id)  # type: ignore[union-attr]
                 return val  # already str because decode_responses=True
             except Exception as exc:
-                logger.warning(
-                    "memory_get_prior_lang_error", session_id=session_id, error=str(exc)
-                )
+                logger.warning("memory_get_prior_lang_error", session_id=session_id, error=str(exc))
                 return None
         assert self._fallback is not None
         return self._fallback.lang_get(session_id)
@@ -231,9 +229,7 @@ class SessionMemory:
                     _LANG_PREFIX + session_id, ttl, lang
                 )
             except Exception as exc:
-                logger.warning(
-                    "memory_set_prior_lang_error", session_id=session_id, error=str(exc)
-                )
+                logger.warning("memory_set_prior_lang_error", session_id=session_id, error=str(exc))
         else:
             assert self._fallback is not None
             self._fallback.lang_set(session_id, lang, ttl)

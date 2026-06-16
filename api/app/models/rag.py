@@ -107,7 +107,9 @@ class RAGRetriever:
         scores = self._reranker.predict([(query, self._texts[i]) for i in ids])
         order = np.argsort(scores)[::-1][:k]
         return [
-            Passage(text=self._texts[ids[i]], context=self._contexts[ids[i]], score=float(scores[i]))
+            Passage(
+                text=self._texts[ids[i]], context=self._contexts[ids[i]], score=float(scores[i])
+            )
             for i in order
         ]
 

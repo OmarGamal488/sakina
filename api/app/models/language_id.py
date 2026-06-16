@@ -183,19 +183,13 @@ class LanguageDetector:
         )
         # script_map values may be lists or tuples; normalise to list[str].
         raw_script_map: dict = guard.get("script_map", _DEFAULT_GUARD["script_map"])
-        self._script_map: dict[str, list[str]] = {
-            k: list(v) for k, v in raw_script_map.items()
-        }
+        self._script_map: dict[str, list[str]] = {k: list(v) for k, v in raw_script_map.items()}
 
         # Build lingua detector once here (compiles Rust models — never per request).
         from lingua import Language, LanguageDetectorBuilder
 
-        fallback_codes: list[str] = metadata.get(
-            "fallback_languages", self._classes.tolist()
-        )
-        iso_to_language = {
-            lang.iso_code_639_1.name.lower(): lang for lang in Language.all()
-        }
+        fallback_codes: list[str] = metadata.get("fallback_languages", self._classes.tolist())
+        iso_to_language = {lang.iso_code_639_1.name.lower(): lang for lang in Language.all()}
         lingua_langs = [iso_to_language[c] for c in fallback_codes if c in iso_to_language]
         self._lingua = (
             LanguageDetectorBuilder.from_languages(*lingua_langs)
@@ -261,9 +255,7 @@ class LanguageDetector:
                     confidence=float(vals[0].value),
                     source="lingua-short",
                 )
-            return LanguageResult(
-                lang=self._no_signal_default, confidence=0.0, source="default"
-            )
+            return LanguageResult(lang=self._no_signal_default, confidence=0.0, source="default")
 
         # Step 4 — normal-length text: trust TF-IDF above the threshold.
         if top_conf >= self._confidence_threshold:

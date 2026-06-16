@@ -9,10 +9,10 @@ from __future__ import annotations
 
 import asyncio
 import json
-from urllib import request as urlrequest
 import uuid
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
+from urllib import request as urlrequest
 
 import structlog
 from fastapi import FastAPI, File, HTTPException, Request, Response, UploadFile
@@ -107,9 +107,7 @@ async def stt(audio: UploadFile = File(...)) -> dict:
     if not data:
         raise HTTPException(status_code=400, detail="empty audio upload")
     try:
-        text = await run_in_threadpool(
-            stt_service.transcribe, data, audio.filename or "audio.webm"
-        )
+        text = await run_in_threadpool(stt_service.transcribe, data, audio.filename or "audio.webm")
     except Exception as e:  # noqa: BLE001
         logger.warning("stt_error", error=str(e)[:200])
         raise HTTPException(status_code=502, detail="transcription failed") from e
@@ -157,20 +155,31 @@ async def chat(req: ChatRequest):
             logger.info("crisis_gate", source="chat", lang=lang, pattern=crisis.pattern[:40])
             yield _sse(
                 "meta",
-                {"emotion": "sadness", "intent": None, "language": lang,
-                 "sources": [], "kind": "crisis"},
+                {
+                    "emotion": "sadness",
+                    "intent": None,
+                    "language": lang,
+                    "sources": [],
+                    "kind": "crisis",
+                },
             )
             words = line.split(" ")
             for i in range(0, len(words), 3):
-                chunk = " ".join(words[i:i + 3])
+                chunk = " ".join(words[i : i + 3])
                 yield _sse("delta", {"text": chunk + (" " if i + 3 < len(words) else "")})
             text = {lang: line}
             if lang != "en":
                 text["en"] = safety.SUPPORTIVE_LINE["en"]
             yield _sse(
                 "done",
-                {"id": "a-" + uuid.uuid4().hex[:8], "role": "assistant",
-                 "emotion": "sadness", "time": _now(), "text": text, "kind": "crisis"},
+                {
+                    "id": "a-" + uuid.uuid4().hex[:8],
+                    "role": "assistant",
+                    "emotion": "sadness",
+                    "time": _now(),
+                    "text": text,
+                    "kind": "crisis",
+                },
             )
             asyncio.create_task(_notify_trusted_person(req.user_name, req.trusted_person_email))
             return
@@ -235,10 +244,9 @@ async def chat_ui(request: Request) -> StreamingResponse:
     for m in reversed(msgs):
         if m.get("role") == "user":
             parts = m.get("parts") or []
-            user_text = (
-                " ".join(p.get("text", "") for p in parts if p.get("type") == "text").strip()
-                or m.get("content", "")
-            )
+            user_text = " ".join(
+                p.get("text", "") for p in parts if p.get("type") == "text"
+            ).strip() or m.get("content", "")
             break
     if not user_text:
         raise HTTPException(status_code=400, detail="no user message")
@@ -261,11 +269,19 @@ async def chat_ui(request: Request) -> StreamingResponse:
             lang = crisis.lang_hint
             line = safety.SUPPORTIVE_LINE.get(lang, safety.SUPPORTIVE_LINE["en"])
             logger.info("crisis_gate", source="chat_ui", lang=lang, pattern=crisis.pattern[:40])
-            yield _ai({
-                "type": "data-meta", "id": "meta",
-                "data": {"emotion": "sadness", "intent": None, "language": lang,
-                         "sources": [], "kind": "crisis"},
-            })
+            yield _ai(
+                {
+                    "type": "data-meta",
+                    "id": "meta",
+                    "data": {
+                        "emotion": "sadness",
+                        "intent": None,
+                        "language": lang,
+                        "sources": [],
+                        "kind": "crisis",
+                    },
+                }
+            )
             yield _ai({"type": "text-start", "id": tid})
             yield _ai({"type": "text-delta", "id": tid, "delta": line})
             yield _ai({"type": "text-end", "id": tid})
@@ -283,16 +299,18 @@ async def chat_ui(request: Request) -> StreamingResponse:
         prior_lang = mem.get_prior_lang(session_id)
         history = mem.get_history(session_id)
         result = await orchestrator.analyze(user_text, session_lang=prior_lang)
-        yield _ai({
-            "type": "data-meta",
-            "id": "meta",
-            "data": {
-                "emotion": result.emotion,
-                "intent": result.intent,
-                "language": result.language,
-                "sources": result.sources,
-            },
-        })
+        yield _ai(
+            {
+                "type": "data-meta",
+                "id": "meta",
+                "data": {
+                    "emotion": result.emotion,
+                    "intent": result.intent,
+                    "language": result.language,
+                    "sources": result.sources,
+                },
+            }
+        )
 
         # The LLM picks a generative-UI widget (mental-health turns only), concurrently.
         widget_task = None

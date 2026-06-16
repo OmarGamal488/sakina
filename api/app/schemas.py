@@ -23,9 +23,9 @@ class ChatRequest(BaseModel):
     """Incoming user message."""
 
     message: str = Field(..., min_length=1)
-    lang: str | None = None          # optional UI language hint (ISO 639-1)
+    lang: str | None = None  # optional UI language hint (ISO 639-1)
     session_lang: str | None = None  # the previous turn's detected language (robustness prior)
-    session_id: str | None = None    # session key for Redis conversation memory + prior_lang
+    session_id: str | None = None  # session key for Redis conversation memory + prior_lang
     trusted_person_email: str | None = None
     user_name: str | None = None
 
