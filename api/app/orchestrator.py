@@ -162,19 +162,41 @@ _llm: OpenAI | None = None
 def _get_llm() -> OpenAI:
     global _llm
     if _llm is None:
-        _llm = OpenAI(base_url=settings.lightning_base_url, api_key=settings.lightning_api_key)
+        # The OpenAI client refuses to construct with an empty api_key, which would
+        # crash startup / health on a keyless container (CI, fresh deploy). Pass a
+        # placeholder so it constructs; a real call still 401s clearly if the key is
+        # genuinely missing — but /health and boot stay green without secrets.
+        _llm = OpenAI(
+            base_url=settings.lightning_base_url,
+            api_key=settings.lightning_api_key or "missing-key",
+        )
     return _llm
 
 
 def warmup() -> None:
-    """Load all model singletons once (blocking).  Called from the app lifespan."""
+    """Warm the model singletons at startup.
+
+    Default (``WARMUP_HEAVY`` unset/false): load only the CHEAP, local-artifact
+    singletons (language detector + memory) so the container becomes healthy in
+    seconds without any API keys. The LLM client and the heavy HF models —
+    emotion+NLLB (~5 GB) and RAG
+    bge-m3+reranker (~4.6 GB) — stay lazy and load on the first request that needs
+    them. This keeps cold starts fast and the image small for free-tier hosting.
+
+    Set ``WARMUP_HEAVY=1`` to pre-load everything (useful locally / on a warm box).
+    """
+    import os
+
     language_id.get_detector()
-    emotion_mod.get_classifier()
-    intent_mod.get_classifier()
-    rag_mod.get_retriever()
     memory.get_memory()
-    _get_llm()
-    logger.info("orchestrator_warm")
+    if os.getenv("WARMUP_HEAVY", "").lower() in ("1", "true", "yes"):
+        _get_llm()
+        emotion_mod.get_classifier()
+        intent_mod.get_classifier()
+        rag_mod.get_retriever()
+        logger.info("orchestrator_warm", heavy=True)
+    else:
+        logger.info("orchestrator_warm", heavy=False)
 
 
 async def analyze(
