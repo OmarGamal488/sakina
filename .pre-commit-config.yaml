@@ -1,0 +1,21 @@
+# Pre-commit hooks for the Sakina backend.
+# Linter + formatter as required by the MLOps rubric (Repository Setup).
+# Pinned to a stable ruff-pre-commit release matching the project's ruff 0.7.x.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.7.0
+    hooks:
+      # Linter (auto-fixes what it safely can).
+      - id: ruff
+        args: [--fix]
+      # Formatter.
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: [--maxkb=2048]
