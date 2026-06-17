@@ -139,6 +139,10 @@ The backend API is deployed on **Hugging Face Spaces** (Docker runtime, HTTPS en
 - Health check: [`/health`](https://HamzaHendy-sakina-api.hf.space/health)
 - Interactive docs: [`/docs`](https://HamzaHendy-sakina-api.hf.space/docs)
 
+The frontend ([forked from `ishraq-hassan/chatbot-frontend`](https://github.com/ishraq-hassan/chatbot-frontend)) is deployed on GitHub Pages and points at the API above:
+
+**Live frontend → https://hamza-hesham-hendy.github.io/chatbot-frontend/**
+
 The Docker image is also published to the GitHub Container Registry at `ghcr.io/omargamal488/sakina`.
 
 ## CI/CD
