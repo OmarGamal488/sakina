@@ -104,6 +104,28 @@ uv run jupyter lab     # open notebooks/01..04 and Run All
 cd demo && python3 -m http.server 8000   # http://localhost:8000
 ```
 
+## Deployment
+
+The backend API is deployed on **Hugging Face Spaces** (Docker runtime, HTTPS enabled):
+
+**Live API → https://HamzaHendy-sakina-api.hf.space**
+
+- Health check: [`/health`](https://HamzaHendy-sakina-api.hf.space/health)
+- Interactive docs: [`/docs`](https://HamzaHendy-sakina-api.hf.space/docs)
+
+The Docker image is also published to the GitHub Container Registry at `ghcr.io/omargamal488/sakina`.
+
+## CI/CD
+
+A GitHub Actions workflow ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs on every push to the **`mlops-final`** branch. (This repository hosts the original NLP project on `main` and the MLOps deliverable on `mlops-final`, so CI is scoped to the latter to avoid running against the NLP codebase.) The pipeline runs four sequential jobs:
+
+1. **Lint** — `ruff check` + `ruff format --check`
+2. **Test** — the full `pytest` suite (must pass)
+3. **Build & Push** — builds the Docker image and pushes it to GHCR
+4. **Deploy** — pushes the app to the Hugging Face Space (only runs if lint + tests pass)
+
+All actions are official/verified and pinned to stable versions.
+
 ## Monitoring Metrics
 
 The API is instrumented with [OpenTelemetry](https://opentelemetry.io/) and exports metrics via OTLP to an OTel Collector, which forwards them to [Axiom](https://axiom.co/). Five instruments cover the three required categories:
