@@ -54,6 +54,32 @@ your message
 scikit-learn, Qdrant, Redis, Lightning AI (`gpt-oss-120b`). **Frontend:** React 18,
 TypeScript, Vite, Tailwind, Vercel AI SDK. **Tooling:** `uv` workspace, `ruff`, `pytest`, `vitest`.
 
+## Model Comparison
+
+Each pipeline stage was chosen by benchmarking candidates on held-out data. The selected model is in **bold**.
+
+**Language detection** — three classifiers on shared TF-IDF `char_wb` n-gram features (20 languages):
+
+| Model | Test accuracy | Macro-F1 | Weakest language (`sw`) |
+|---|---|---|---|
+| Logistic Regression | 0.9953 | 0.9953 | 0.9661 |
+| Naive Bayes | 0.9950 | 0.9950 | 0.9680 |
+| **Calibrated LinearSVC** ✅ | **0.9959** | **0.9959** | **0.9708** |
+
+> LinearSVC wins on every metric; `CalibratedClassifierCV` also exposes `predict_proba` for the lingua fallback.
+
+**Emotion** — same DistilBERT classifier, varying the translation method (pooled macro-F1 across 20 languages, n=1200):
+
+| Method | Pooled macro-F1 |
+|---|---|
+| **NLLB-200-distilled-1.3B** ✅ | **0.8975** |
+| NLLB-200-distilled-600M | 0.8806 |
+| LLM `gpt-oss-120b` (translate) | 0.8759 |
+| LLM `gpt-oss-20b` (translate) | 0.7983 |
+| LLM `gpt-oss-20b` (direct, no translation) | 0.4919 |
+
+> NLLB-1.3B wins pooled (+1.7pp over 600M, better in 13/20 languages), is free/local, and costs 0 API calls. English-only test: accuracy 0.927, macro-F1 0.882.
+
 ## Installation
 
 **Prerequisites:** Python 3.11, [`uv`](https://docs.astral.sh/uv/), Node 18+, and accounts for
