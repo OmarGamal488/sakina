@@ -104,6 +104,45 @@ uv run jupyter lab     # open notebooks/01..04 and Run All
 cd demo && python3 -m http.server 8000   # http://localhost:8000
 ```
 
+## Monitoring Metrics
+
+The API is instrumented with [OpenTelemetry](https://opentelemetry.io/) and exports metrics via OTLP to an OTel Collector, which forwards them to [Axiom](https://axiom.co/). Five instruments cover the three required categories:
+
+**Model / NLP**
+
+| Metric | Type | Why |
+|---|---|---|
+| `sakina.chat.requests` | Counter (by intent) | Tracks intent distribution — shows which intents are most common and flags model drift if the distribution shifts unexpectedly |
+| `sakina.chat.latency` | Histogram (ms) | End-to-end response latency — catches slowdowns in RAG retrieval or LLM generation before users notice |
+
+**Data**
+
+| Metric | Type | Why |
+|---|---|---|
+| `sakina.message.length` | Histogram (chars) | Input size distribution — very short messages may signal bot traffic; very long ones may expose edge cases in the pipeline |
+| `sakina.feedback.votes` | Counter (up / down) | Helpfulness ratio — direct user signal on response quality over time |
+
+**Server**
+
+| Metric | Type | Why |
+|---|---|---|
+| `sakina.http.errors` | Counter (by status code) | Error rate and reliability — 4xx/5xx spikes indicate broken clients or backend failures |
+
+## System Monitoring
+
+Metrics flow: **Sakina API → OTLP/gRPC (port 4317) → OTel Collector → Axiom**.
+
+Run the full observability stack locally:
+
+```bash
+# copy api/.env.example → api/.env and fill in AXIOM_TOKEN + AXIOM_DATASET
+docker compose up --build
+```
+
+Send traffic to `http://localhost:8000/chat` and watch metrics appear in your Axiom dataset.
+
+![Axiom Dashboard](docs/screenshots/axiom-dashboard.png)
+
 ## Team
 
 ITI AI Track · NLP · Intake 46
