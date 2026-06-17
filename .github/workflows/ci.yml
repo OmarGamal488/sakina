@@ -103,8 +103,8 @@ jobs:
           fi
 
           # HF Docker Spaces are configured via YAML frontmatter in the Space's
-          # README. Prepend it here (CI workspace only — never pushed to GitHub)
-          # so HF knows to build the Dockerfile and route to port 8000.
+          # README. Build it here so HF knows to build the Dockerfile and route
+          # to port 8000.
           cat > hf_readme.md <<'EOF'
           ---
           title: Sakina API
@@ -118,15 +118,23 @@ jobs:
 
           EOF
           cat README.md >> hf_readme.md
-          mv hf_readme.md README.md
 
-          # Re-init as a fresh repo so the large model artifacts are committed
-          # straight into Git LFS (HF rejects non-LFS files over 10 MB). Doing
-          # this from a clean history avoids fragile in-place LFS migration.
-          rm -rf .git
+          # Assemble a MINIMAL Space repo — only the files the Dockerfile builds
+          # from. This keeps the Space lean and, crucially, avoids pushing the
+          # presentation/frontend binaries that HF's hub rejects. The only
+          # binary artifacts left (bm25_index.pkl, lang_id.joblib) go into LFS.
+          SPACE_DIR="$RUNNER_TEMP/space"
+          rm -rf "$SPACE_DIR"
+          mkdir -p "$SPACE_DIR/api"
+          cp Dockerfile .dockerignore pyproject.toml uv.lock "$SPACE_DIR/"
+          cp hf_readme.md "$SPACE_DIR/README.md"
+          cp api/pyproject.toml "$SPACE_DIR/api/"
+          cp -r api/app "$SPACE_DIR/api/app"
+
+          cd "$SPACE_DIR"
           git init -q
           git lfs install --local
-          git lfs track "*.joblib" "*.pkl" "*.mp3"
+          git lfs track "*.joblib" "*.pkl"
           git config user.email "ci@github.com"
           git config user.name "GitHub Actions"
           git add .gitattributes
