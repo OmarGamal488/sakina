@@ -39,7 +39,7 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv sync --frozen --all-packages --group dev
+        run: uv sync --frozen --all-packages --all-extras
 
       - name: Run unit tests
         run: uv run pytest api/tests/ -v
@@ -101,6 +101,30 @@ jobs:
             echo "HF_TOKEN or HF_SPACE secret not set — skipping deploy."
             exit 0
           fi
+
+          # HF Docker Spaces are configured via YAML frontmatter in the Space's
+          # README. Prepend it here (CI workspace only — never pushed to GitHub)
+          # so HF knows to build the Dockerfile and route to port 8000.
+          cat > hf_readme.md <<'EOF'
+          ---
+          title: Sakina API
+          emoji: 🧠
+          colorFrom: indigo
+          colorTo: purple
+          sdk: docker
+          app_port: 8000
+          pinned: false
+          ---
+
+          EOF
+          cat README.md >> hf_readme.md
+          mv hf_readme.md README.md
+
           git config user.email "ci@github.com"
           git config user.name "GitHub Actions"
-          git push https://hamza-hesham-hendy:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE} HEAD:main --force
+          git add README.md
+          git commit -m "deploy: inject HF Space config"
+
+          # Username for HF git auth is the Space namespace (token owner).
+          HF_USER="${HF_SPACE%%/*}"
+          git push https://${HF_USER}:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE} HEAD:main --force

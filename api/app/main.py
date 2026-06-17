@@ -199,9 +199,7 @@ async def chat_json(req: ChatRequest) -> ChatJSONResponse:
             line = safety.SUPPORTIVE_LINE.get(lang, safety.SUPPORTIVE_LINE["en"])
             logger.info("crisis_gate", source="chat_json", lang=lang, pattern=crisis.pattern[:40])
             if req.trusted_person_email:
-                asyncio.create_task(
-                    _notify_trusted_person(req.user_name, req.trusted_person_email)
-                )
+                asyncio.create_task(_notify_trusted_person(req.user_name, req.trusted_person_email))
             telemetry.record_chat("crisis", len(req.message), elapsed_ms())
             return ChatJSONResponse(
                 response=line, intent=None, emotion="sadness", language=lang, kind="crisis"
@@ -224,9 +222,7 @@ async def chat_json(req: ChatRequest) -> ChatJSONResponse:
             mem.append_turn(sid, "assistant", reply)
             mem.set_prior_lang(sid, result.language)
 
-        logger.info(
-            "chat_json", intent=result.intent, emotion=result.emotion, lang=result.language
-        )
+        logger.info("chat_json", intent=result.intent, emotion=result.emotion, lang=result.language)
         # model/NLP metrics: intent distribution + latency; data metric: message length.
         telemetry.record_chat(result.intent, len(req.message), elapsed_ms())
         return ChatJSONResponse(
