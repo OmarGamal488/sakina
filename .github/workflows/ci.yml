@@ -22,10 +22,10 @@ jobs:
           enable-cache: true
 
       - name: Lint with ruff
-        run: uv run --package sakina-api ruff check --exclude notebooks/ .
+        run: uvx ruff@0.7.0 check --exclude notebooks/ .
 
       - name: Check formatting with ruff
-        run: uv run --package sakina-api ruff format --check --exclude notebooks/ .
+        run: uvx ruff@0.7.0 format --check --exclude notebooks/ .
 
   test:
     name: Test
@@ -39,10 +39,10 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv sync --all-packages --group dev
+        run: uv sync --frozen --all-packages --group dev
 
       - name: Run unit tests
-        run: uv run --package sakina-api pytest api/tests/ -v
+        run: uv run pytest api/tests/ -v
 
   docker:
     name: Build & Push Docker Image
