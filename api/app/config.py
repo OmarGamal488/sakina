@@ -44,6 +44,9 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.5-flash"
 
+    # --- Hugging Face ─────────────────────────────────────────────────────────
+    hf_token: str = ""
+
     # --- OpenTelemetry → Collector → Axiom ---
     # OTLP/gRPC endpoint of the Collector. Empty → telemetry no-ops (local/CI/tests).
     otel_exporter_otlp_endpoint: str = ""
@@ -107,3 +110,5 @@ os.environ["TRANSFORMERS_CACHE"] = str(settings.hf_hub_cache_dir)
 os.environ["SENTENCE_TRANSFORMERS_HOME"] = str(settings.sentence_transformers_cache_dir)
 os.environ["HF_HUB_DISABLE_XET"] = "1"
 os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+if settings.hf_token:
+    os.environ["HF_TOKEN"] = settings.hf_token

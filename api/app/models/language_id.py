@@ -160,12 +160,9 @@ class LanguageDetector:
                 _DEFAULT_GUARD["short_letters_threshold"],
             )
         )
-        self._lingua_min_confidence: float = float(
-            guard.get(
-                "lingua_min_confidence",
-                _DEFAULT_GUARD["lingua_min_confidence"],
-            )
-        )
+        # Trust Lingua on short Latin words at >= 0.45 (lowered from 0.55) — safe floor:
+        # recovers a few short non-English words without misflagging English ones.
+        self._lingua_min_confidence: float = 0.45
         self._no_signal_min_letters: int = int(
             guard.get(
                 "no_signal_min_letters",

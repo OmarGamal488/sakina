@@ -1501,6 +1501,83 @@
       border-radius: 50%;
     }
 
+    .shot-fig { margin: 18px 0 0; }
+    .shot {
+      display: block;
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(99, 215, 255, .28);
+      background: rgba(255, 255, 255, .04);
+      box-shadow: 0 0 38px rgba(51, 214, 255, .16), 0 16px 44px rgba(0, 0, 0, .42);
+    }
+    .shot-cap {
+      margin-top: 11px;
+      font-size: .82rem;
+      letter-spacing: .01em;
+      line-height: 1.45;
+      color: rgba(247, 251, 255, .58);
+      text-align: center;
+    }
+
+    /* on-demand diagram button + lightbox (supplementary visuals) */
+    .diagram-btn {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 14px;
+      font: inherit; font-size: .8rem; font-weight: 600; letter-spacing: .02em; cursor: pointer;
+      color: #cdf4ff; background: rgba(51, 214, 255, .10);
+      border: 1px solid rgba(99, 215, 255, .42); border-radius: 999px; padding: 8px 15px;
+      transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+    .diagram-btn:hover { background: rgba(51, 214, 255, .2); transform: translateY(-2px); box-shadow: 0 0 24px rgba(51, 214, 255, .32); }
+    .diagram-btn svg { width: 15px; height: 15px; flex: none; }
+
+    .lightbox {
+      position: fixed; inset: 0; z-index: 200; display: none;
+      align-items: center; justify-content: center; padding: 5vh 4vw;
+      background: rgba(4, 7, 18, .9); backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px);
+    }
+    .lightbox.open { display: flex; animation: lbFade .26s ease; }
+    @keyframes lbFade { from { opacity: 0; transform: scale(.985); } to { opacity: 1; transform: none; } }
+    .lightbox figure { margin: 0; max-width: min(1120px, 94vw); display: flex; flex-direction: column; gap: 14px; align-items: center; }
+    .lightbox img {
+      max-width: 100%; max-height: 78vh; object-fit: contain; border-radius: 14px; background: #0a1024;
+      border: 1px solid rgba(99, 215, 255, .35);
+      box-shadow: 0 0 64px rgba(51, 214, 255, .22), 0 30px 80px rgba(0, 0, 0, .55);
+    }
+    .lightbox figcaption { font-size: .9rem; color: rgba(247, 251, 255, .76); text-align: center; max-width: 72ch; line-height: 1.5; }
+    .lightbox figcaption strong { color: #cdf4ff; }
+    .lb-close {
+      position: absolute; top: 22px; right: 26px; width: 44px; height: 44px; border-radius: 12px; cursor: pointer;
+      font-size: 1.35rem; line-height: 1; color: #dff; background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(99, 215, 255, .3); transition: background .2s ease, transform .2s ease;
+    }
+    .lb-close:hover { background: rgba(51, 214, 255, .2); transform: rotate(90deg); }
+    .lb-hint { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: rgba(247, 251, 255, .4); }
+
+    /* language guard cascade diagram */
+    .guard-cascade { display: grid; grid-template-columns: 1.45fr .85fr; gap: 22px; margin-top: 12px; align-items: start; }
+    @media (max-width: 1100px) { .guard-cascade { grid-template-columns: 1fr; } }
+    .gc-flow { display: flex; flex-direction: column; }
+    .gc-input { align-self: flex-start; font-size: .74rem; letter-spacing: .04em; color: #aeb9d4;
+      border: 1px dashed rgba(99, 215, 255, .35); border-radius: 999px; padding: 5px 14px; margin-bottom: 4px; }
+    .gc-step { display: flex; flex-direction: column; }
+    .gc-card { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 13px;
+      background: rgba(255, 255, 255, .045); border: 1px solid rgba(255, 255, 255, .10);
+      border-left: 3px solid var(--c, #33d6ff); border-radius: 13px; padding: 8px 15px;
+      box-shadow: 0 0 24px -10px var(--c, #33d6ff); }
+    .gc-num { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center;
+      font-weight: 800; font-size: .82rem; color: #04121a; background: var(--c, #33d6ff); }
+    .gc-test .q { display: block; font-weight: 700; color: #f7fbff; font-size: .9rem; }
+    .gc-test .sub { display: block; color: #9aa6c4; font-size: .71rem; margin-top: 1px; line-height: 1.25; }
+    .gc-out { text-align: right; max-width: 250px; }
+    .gc-out .tag { display: block; font-size: .56rem; letter-spacing: .14em; text-transform: uppercase; color: var(--c, #33d6ff); font-weight: 700; }
+    .gc-out .val { font-size: .77rem; color: #dfe9ff; font-weight: 600; line-height: 1.25; }
+    .gc-else { font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: #6f7da0; padding: 2px 0 2px 14px; }
+    .gc-side { display: flex; flex-direction: column; gap: 14px; }
+    .script-map { display: flex; flex-direction: column; gap: 7px; margin-top: 10px; }
+    .sm-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: .8rem; }
+    .sm-row b { color: #cdf4ff; font-weight: 600; }
+    .sm-row .codes { display: flex; gap: 5px; }
+
     .dot-sphere {
       position: relative;
       width: min(360px, 100%);
@@ -1930,7 +2007,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Sakina Technical Keynote</span>
-          <span class="slide-count">01 / 20</span>
+          <span class="slide-count">01 / 21</span>
         </div>
         <div class="slide-grid wide-left">
           <div class="copy-stack">
@@ -1972,7 +2049,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Ordered Runtime Modules</span>
-          <span class="slide-count">02 / 20</span>
+          <span class="slide-count">02 / 21</span>
         </div>
         <div class="copy-stack">
           <h2>The turn is a cinematic pipeline, not a single prompt.</h2>
@@ -2000,7 +2077,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">User Input Intake</span>
-          <span class="slide-count">03 / 20</span>
+          <span class="slide-count">03 / 21</span>
         </div>
         <div class="slide-grid">
           <div class="copy-stack">
@@ -2042,7 +2119,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Crisis Management Gate</span>
-          <span class="slide-count">04 / 20</span>
+          <span class="slide-count">04 / 21</span>
         </div>
         <div class="slide-grid wide-left">
           <div class="copy-stack">
@@ -2074,7 +2151,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Language Detection</span>
-          <span class="slide-count">05 / 20</span>
+          <span class="slide-count">05 / 21</span>
         </div>
         <div class="slide-grid">
           <div class="copy-stack">
@@ -2098,6 +2175,7 @@
                 <li><span>Preprocess: strip URLs, Unicode NFKC normalization, lowercase.</span></li>
                 <li><span>Warmed once at FastAPI startup through <strong>orchestrator.warmup()</strong>.</span></li>
               </ul>
+              <button class="diagram-btn" onclick="openShot('Explaining%20Images/TF-IDF.png','<strong>TF-IDF</strong> — character n-gram term weighting, the feature space behind the language classifier.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 13l5-4 5 4 3-2 5 4"/><circle cx="8" cy="8.5" r="1.3"/></svg> View TF-IDF diagram</button>
             </div>
             <div class="glass panel">
               <h3>Why it matters</h3>
@@ -2113,7 +2191,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Language Guard and Notebook</span>
-          <span class="slide-count">06 / 20</span>
+          <span class="slide-count">06 / 21</span>
         </div>
         <div class="slide-grid">
           <div class="copy-stack">
@@ -2131,8 +2209,8 @@
               <div class="guard-stack">
                 <div class="guard-row"><strong>No signal</strong><span>Use prior language if present; otherwise English.</span></div>
                 <div class="guard-row"><strong>Non-Latin</strong><span>Restrict candidates by Unicode script: Arabic, Cyrillic, Greek, Thai, Devanagari, Han/Japanese.</span></div>
-                <div class="guard-row"><strong>Short Latin</strong><span>Below 7 letters: prior language, then Lingua >= 0.55, then English.</span></div>
-                <div class="guard-row"><strong>Normal text</strong><span>Trust TF-IDF >= 0.6; otherwise fall back to Lingua.</span></div>
+                <div class="guard-row"><strong>Short Latin</strong><span>Below 7 letters: prior language, then Lingua >= 0.45, then English.</span></div>
+                <div class="guard-row"><strong>Normal text</strong><span>Trust TF-IDF >= 0.8; otherwise fall back to Lingua.</span></div>
               </div>
             </div>
             <div class="glass panel">
@@ -2149,11 +2227,74 @@
       </div>
     </section>
 
+    <section class="slide" data-title="Guard Cascade">
+      <div class="slide-shell">
+        <div class="slide-top">
+          <span class="eyebrow">Language Guard · Decision Cascade</span>
+          <span class="slide-count">07 / 21</span>
+        </div>
+        <div class="copy-stack">
+          <h2>The guard is a four-step fall-through, not the raw classifier.</h2>
+          <p class="lead">Each message falls through the checks top to bottom and exits at the first match &mdash; what makes short, mixed-script, or signal-free chat input safe.</p>
+        </div>
+        <div class="guard-cascade">
+          <div class="gc-flow">
+            <div class="gc-input">Input message &rarr; count letters (raw text)</div>
+            <div class="gc-step" style="--c:#33d6ff">
+              <div class="gc-card">
+                <span class="gc-num">1</span>
+                <div class="gc-test"><span class="q">Fewer than 2 letters?</span><span class="sub">emoji, digits, symbols &mdash; no language signal</span></div>
+                <div class="gc-out"><span class="tag">exit &rarr;</span><span class="val">prior language, else English</span></div>
+              </div>
+              <div class="gc-else">else &darr;</div>
+            </div>
+            <div class="gc-step" style="--c:#9d5cff">
+              <div class="gc-card">
+                <span class="gc-num">2</span>
+                <div class="gc-test"><span class="q">A non-Latin script dominates?</span><span class="sub">restrict to that script's languages (short token &rarr; trust prior)</span></div>
+                <div class="gc-out"><span class="tag">exit &rarr;</span><span class="val">best label within that script</span></div>
+              </div>
+              <div class="gc-else">else &darr;</div>
+            </div>
+            <div class="gc-step" style="--c:#ffd166">
+              <div class="gc-card">
+                <span class="gc-num">3</span>
+                <div class="gc-test"><span class="q">Latin?</span><span class="sub">"ok", "danke" &mdash; short Latin, where TF-IDF is unreliable</span></div>
+                <div class="gc-out"><span class="tag">exit &rarr;</span><span class="val">prior &rarr; Lingua &ge; 0.45 &rarr; English</span></div>
+              </div>
+              <div class="gc-else">else &darr;</div>
+            </div>
+            <div class="gc-step" style="--c:#38f8ad">
+              <div class="gc-card">
+                <span class="gc-num">4</span>
+                <div class="gc-test"><span class="q">Normal length &mdash; TF-IDF confidence &ge; 0.8?</span><span class="sub">raised from 0.6 to stop confident short-phrase errors</span></div>
+                <div class="gc-out"><span class="tag">yes &rarr; trust TF-IDF</span><span class="val">no &rarr; defer to Lingua</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="gc-side">
+            <div class="glass panel">
+              <h3>Non-Latin script map</h3>
+              <div class="script-map">
+                <div class="sm-row"><b>Arabic</b><span class="codes"><span class="lang-chip">ar</span><span class="lang-chip">ur</span></span></div>
+                <div class="sm-row"><b>Cyrillic</b><span class="codes"><span class="lang-chip">bg</span><span class="lang-chip">ru</span></span></div>
+                <div class="sm-row"><b>Greek</b><span class="codes"><span class="lang-chip">el</span></span></div>
+                <div class="sm-row"><b>Thai</b><span class="codes"><span class="lang-chip">th</span></span></div>
+                <div class="sm-row"><b>Devanagari</b><span class="codes"><span class="lang-chip">hi</span></span></div>
+                <div class="sm-row"><b>Han / Japanese</b><span class="codes"><span class="lang-chip">zh</span><span class="lang-chip">ja</span></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cue"><span>First matching rule wins; the classifier runs at full trust only on normal-length text.</span><span class="line"></span><span>Lingua is the second-opinion detector for the hard cases.</span></div>
+      </div>
+    </section>
+
     <section class="slide" data-title="Emotion">
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Emotion Classifier</span>
-          <span class="slide-count">07 / 20</span>
+          <span class="slide-count">08 / 21</span>
         </div>
         <div class="slide-grid wide-right">
           <div class="glass panel large">
@@ -2174,12 +2315,14 @@
                 <span class="tiny">Translation</span>
                 <span class="big">NLLB-200 distilled 1.3B</span>
                 <p class="quiet">Detected language -> English on CPU.</p>
+                <button class="diagram-btn" onclick="openShot('Explaining%20Images/Seq2Seq.png','<strong>Seq2Seq</strong> — the encoder–decoder architecture behind NLLB-200 translation.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 13l5-4 5 4 3-2 5 4"/><circle cx="8" cy="8.5" r="1.3"/></svg> Seq2Seq diagram</button>
               </div>
               <div class="arrow-glow" aria-hidden="true"></div>
               <div class="glass process-card">
                 <span class="tiny">Classification</span>
                 <span class="big">DistilBERT emotion</span>
                 <p class="quiet">bhadresh-savani/distilbert-base-uncased-emotion.</p>
+                <button class="diagram-btn" onclick="openShot('Explaining%20Images/Transformer.png','<strong>Transformer</strong> — the architecture behind DistilBERT (and the gpt-oss LLMs).')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 13l5-4 5 4 3-2 5 4"/><circle cx="8" cy="8.5" r="1.3"/></svg> Transformer diagram</button>
               </div>
             </div>
             <ul class="key-list">
@@ -2197,7 +2340,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Emotion Evaluation</span>
-          <span class="slide-count">08 / 20</span>
+          <span class="slide-count">09 / 21</span>
         </div>
         <div class="slide-grid">
           <div class="copy-stack">
@@ -2229,7 +2372,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Intent Classifier / Router</span>
-          <span class="slide-count">09 / 20</span>
+          <span class="slide-count">10 / 21</span>
         </div>
         <div class="copy-stack">
           <h2>Intent is the switchboard for the rest of the turn.</h2>
@@ -2270,7 +2413,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Prompt Journey</span>
-          <span class="slide-count">10 / 20</span>
+          <span class="slide-count">11 / 21</span>
         </div>
         <div class="slide-grid">
           <div class="copy-stack">
@@ -2307,7 +2450,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Q&A RAG Activation</span>
-          <span class="slide-count">11 / 20</span>
+          <span class="slide-count">12 / 21</span>
         </div>
         <div class="slide-grid">
           <div class="copy-stack">
@@ -2335,6 +2478,7 @@
               <div class="score-cell"><strong>bge-m3</strong><span>1024-dimensional dense embeddings</span></div>
             </div>
             <p class="quiet" style="margin-top:18px">The corpus is English, so non-English user messages reuse the NLLB-translated emotion text as the retrieval query.</p>
+            <button class="diagram-btn" onclick="openShot('Explaining%20Images/RAG.png','<strong>RAG</strong> — retrieve grounded counselor notes, then compose the reply from them.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 13l5-4 5 4 3-2 5 4"/><circle cx="8" cy="8.5" r="1.3"/></svg> View RAG diagram</button>
           </div>
         </div>
         <div class="cue"><span>RAG returns notes, not the final answer.</span><span class="line"></span><span>The generator remains Lightning gpt-oss-120b.</span></div>
@@ -2345,11 +2489,12 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Hybrid Retrieval Flow</span>
-          <span class="slide-count">12 / 20</span>
+          <span class="slide-count">13 / 21</span>
         </div>
         <div class="copy-stack">
           <h2>Keyword precision and semantic recall converge before reranking.</h2>
           <p class="lead">BM25 catches exact terms. Dense search catches paraphrases. RRF fuses ranked lists without comparing incompatible scores.</p>
+          <button class="diagram-btn" onclick="openShot('Explaining%20Images/Hybrid%20Search.png','<strong>Hybrid Search</strong> — BM25 (lexical) + dense (semantic) retrieval fused by RRF, then reranked.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 13l5-4 5 4 3-2 5 4"/><circle cx="8" cy="8.5" r="1.3"/></svg> View Hybrid Search diagram</button>
         </div>
         <div class="retrieval-diagram">
           <div class="retrieval-row">
@@ -2391,7 +2536,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">RAG Evaluation and Cost</span>
-          <span class="slide-count">13 / 20</span>
+          <span class="slide-count">14 / 21</span>
         </div>
         <div class="slide-grid">
           <div class="copy-stack">
@@ -2424,7 +2569,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Response Composition and Streaming</span>
-          <span class="slide-count">14 / 20</span>
+          <span class="slide-count">15 / 21</span>
         </div>
         <div class="slide-grid">
           <div class="copy-stack">
@@ -2455,7 +2600,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Streaming UI Contract</span>
-          <span class="slide-count">15 / 20</span>
+          <span class="slide-count">16 / 21</span>
         </div>
         <div class="slide-grid wide-right">
           <div class="glass stream-visual">
@@ -2489,7 +2634,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Message / Session Memory</span>
-          <span class="slide-count">16 / 20</span>
+          <span class="slide-count">17 / 21</span>
         </div>
         <div class="slide-grid">
           <div class="copy-stack">
@@ -2519,7 +2664,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Text to Speech</span>
-          <span class="slide-count">17 / 20</span>
+          <span class="slide-count">18 / 21</span>
         </div>
         <div class="slide-grid wide-left">
           <div class="copy-stack">
@@ -2556,7 +2701,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Adjacent Feature Boundaries</span>
-          <span class="slide-count">18 / 20</span>
+          <span class="slide-count">19 / 21</span>
         </div>
         <div class="slide-grid">
           <div class="copy-stack">
@@ -2586,9 +2731,12 @@
             </div>
           </div>
           <div class="glass panel large">
-            <h3>Boundary rule</h3>
-            <p class="lead" style="font-size:1.05rem">Adjacent features may enrich the product, but they do not enter language detection, emotion classification, intent routing, RAG, or response generation.</p>
-            <div class="dot-sphere" data-dots="72" aria-hidden="true"></div>
+            <h3>The webhook layer (n8n)</h3>
+            <p class="lead" style="font-size:1.05rem">Adjacent features stay outside inference — but the letter / crisis-help flow is handled by an n8n webhook.</p>
+            <figure class="shot-fig">
+              <img class="shot" src="n8n.jpeg" alt="n8n webhook workflow for letter forwarding and crisis trusted-person help" />
+              <figcaption class="shot-cap">n8n workflow — future-self letters (<strong>intent = letter</strong>) &amp; crisis trusted-person alert (<strong>intent = help</strong>)</figcaption>
+            </figure>
           </div>
         </div>
         <div class="cue"><span>Feature isolation keeps the AI path easy to explain and debug.</span><span class="line"></span><span>The webhook layer handles future letters and crisis trusted-person contact.</span></div>
@@ -2599,7 +2747,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">Database / Storage Topology</span>
-          <span class="slide-count">19 / 20</span>
+          <span class="slide-count">20 / 21</span>
         </div>
         <div class="copy-stack">
           <h2>State is split by responsibility.</h2>
@@ -2630,7 +2778,7 @@
       <div class="slide-shell">
         <div class="slide-top">
           <span class="eyebrow">End-to-End Turn Timeline</span>
-          <span class="slide-count">20 / 20</span>
+          <span class="slide-count">21 / 21</span>
         </div>
         <div class="slide-grid wide-left">
           <div class="copy-stack">
@@ -2771,12 +2919,8 @@
         if (event.key === "End") goTo(slides.length - 1);
       });
 
-      window.addEventListener("wheel", (event) => {
-        if (Math.abs(event.deltaY) < 24 || wheelLocked) return;
-        wheelLocked = true;
-        goTo(index + (event.deltaY > 0 ? 1 : -1));
-        setTimeout(() => { wheelLocked = false; }, 720);
-      }, { passive: true });
+      // Mouse-wheel slide navigation disabled — scrolling no longer changes slides.
+      // Navigate with arrow keys, the prev/next buttons, the dot rail, or swipe.
 
       let touchStart = null;
       window.addEventListener("touchstart", (event) => {
@@ -2912,6 +3056,32 @@
       activate();
       setTimeout(() => document.body.classList.add("deck-ready"), 80);
       window.addEventListener("resize", buildSpheres);
+    })();
+  </script>
+
+  <!-- On-demand diagram lightbox (supplementary visuals) -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Diagram viewer">
+    <button class="lb-close" id="lbClose" aria-label="Close">&times;</button>
+    <figure>
+      <img id="lbImg" src="" alt="" />
+      <figcaption id="lbCap"></figcaption>
+    </figure>
+    <div class="lb-hint">click anywhere or press Esc to close</div>
+  </div>
+  <script>
+    (function () {
+      const lb = document.getElementById('lightbox');
+      const img = document.getElementById('lbImg');
+      const cap = document.getElementById('lbCap');
+      window.openShot = function (src, caption) {
+        img.src = src; img.alt = caption || ''; cap.innerHTML = caption || '';
+        lb.classList.add('open');
+      };
+      function close() { lb.classList.remove('open'); img.src = ''; }
+      window.closeShot = close;
+      lb.addEventListener('click', close);                 // click backdrop / image / close button
+      document.getElementById('lbClose').addEventListener('click', close);
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && lb.classList.contains('open')) close(); });
     })();
   </script>
 </body>
