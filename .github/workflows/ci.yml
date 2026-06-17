@@ -82,22 +82,25 @@ jobs:
           cache-to: type=gha,mode=max
 
   deploy:
-    name: Deploy
+    name: Deploy to Hugging Face Spaces
     needs: docker
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/mlops-final'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
 
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli@3.11.4
-
-      - name: Deploy to Railway
+      - name: Push to Hugging Face Space
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE: ${{ secrets.HF_SPACE }}
         run: |
-          if [ -z "$RAILWAY_TOKEN" ]; then
-            echo "RAILWAY_TOKEN secret not set — skipping deploy."
+          if [ -z "$HF_TOKEN" ] || [ -z "$HF_SPACE" ]; then
+            echo "HF_TOKEN or HF_SPACE secret not set — skipping deploy."
             exit 0
           fi
-          railway up --service sakina-api --detach
+          git config user.email "ci@github.com"
+          git config user.name "GitHub Actions"
+          git push https://hamza-hesham-hendy:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE} HEAD:main --force
