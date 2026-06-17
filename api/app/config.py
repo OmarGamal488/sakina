@@ -44,6 +44,9 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.5-flash"
 
+    # --- Hugging Face ─────────────────────────────────────────────────────────
+    hf_token: str = ""
+
     # comma-separated str (pydantic-settings JSON-decodes list fields, tripping on plain values)
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
     model_cache_dir: Path = _REPO_ROOT / "downloaded_models"
@@ -103,3 +106,5 @@ os.environ["TRANSFORMERS_CACHE"] = str(settings.hf_hub_cache_dir)
 os.environ["SENTENCE_TRANSFORMERS_HOME"] = str(settings.sentence_transformers_cache_dir)
 os.environ["HF_HUB_DISABLE_XET"] = "1"
 os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+if settings.hf_token:
+    os.environ["HF_TOKEN"] = settings.hf_token

@@ -78,6 +78,7 @@ class EmotionClassifier:
             nllb_id,
             cache_dir=settings.hf_hub_cache_dir,
             low_cpu_mem_usage=True,
+            use_safetensors=True,
         ).eval()
 
         logger.info("emotion_loaded", n_labels=len(self._labels))
