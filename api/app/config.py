@@ -44,6 +44,12 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.5-flash"
 
+    # --- OpenTelemetry → Collector → Axiom ---
+    # OTLP/gRPC endpoint of the Collector. Empty → telemetry no-ops (local/CI/tests).
+    otel_exporter_otlp_endpoint: str = ""
+    otel_service_name: str = "sakina-api"
+    otel_metric_export_interval_ms: int = 15000  # how often metrics flush to the Collector
+
     # comma-separated str (pydantic-settings JSON-decodes list fields, tripping on plain values)
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
     model_cache_dir: Path = _REPO_ROOT / "downloaded_models"

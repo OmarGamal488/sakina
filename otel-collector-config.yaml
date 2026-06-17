@@ -1,0 +1,36 @@
+# OpenTelemetry Collector — receives OTLP from the Sakina API and forwards
+# metrics to Axiom. Env vars (AXIOM_TOKEN, AXIOM_DATASET) come from the
+# environment / .env via docker-compose.
+#
+# Flow:  Sakina API --OTLP/gRPC:4317--> Collector --HTTPS--> Axiom
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+
+exporters:
+  # Axiom ingests OTLP over HTTP at /v1/metrics with a bearer token + dataset header.
+  otlphttp/axiom:
+    compression: gzip
+    endpoint: https://api.axiom.co
+    headers:
+      authorization: "Bearer ${env:AXIOM_TOKEN}"
+      x-axiom-dataset: "${env:AXIOM_DATASET}"
+  # Echo to the Collector's own logs so you can confirm data is flowing locally.
+  debug:
+    verbosity: normal
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlphttp/axiom, debug]

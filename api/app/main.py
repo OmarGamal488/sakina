@@ -26,7 +26,7 @@ from fastapi.responses import StreamingResponse
 from sse_starlette.sse import EventSourceResponse
 from starlette.concurrency import run_in_threadpool
 
-from app import memory, orchestrator, safety, widgets
+from app import memory, orchestrator, safety, telemetry, widgets
 from app import scribble as scribble_service
 from app import stt as stt_service
 from app import tts as tts_service
@@ -51,8 +51,9 @@ logger = structlog.get_logger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """App lifespan — warm the model singletons once at startup."""
+    """App lifespan — set up telemetry + warm the model singletons once at startup."""
     logger.info("sakina_api_start", model=settings.lightning_model)
+    telemetry.setup_telemetry()
     await run_in_threadpool(orchestrator.warmup)
     logger.info("sakina_api_ready")
     yield
@@ -60,6 +61,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Sakina API", version="0.1.0", lifespan=lifespan)
+telemetry.instrument_app(app)  # request count / latency / errors (server metrics)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
@@ -137,6 +139,7 @@ async def feedback(req: FeedbackRequest) -> dict:
         user_chars=len(req.user_message),
         bot_chars=len(req.bot_response),
     )
+    telemetry.record_feedback(req.vote)  # data metric: up/down ratio
     return {"status": "ok"}
 
 
@@ -188,40 +191,50 @@ async def chat_json(req: ChatRequest) -> ChatJSONResponse:
     Same pipeline as the SSE route, collected into one response: crisis gate →
     analyze → drain ``stream_reply`` → ``{response, intent, emotion, language}``.
     """
-    # Crisis-safety gate — model-free, before any RAG/LLM call.
-    crisis = safety.check_crisis(req.message)
-    if crisis.triggered:
-        lang = crisis.lang_hint
-        line = safety.SUPPORTIVE_LINE.get(lang, safety.SUPPORTIVE_LINE["en"])
-        logger.info("crisis_gate", source="chat_json", lang=lang, pattern=crisis.pattern[:40])
-        if req.trusted_person_email:
-            asyncio.create_task(_notify_trusted_person(req.user_name, req.trusted_person_email))
-        return ChatJSONResponse(
-            response=line, intent=None, emotion="sadness", language=lang, kind="crisis"
+    with telemetry.measure_latency() as elapsed_ms:
+        # Crisis-safety gate — model-free, before any RAG/LLM call.
+        crisis = safety.check_crisis(req.message)
+        if crisis.triggered:
+            lang = crisis.lang_hint
+            line = safety.SUPPORTIVE_LINE.get(lang, safety.SUPPORTIVE_LINE["en"])
+            logger.info("crisis_gate", source="chat_json", lang=lang, pattern=crisis.pattern[:40])
+            if req.trusted_person_email:
+                asyncio.create_task(
+                    _notify_trusted_person(req.user_name, req.trusted_person_email)
+                )
+            telemetry.record_chat("crisis", len(req.message), elapsed_ms())
+            return ChatJSONResponse(
+                response=line, intent=None, emotion="sadness", language=lang, kind="crisis"
+            )
+
+        mem = memory.get_memory()
+        sid = req.session_id or ""
+        session_lang = req.session_lang or mem.get_prior_lang(sid)
+        history = mem.get_history(sid)
+        result = await orchestrator.analyze(
+            req.message, lang_hint=req.lang, session_lang=session_lang
         )
+        parts: list[str] = []
+        async for tok in orchestrator.stream_reply(req.message, result, history):
+            parts.append(tok)
+        reply = "".join(parts).strip()
 
-    mem = memory.get_memory()
-    sid = req.session_id or ""
-    session_lang = req.session_lang or mem.get_prior_lang(sid)
-    history = mem.get_history(sid)
-    result = await orchestrator.analyze(req.message, lang_hint=req.lang, session_lang=session_lang)
-    parts: list[str] = []
-    async for tok in orchestrator.stream_reply(req.message, result, history):
-        parts.append(tok)
-    reply = "".join(parts).strip()
+        if sid:
+            mem.append_turn(sid, "user", req.message)
+            mem.append_turn(sid, "assistant", reply)
+            mem.set_prior_lang(sid, result.language)
 
-    if sid:
-        mem.append_turn(sid, "user", req.message)
-        mem.append_turn(sid, "assistant", reply)
-        mem.set_prior_lang(sid, result.language)
-
-    logger.info("chat_json", intent=result.intent, emotion=result.emotion, lang=result.language)
-    return ChatJSONResponse(
-        response=reply,
-        intent=result.intent,
-        emotion=result.emotion,
-        language=result.language,
-    )
+        logger.info(
+            "chat_json", intent=result.intent, emotion=result.emotion, lang=result.language
+        )
+        # model/NLP metrics: intent distribution + latency; data metric: message length.
+        telemetry.record_chat(result.intent, len(req.message), elapsed_ms())
+        return ChatJSONResponse(
+            response=reply,
+            intent=result.intent,
+            emotion=result.emotion,
+            language=result.language,
+        )
 
 
 @app.post("/chat/stream")
