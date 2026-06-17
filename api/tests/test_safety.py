@@ -8,7 +8,6 @@ QUIET on benign mental-health talk.
 from __future__ import annotations
 
 import pytest
-
 from app import safety
 
 CRISIS_EN = [

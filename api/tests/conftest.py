@@ -17,10 +17,9 @@ from __future__ import annotations
 from collections.abc import AsyncIterator
 
 import pytest
-from fastapi.testclient import TestClient
-
 from app import main, orchestrator
 from app.orchestrator import PipelineResult
+from fastapi.testclient import TestClient
 
 # A canned non-crisis analysis result the fake ``analyze`` returns by default.
 _FAKE_RESULT = PipelineResult(
