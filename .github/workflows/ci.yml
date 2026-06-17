@@ -120,11 +120,20 @@ jobs:
           cat README.md >> hf_readme.md
           mv hf_readme.md README.md
 
+          # Re-init as a fresh repo so the large model artifacts are committed
+          # straight into Git LFS (HF rejects non-LFS files over 10 MB). Doing
+          # this from a clean history avoids fragile in-place LFS migration.
+          rm -rf .git
+          git init -q
+          git lfs install --local
+          git lfs track "*.joblib" "*.pkl" "*.mp3"
           git config user.email "ci@github.com"
           git config user.name "GitHub Actions"
-          git add README.md
-          git commit -m "deploy: inject HF Space config"
+          git add .gitattributes
+          git add -A
+          git commit -q -m "deploy from GitHub Actions"
+          git branch -M main
 
           # Username for HF git auth is the Space namespace (token owner).
           HF_USER="${HF_SPACE%%/*}"
-          git push https://${HF_USER}:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE} HEAD:main --force
+          git push --force https://${HF_USER}:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE} main
