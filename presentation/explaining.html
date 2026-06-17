@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sakina Interactive Pipeline Explanations</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050816;
+      --ink: #f7fbff;
+      --muted: #aeb9d4;
+      --dim: #73809d;
+      --cyan: #33d6ff;
+      --purple: #9d5cff;
+      --magenta: #ff4fd8;
+      --green: #38f8ad;
+      --gold: #ffd166;
+      --rose: #ff6f91;
+      --line: rgba(156, 188, 255, .22);
+      --panel: rgba(12, 18, 42, .62);
+      --ease: cubic-bezier(.16, 1, .3, 1);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      background:
+        radial-gradient(ellipse at 18% 12%, rgba(51, 214, 255, .24), transparent 34%),
+        radial-gradient(ellipse at 86% 18%, rgba(157, 92, 255, .24), transparent 38%),
+        radial-gradient(ellipse at 54% 92%, rgba(56, 248, 173, .12), transparent 34%),
+        var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: -20%;
+      z-index: -2;
+      background: conic-gradient(from 130deg, transparent, rgba(51, 214, 255, .14), rgba(157, 92, 255, .18), transparent, rgba(56, 248, 173, .08), transparent);
+      filter: blur(70px);
+      animation: spin 34s linear infinite;
+    }
+
+    body::after {
+      animation-direction: reverse;
+      animation-duration: 46s;
+      opacity: .55;
+    }
+
+    .grid {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: .18;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(99, 215, 255, .13) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 215, 255, .13) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(circle at center, black, transparent 74%);
+      animation: drift 18s linear infinite;
+    }
+
+    main {
+      width: min(1220px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 42px 0 58px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 30px;
+      color: #dce8ff;
+      font-weight: 760;
+      font-size: .82rem;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 18px var(--green);
+    }
+
+    h1,
+    h2,
+    h3,
+    p { margin: 0; }
+
+    h1 {
+      max-width: 920px;
+      margin-top: 12px;
+      font-size: clamp(2.4rem, 6vw, 5rem);
+      line-height: .96;
+      font-weight: 840;
+    }
+
+    .accent {
+      background: linear-gradient(95deg, #fff, #9ceeff 42%, #c69bff 78%, #ffd166);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .lead {
+      max-width: 740px;
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 1.12rem;
+      line-height: 1.55;
+    }
+
+    .home {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(99, 215, 255, .3);
+      border-radius: 50%;
+      background: rgba(51, 214, 255, .08);
+      color: #eaf8ff;
+      text-decoration: none;
+      box-shadow: 0 0 34px rgba(51, 214, 255, .15);
+    }
+
+    .home svg {
+      width: 21px;
+      height: 21px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .glass {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, rgba(255, 255, 255, .105), rgba(255, 255, 255, .035)), var(--panel);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .12);
+      backdrop-filter: blur(22px) saturate(1.25);
+      overflow: hidden;
+    }
+
+    .topics {
+      position: sticky;
+      top: 22px;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .topic {
+      width: 100%;
+      min-height: 58px;
+      padding: 12px 14px;
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 12px;
+      align-items: center;
+      border: 1px solid rgba(99, 215, 255, .16);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .045);
+      color: var(--muted);
+      text-align: left;
+      cursor: pointer;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .topic:hover,
+    .topic.active {
+      transform: translateY(-1px);
+      border-color: rgba(99, 215, 255, .46);
+      background: rgba(51, 214, 255, .09);
+      color: #fff;
+    }
+
+    .topic b {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(51, 214, 255, .12);
+      color: var(--cyan);
+      box-shadow: 0 0 18px rgba(51, 214, 255, .18);
+      font-size: .82rem;
+    }
+
+    .topic span {
+      display: block;
+      font-weight: 780;
+      line-height: 1.15;
+    }
+
+    .topic small {
+      display: block;
+      margin-top: 4px;
+      color: var(--dim);
+      font-size: .75rem;
+      line-height: 1.25;
+    }
+
+    .stage {
+      min-height: 720px;
+      padding: 26px;
+      display: grid;
+      gap: 22px;
+    }
+
+    .stage-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .stage h2 {
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      line-height: 1.04;
+      font-weight: 820;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .chip {
+      min-height: 32px;
+      padding: 7px 10px;
+      border: 1px solid rgba(99, 215, 255, .24);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .045);
+      color: #d8e7ff;
+      font-size: .76rem;
+      white-space: nowrap;
+    }
+
+    .diagram {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(130px, 1fr));
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .node {
+      min-height: 154px;
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+      align-content: space-between;
+      border: 1px solid rgba(99, 215, 255, .18);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .045);
+      cursor: pointer;
+      transform: translateY(12px);
+      opacity: 0;
+      animation: reveal .7s var(--ease) forwards;
+      animation-delay: calc(var(--i) * 80ms);
+    }
+
+    .node:hover,
+    .node.active {
+      border-color: rgba(99, 215, 255, .58);
+      background: rgba(51, 214, 255, .09);
+      box-shadow: 0 0 40px rgba(51, 214, 255, .1);
+    }
+
+    .node-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .num {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      color: #fff;
+      font-weight: 830;
+      font-size: .8rem;
+      box-shadow: 0 0 24px rgba(51, 214, 255, .25);
+      flex: 0 0 auto;
+    }
+
+    .node h3 {
+      color: #fff;
+      font-size: .98rem;
+      line-height: 1.18;
+    }
+
+    .node p {
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.38;
+    }
+
+    .visual {
+      min-height: 54px;
+      display: grid;
+      place-items: center;
+    }
+
+    .token-row,
+    .bar-row,
+    .mini-grid,
+    .rank-list {
+      width: 100%;
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .token {
+      padding: 6px 8px;
+      border: 1px solid rgba(99, 215, 255, .28);
+      border-radius: 7px;
+      background: rgba(51, 214, 255, .07);
+      color: #e9f7ff;
+      font-size: .72rem;
+      animation: float 3s ease-in-out infinite;
+      animation-delay: calc(var(--j) * 120ms);
+    }
+
+    .bar {
+      width: var(--w);
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      box-shadow: 0 0 16px rgba(51, 214, 255, .28);
+      animation: draw 1.2s var(--ease) both;
+      transform-origin: left;
+    }
+
+    .cell {
+      width: 15px;
+      height: 15px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, .08);
+      border: 1px solid rgba(99, 215, 255, .18);
+    }
+
+    .cell.on {
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      box-shadow: 0 0 14px rgba(51, 214, 255, .28);
+    }
+
+    .rank {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 26px 1fr 42px;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: .74rem;
+    }
+
+    .attention {
+      width: 100%;
+      height: 64px;
+    }
+
+    .attention path {
+      fill: none;
+      stroke: var(--cyan);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-dasharray: 120;
+      stroke-dashoffset: 120;
+      animation: trace 1.5s var(--ease) forwards infinite alternate;
+      filter: drop-shadow(0 0 8px rgba(51, 214, 255, .55));
+    }
+
+    .detail {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(240px, .6fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .detail h3 {
+      color: #fff;
+      font-size: 1.12rem;
+      margin-bottom: 8px;
+    }
+
+    .detail p,
+    .detail li {
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: .92rem;
+    }
+
+    .detail ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .formula {
+      min-height: 112px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border: 1px solid rgba(255, 209, 102, .24);
+      border-radius: var(--radius);
+      background: rgba(255, 209, 102, .055);
+      color: #fff1c6;
+      font-size: 1.14rem;
+      font-weight: 800;
+      text-align: center;
+      box-shadow: inset 0 0 38px rgba(255, 209, 102, .04);
+    }
+
+    .flow-footer {
+      min-height: 58px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      border: 1px solid rgba(99, 215, 255, .18);
+      border-radius: var(--radius);
+      background: linear-gradient(90deg, rgba(51, 214, 255, .13), rgba(157, 92, 255, .12), rgba(255, 79, 216, .11));
+      color: #f7fbff;
+      font-weight: 820;
+      text-align: center;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes drift {
+      to { background-position: 64px 64px; }
+    }
+
+    @keyframes reveal {
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    @keyframes draw {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+
+    @keyframes trace {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @media (max-width: 980px) {
+      header,
+      .layout,
+      .stage-head,
+      .detail {
+        grid-template-columns: 1fr;
+      }
+
+      .topics {
+        position: static;
+      }
+
+      .diagram {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .chips {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 620px) {
+      main {
+        width: min(366px, calc(100% - 24px));
+        padding-top: 26px;
+      }
+
+      .diagram {
+        grid-template-columns: 1fr;
+      }
+
+      .stage {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid" aria-hidden="true"></div>
+  <main>
+    <header>
+      <div>
+        <span class="eyebrow">Interactive Pipeline Explanations</span>
+        <h1><span class="accent">Visual systems</span><br />behind Sakina's NLP stack.</h1>
+        <p class="lead">Click a topic, then click any step inside the animated diagram to reveal the technical explanation underneath.</p>
+      </div>
+      <a class="home" href="index.html#1" title="Back to presentation" aria-label="Back to presentation">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </a>
+    </header>
+
+    <section class="layout">
+      <aside class="glass topics" id="topics" aria-label="Explanation topics"></aside>
+      <article class="glass stage" id="stage" aria-live="polite"></article>
+    </section>
+  </main>
+
+  <script>
+    const topics = [
+      {
+        title: "TF-IDF Vectorizer",
+        subtitle: "Words plus weights become searchable sparse vectors.",
+        tags: ["language detection", "char n-grams", "sparse signal"],
+        formula: "TF-IDF = term frequency x inverse document frequency",
+        footer: "Exact words + rarity weighting = fast lexical matching",
+        steps: [
+          ["Corpus + Query", "Start with the user's query and a small document collection.", "tokens", ["passport", "renewal"]],
+          ["Tokenize", "Split text into comparable units. In Sakina language ID, character n-grams are used for robustness.", "tokens", ["pass", "renew", "visa"]],
+          ["Vocabulary + TF", "Build a term vocabulary and count how often terms appear.", "grid"],
+          ["IDF Weighting", "Rare terms receive more weight than common terms.", "bars"],
+          ["Vectors + Similarity", "Represent each document as a sparse vector and rank with similarity.", "rank"]
+        ],
+        bullets: ["Used conceptually by Sakina's traditional language detector.", "Strong when exact terms carry meaning.", "Cheap, interpretable, and fast."]
+      },
+      {
+        title: "Seq2Seq Model",
+        subtitle: "One input sequence in, one output sequence out.",
+        tags: ["encoder", "attention", "decoder"],
+        formula: "Input sequence + encoder + attention + decoder = generated sequence",
+        footer: "The model compresses source context, then predicts target tokens",
+        steps: [
+          ["Input Sequence", "Tokens enter in source order.", "tokens", ["I", "love", "machine", "learning"]],
+          ["Encoder", "The encoder reads the source and produces hidden states.", "bars"],
+          ["Context / Attention", "Attention focuses the decoder on relevant source positions.", "attention"],
+          ["Decoder", "The decoder predicts the next target token step by step.", "tokens", ["J'", "aime", "apprentissage"]],
+          ["Output Sequence", "Generated tokens form the translated or summarized result.", "tokens", ["J'aime", "l'apprentissage", "automatique"]]
+        ],
+        bullets: ["Useful mental model for translation and generation.", "Attention reduces the bottleneck of a single context vector.", "Still sequential compared with Transformers."]
+      },
+      {
+        title: "Transformer Architecture",
+        subtitle: "Self-attention, positional encoding, encoder-decoder stacks.",
+        tags: ["self-attention", "parallel", "cross-attention"],
+        formula: "Embeddings + positions + attention layers + softmax = output tokens",
+        footer: "All tokens can be processed in parallel during training",
+        steps: [
+          ["Input Tokens", "Text becomes token IDs.", "tokens", ["I", "love", "ML"]],
+          ["Embeddings + Position", "Token vectors gain position information so order is preserved.", "grid"],
+          ["Encoder Stack", "Self-attention relates tokens to each other.", "attention"],
+          ["Shifted Decoder Input", "Decoder sees previous target tokens, shifted right.", "tokens", ["<s>", "J'", "aime"]],
+          ["Decoder + Softmax", "Masked attention, cross-attention, feed-forward layers, then probabilities.", "bars"]
+        ],
+        bullets: ["Foundation for modern LLMs and sequence modeling.", "Self-attention captures long-range relationships.", "Cross-attention lets decoder read encoder context."]
+      },
+      {
+        title: "Hybrid Search",
+        subtitle: "BM25 and semantic search fused before reranking.",
+        tags: ["BM25", "bge-m3", "RRF", "reranker"],
+        formula: "BM25 top-k + dense top-k -> RRF(K=60) -> cross-encoder rerank",
+        footer: "Words + meaning + fusion + precision = better retrieved context",
+        steps: [
+          ["Query + Candidates", "The English query is compared against counseling chunks.", "tokens", ["sleep", "panic", "stress"]],
+          ["BM25", "Exact keyword search rewards lexical overlap.", "rank"],
+          ["Semantic Search", "Dense bge-m3 embeddings catch paraphrases and meaning.", "attention"],
+          ["RRF Fusion", "Reciprocal Rank Fusion merges rankings without comparing raw scores.", "bars"],
+          ["Reranker", "A cross-encoder scores query-document relevance for final precision.", "rank"]
+        ],
+        bullets: ["This is Sakina's RAG retrieval path.", "BM25 protects exact terms; dense search protects meaning.", "Reranking is applied only after narrowing candidates."]
+      },
+      {
+        title: "RAG Architecture",
+        subtitle: "Retrieve knowledge, augment the prompt, then generate.",
+        tags: ["offline index", "online query", "grounded answer"],
+        formula: "Retrieve relevant chunks + prompt context + LLM = grounded reply",
+        footer: "Retrieval supplies evidence; the LLM composes the final answer",
+        steps: [
+          ["Data Sources", "Counseling Q&A answers are prepared as retrievable knowledge.", "tokens", ["docs", "Q&A", "chunks"]],
+          ["Preprocess + Chunk", "Clean, extract, chunk, and attach metadata.", "grid"],
+          ["Embed + Store", "Create dense vectors and store them in Qdrant.", "bars"],
+          ["Retrieve Top-K", "At query time, find relevant chunks with hybrid search.", "rank"],
+          ["Augment + Generate", "Insert retrieved notes into the prompt and stream the answer.", "attention"]
+        ],
+        bullets: ["In Sakina, RAG runs only for mental-health support intent.", "Returned passages include text, context, and score.", "The cache stores retrieved passages, not generated replies."]
+      }
+    ];
+
+    const topicsEl = document.querySelector("#topics");
+    const stageEl = document.querySelector("#stage");
+    let activeTopic = 0;
+    let activeStep = 0;
+
+    function visual(step, i) {
+      const type = step[2];
+      const values = step[3] || [];
+      if (type === "tokens") {
+        return `<div class="token-row">${values.map((v, j) => `<span class="token" style="--j:${j}">${v}</span>`).join("")}</div>`;
+      }
+      if (type === "grid") {
+        return `<div class="mini-grid">${Array.from({ length: 24 }, (_, j) => `<span class="cell ${j % 5 === 0 || j % 7 === 0 ? "on" : ""}"></span>`).join("")}</div>`;
+      }
+      if (type === "bars") {
+        return `<div class="bar-row">${[36, 58, 82, 64].map((w) => `<span class="bar" style="--w:${w}%"></span>`).join("")}</div>`;
+      }
+      if (type === "rank") {
+        return `<div class="rank-list">${["D1", "D2", "D3"].map((d, j) => `<div class="rank"><b>${j + 1}</b><span class="bar" style="--w:${82 - j * 18}%"></span><span>${d}</span></div>`).join("")}</div>`;
+      }
+      return `<svg class="attention" viewBox="0 0 180 64" aria-hidden="true"><path d="M20 48 C54 8 78 8 110 48 S148 12 164 36"/><path d="M26 20 C68 54 108 10 154 48"/></svg>`;
+    }
+
+    function renderTopics() {
+      topicsEl.innerHTML = topics.map((topic, i) => `
+        <button class="topic ${i === activeTopic ? "active" : ""}" type="button" data-topic="${i}">
+          <b>${String(i + 1).padStart(2, "0")}</b>
+          <span>${topic.title}<small>${topic.subtitle}</small></span>
+        </button>
+      `).join("");
+      topicsEl.querySelectorAll(".topic").forEach((button) => {
+        button.addEventListener("click", () => {
+          activeTopic = Number(button.dataset.topic);
+          activeStep = 0;
+          render();
+        });
+      });
+    }
+
+    function renderStage() {
+      const topic = topics[activeTopic];
+      const step = topic.steps[activeStep];
+      stageEl.innerHTML = `
+        <div class="stage-head">
+          <div>
+            <span class="eyebrow">${topic.title}</span>
+            <h2>${topic.subtitle}</h2>
+          </div>
+          <div class="chips">${topic.tags.map((tag) => `<span class="chip">${tag}</span>`).join("")}</div>
+        </div>
+        <div class="diagram">
+          ${topic.steps.map((item, i) => `
+            <button class="node ${i === activeStep ? "active" : ""}" type="button" data-step="${i}" style="--i:${i}">
+              <div class="node-top"><span class="num">${i + 1}</span><h3>${item[0]}</h3></div>
+              <div class="visual">${visual(item, i)}</div>
+              <p>${item[1]}</p>
+            </button>
+          `).join("")}
+        </div>
+        <div class="glass detail">
+          <div>
+            <h3>${step[0]}</h3>
+            <p>${step[1]}</p>
+            <ul>${topic.bullets.map((bullet) => `<li>${bullet}</li>`).join("")}</ul>
+          </div>
+          <div class="formula">${topic.formula}</div>
+        </div>
+        <div class="flow-footer">${topic.footer}</div>
+      `;
+      stageEl.querySelectorAll(".node").forEach((button) => {
+        button.addEventListener("click", () => {
+          activeStep = Number(button.dataset.step);
+          renderStage();
+        });
+      });
+    }
+
+    function render() {
+      renderTopics();
+      renderStage();
+    }
+
+    render();
+  </script>
+</body>
+</html>

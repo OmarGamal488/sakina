@@ -1122,7 +1122,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   margin-top: 6px;
 }
 .emo-tag,
-.lang-tag {
+.lang-tag,
+.intent-tag {
   display: inline-flex;
   align-items: center;
   gap: 5px;

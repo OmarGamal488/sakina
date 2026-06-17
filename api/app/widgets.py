@@ -18,18 +18,18 @@ logger = structlog.get_logger(__name__)
 # DEACTIVATED widgets — kept out of this list so the selector can never pick them
 # (frontend components stay dormant for easy reactivation):
 #   - mood_checkin ("How are you feeling?")
-#   - breathing    (box-breathing exercise)
 #   - grounding    (5-4-3-2-1 grounding exercise)
 #   - actions      (suggested next-step replies / "What would help most?")
-WIDGETS = ["mood_chart"]
+WIDGETS = ["mood_chart", "breathing"]
 
 _SYSTEM = """You decide whether to show ONE interactive support widget alongside Sakina's reply, based on the user's message and emotional state. Pick the single most helpful, or "none".
 
 Widgets:
 - mood_chart — a chart of the user's emotions across this conversation. Pick ONLY when the user asks about their mood, patterns, trends, or how they've been.
-- none — most of the time. Prefer "none" unless mood_chart clearly helps; plain conversation is usually best.
+- breathing — a guided box-breathing exercise. Pick ONLY when the detected emotion is fear AND the user sounds acutely anxious, panicking, or overwhelmed right now (racing heart, can't calm down, spiraling). Do NOT pick it for sadness, grief, anger, or calm reflection.
+- none — most of the time. Prefer "none" unless a widget clearly helps; plain conversation is usually best.
 
-Reply with EXACTLY one word: mood_chart or none."""
+Reply with EXACTLY one word: mood_chart, breathing, or none."""
 
 _client: OpenAI | None = None
 
