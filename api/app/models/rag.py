@@ -51,22 +51,20 @@ class RAGRetriever:
         from qdrant_client import QdrantClient
         from sentence_transformers import CrossEncoder, SentenceTransformer
 
-        logger.info("rag_loading", embed=EMBED_MODEL, reranker=RERANKER_MODEL, use_reranker=settings.use_reranker)
+        logger.info("rag_loading", embed=EMBED_MODEL, reranker=RERANKER_MODEL)
         self._embedder = SentenceTransformer(
             EMBED_MODEL,
             device="cpu",
             cache_folder=str(settings.sentence_transformers_cache_dir),
             model_kwargs={"low_cpu_mem_usage": True},
         )
-        self._reranker = None
-        if settings.use_reranker:
-            self._reranker = CrossEncoder(
-                RERANKER_MODEL,
-                device="cpu",
-                max_length=512,
-                cache_folder=str(settings.sentence_transformers_cache_dir),
-                model_kwargs={"low_cpu_mem_usage": True},
-            )
+        self._reranker = CrossEncoder(
+            RERANKER_MODEL,
+            device="cpu",
+            max_length=512,
+            cache_folder=str(settings.sentence_transformers_cache_dir),
+            model_kwargs={"low_cpu_mem_usage": True},
+        )
         self._qc = QdrantClient(
             url=settings.qdrant_url, api_key=settings.qdrant_api_key, timeout=60
         )
@@ -106,11 +104,6 @@ class RAGRetriever:
         ids = [doc_id for doc_id, _ in fused[:TOP_K_PER_RETRIEVER]]
         if not ids:
             return []
-        if not settings.use_reranker:
-            return [
-                Passage(text=self._texts[doc_id], context=self._contexts[doc_id], score=rrf_score)
-                for doc_id, rrf_score in fused[:k]
-            ]
         scores = self._reranker.predict([(query, self._texts[i]) for i in ids])
         order = np.argsort(scores)[::-1][:k]
         return [
