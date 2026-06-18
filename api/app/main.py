@@ -118,6 +118,12 @@ def _health_payload() -> dict:
     return {"status": "ok", "service": "sakina-api", "version": "0.1.0"}
 
 
+@app.get("/")
+async def root() -> dict:
+    """Root — confirms the API is reachable."""
+    return {"service": "sakina-api", "status": "ok", "docs": "/docs"}
+
+
 @app.get("/healthz")
 async def healthz() -> dict:
     """Liveness probe — no models touched, returns instantly."""
