@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sakina — MLOps Implementation Summary</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #1a1a2e;
+      background: #fff;
+      padding: 32px 48px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .header {
+      text-align: center;
+      padding: 28px 0 20px;
+      border-bottom: 3px solid #6c47ff;
+      margin-bottom: 28px;
+    }
+    .header h1 { font-size: 28px; color: #6c47ff; letter-spacing: 1px; }
+    .header .sub { font-size: 14px; color: #555; margin-top: 6px; }
+    .header .meta { font-size: 12px; color: #888; margin-top: 4px; }
+    h2 {
+      font-size: 16px; color: #fff; background: #6c47ff;
+      padding: 7px 14px; border-radius: 5px; margin: 28px 0 12px;
+    }
+    h3 {
+      font-size: 13px; font-weight: 700; color: #6c47ff;
+      margin: 14px 0 6px; padding-bottom: 2px;
+      border-bottom: 1px solid #e0d9ff;
+    }
+    .card {
+      background: #f8f6ff; border-left: 4px solid #6c47ff;
+      border-radius: 4px; padding: 12px 16px; margin: 10px 0;
+    }
+    .card-row { display: flex; gap: 12px; margin: 10px 0; }
+    .card-row .card { flex: 1; }
+    .badge {
+      display: inline-block; padding: 2px 9px; border-radius: 12px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.3px; vertical-align: middle;
+    }
+    .done  { background: #d4edda; color: #155724; }
+    .bonus { background: #fff3cd; color: #856404; }
+    .pts   { background: #e8e2ff; color: #4b2ec7; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+    th {
+      background: #ede9ff; color: #3a1fa8; font-weight: 700;
+      padding: 7px 10px; text-align: left; border-bottom: 2px solid #c8b8ff;
+    }
+    td { padding: 6px 10px; border-bottom: 1px solid #ece9f5; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: #faf8ff; }
+    .winner { font-weight: 700; color: #155724; }
+    .check { color: #22c55e; font-weight: 700; }
+    pre, code {
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 11px; background: #1a1a2e; color: #a5f3fc; border-radius: 4px;
+    }
+    pre { padding: 10px 14px; overflow-x: auto; margin: 8px 0; }
+    code { padding: 1px 5px; }
+    a { color: #6c47ff; text-decoration: none; }
+    .rubric-table th { background: #1a1a2e; color: #a5f3fc; }
+    .rubric-table td { background: #fff; }
+    .rubric-table tr:nth-child(even) td { background: #f8f6ff; }
+    .pipeline {
+      display: flex; align-items: center; gap: 0;
+      flex-wrap: wrap; margin: 10px 0; font-size: 11.5px;
+    }
+    .step {
+      background: #6c47ff; color: #fff; padding: 7px 14px;
+      border-radius: 4px; font-weight: 600; white-space: nowrap;
+    }
+    .arrow { color: #999; font-size: 16px; margin: 0 5px; }
+    .step.grey  { background: #555; }
+    .step.green { background: #16a34a; }
+    .step.amber { background: #d97706; }
+    @media print {
+      body { padding: 20px 32px; }
+      h2 { page-break-after: avoid; }
+      .card, table { page-break-inside: avoid; }
+    }
+    p { margin: 6px 0; }
+    ul { padding-left: 18px; margin: 6px 0; }
+    li { margin-bottom: 3px; }
+    .muted { color: #666; font-size: 11.5px; }
+    .divider { border: none; border-top: 1px solid #e0d9ff; margin: 20px 0; }
+    .url-box {
+      background: #1a1a2e; color: #86efac; padding: 8px 14px;
+      border-radius: 4px; font-family: monospace; font-size: 12px; margin: 6px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Sakina — MLOps Final Project</h1>
+  <div class="sub">Implementation Summary &amp; Step-by-Step Changes</div>
+  <div class="meta">ITI AI Track · Intake 46 &nbsp;|&nbsp; Branch: <code style="background:#e8e2ff;color:#4b2ec7">mlops-final</code> &nbsp;|&nbsp; Repo: OmarGamal488/sakina</div>
+</div>
+
+<h2>Rubric Scorecard</h2>
+<table class="rubric-table">
+  <thead><tr><th>#</th><th>Rubric Point</th><th>Points</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Repo Setup, NLP Pipeline &amp; Model Serving</td><td>20</td><td><span class="badge done">✓ Done (pre-existing)</span></td></tr>
+    <tr><td>2</td><td>Unit Testing</td><td>10</td><td><span class="badge done">✓ Done (pre-existing)</span></td></tr>
+    <tr><td>3</td><td>Containerization (Docker)</td><td>10</td><td><span class="badge done">✓ Done (pre-existing)</span></td></tr>
+    <tr><td>4</td><td>Monitoring Metrics — 5 OTel instruments + README docs</td><td>10</td><td><span class="badge done">✓ Done</span></td></tr>
+    <tr><td>5</td><td>System Monitoring — Axiom dashboard + docker-compose</td><td>10</td><td><span class="badge done">✓ Done</span></td></tr>
+    <tr><td>6</td><td>CI/CD Pipeline — GitHub Actions (4 jobs)</td><td>20</td><td><span class="badge done">✓ Done</span></td></tr>
+    <tr><td>7</td><td>Deployment — Hugging Face Spaces (Docker)</td><td>10</td><td><span class="badge done">✓ Done</span></td></tr>
+    <tr><td>8</td><td>Frontend Integration — GitHub Pages → HF Space API</td><td>10</td><td><span class="badge done">✓ Done</span></td></tr>
+    <tr><td>9</td><td>Model Comparison Bonus</td><td>5</td><td><span class="badge bonus">✓ Bonus</span></td></tr>
+    <tr><td></td><td><strong>Total (without bonus)</strong></td><td><strong>100</strong></td><td><span class="badge pts">Full score</span></td></tr>
+  </tbody>
+</table>
+
+<h2>Live Deliverable URLs</h2>
+<div class="card-row">
+  <div class="card">
+    <h3>Backend API — Hugging Face Space</h3>
+    <div class="url-box">https://HamzaHendy-sakina-api.hf.space</div>
+    <p class="muted">Health: <code>/health</code> &nbsp;·&nbsp; Docs: <code>/docs</code></p>
+  </div>
+  <div class="card">
+    <h3>Frontend — GitHub Pages</h3>
+    <div class="url-box">https://hamza-hesham-hendy.github.io/chatbot-frontend/</div>
+    <p class="muted">Forked from <code>ishraq-hassan/chatbot-frontend</code></p>
+  </div>
+</div>
+<div class="card">
+  <h3>Other Resources</h3>
+  <ul>
+    <li><strong>GitHub repo (MLOps branch):</strong> github.com/OmarGamal488/sakina/tree/mlops-final</li>
+    <li><strong>Docker image (GHCR):</strong> ghcr.io/omargamal488/sakina:latest</li>
+    <li><strong>Frontend fork:</strong> github.com/hamza-hesham-hendy/chatbot-frontend</li>
+    <li><strong>HF Space:</strong> huggingface.co/spaces/HamzaHendy/sakina-api</li>
+  </ul>
+</div>
+
+<h2>Point 4 — Monitoring Metrics <span class="badge pts">10 pts</span></h2>
+<p>File: <code>api/app/telemetry.py</code> — 5 OpenTelemetry instruments covering the 3 required categories.</p>
+<table>
+  <thead><tr><th>Metric Name</th><th>Type</th><th>Category</th><th>What it monitors</th></tr></thead>
+  <tbody>
+    <tr><td><code>sakina.chat.requests</code></td><td>Counter (by intent)</td><td><strong>Model / NLP</strong></td><td>Intent distribution — detects model drift if the pattern shifts unexpectedly</td></tr>
+    <tr><td><code>sakina.chat.latency</code></td><td>Histogram (ms)</td><td><strong>Model / NLP</strong></td><td>End-to-end response latency — catches slowdowns in RAG or LLM generation</td></tr>
+    <tr><td><code>sakina.message.length</code></td><td>Histogram (chars)</td><td><strong>Data</strong></td><td>Input size distribution — very short = possible bot traffic; very long = edge cases</td></tr>
+    <tr><td><code>sakina.feedback.votes</code></td><td>Counter (up / down)</td><td><strong>Data</strong></td><td>Helpfulness ratio — direct user signal on response quality over time</td></tr>
+    <tr><td><code>sakina.http.errors</code></td><td>Counter (by status code)</td><td><strong>Server</strong></td><td>Error rate — 4xx/5xx spikes indicate broken clients or backend failures</td></tr>
+  </tbody>
+</table>
+
+<h2>Point 5 — System Monitoring <span class="badge pts">10 pts</span></h2>
+<h3>Architecture — HF Space (direct export)</h3>
+<div class="pipeline">
+  <div class="step">Sakina API<br><small>HF Space</small></div>
+  <div class="arrow">→</div>
+  <div class="step grey">OTLP HTTP<br><small>AXIOM_TOKEN</small></div>
+  <div class="arrow">→</div>
+  <div class="step green">Axiom<br><small>api.axiom.co</small></div>
+</div>
+<h3>Architecture — Local (docker-compose)</h3>
+<div class="pipeline">
+  <div class="step">Sakina API<br><small>port 8000</small></div>
+  <div class="arrow">→</div>
+  <div class="step grey">OTLP/gRPC<br><small>port 4317</small></div>
+  <div class="arrow">→</div>
+  <div class="step">OTel Collector<br><small>otel/contrib:0.114.0</small></div>
+  <div class="arrow">→</div>
+  <div class="step green">Axiom<br><small>HTTPS / OTLP</small></div>
+</div>
+<div class="card">
+  <h3>HF Space env vars for monitoring (Secrets tab)</h3>
+  <ul>
+    <li><code>AXIOM_TOKEN</code> — bearer token for Axiom API</li>
+    <li><code>AXIOM_DATASET</code> — dataset name (e.g. <code>sakina</code>)</li>
+  </ul>
+  <p class="muted">When both are set, the API exports directly to Axiom via OTLP HTTP — no collector needed on HF Space.</p>
+</div>
+<h3>Local stack</h3>
+<pre>cp api/.env.example api/.env   # fill AXIOM_TOKEN + AXIOM_DATASET
+docker compose up --build</pre>
+
+<h2>Point 6 — CI/CD Pipeline <span class="badge pts">20 pts</span></h2>
+<div class="pipeline">
+  <div class="step">1 · Lint<br><small>ruff</small></div>
+  <div class="arrow">→</div>
+  <div class="step amber">2 · Test<br><small>pytest</small></div>
+  <div class="arrow">→</div>
+  <div class="step grey">3 · Docker<br><small>GHCR</small></div>
+  <div class="arrow">→</div>
+  <div class="step green">4 · Deploy<br><small>HF Space</small></div>
+</div>
+<table>
+  <thead><tr><th>Error encountered</th><th>Root cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>ruff not found</td><td>uv run downloads full ML stack; ruff not in main deps</td><td>Switch to <code>uvx ruff@0.7.0</code></td></tr>
+    <tr><td>I001 import sort error</td><td>Teammate's merge left unsorted imports</td><td><code>uvx ruff@0.7.0 check --fix</code> locally</td></tr>
+    <tr><td>pytest not installed</td><td><code>--group dev</code> wrong — pytest is an extra, not a group</td><td><code>uv sync --frozen --all-packages --all-extras</code></td></tr>
+    <tr><td>HF rejected file &gt;10 MB</td><td>lang_id.joblib is 13 MB, not in LFS</td><td><code>git lfs track "*.joblib" "*.pkl"</code></td></tr>
+    <tr><td>HF rejected binary blobs</td><td>Presentation PNGs in repo root</td><td>Deploy only minimal files to <code>$RUNNER_TEMP/space</code></td></tr>
+    <tr><td>HF Space didn't start</td><td>No YAML frontmatter → HF didn't know it's Docker</td><td>Inject <code>sdk: docker / app_port: 8000</code> at deploy time</td></tr>
+  </tbody>
+</table>
+
+<h2>Point 7 — Deployment <span class="badge pts">10 pts</span></h2>
+<div class="card">
+  <p><strong>Platform:</strong> Hugging Face Spaces (Docker runtime) — <strong>https://HamzaHendy-sakina-api.hf.space</strong></p>
+  <p class="muted">Fully automated: every push to mlops-final triggers CI → build → deploy.</p>
+</div>
+<table>
+  <thead><tr><th>HF Secret / Variable</th><th>Tab</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>LIGHTNING_API_KEY</code></td><td>Secrets</td><td>LLM provider (Lightning AI)</td></tr>
+    <tr><td><code>QDRANT_URL</code></td><td>Secrets</td><td>Vector store URL</td></tr>
+    <tr><td><code>QDRANT_API_KEY</code></td><td>Secrets</td><td>Vector store auth</td></tr>
+    <tr><td><code>GROQ_API_KEY</code></td><td>Secrets</td><td>STT / TTS (voice)</td></tr>
+    <tr><td><code>GEMINI_API_KEY</code></td><td>Secrets</td><td>Scribble reflection</td></tr>
+    <tr><td><code>AXIOM_TOKEN</code></td><td>Secrets</td><td>Monitoring → Axiom direct export</td></tr>
+    <tr><td><code>AXIOM_DATASET</code></td><td>Secrets</td><td>Axiom dataset name</td></tr>
+    <tr><td><code>CORS_ORIGINS</code></td><td>Variables</td><td>GitHub Pages domain allowed by CORS</td></tr>
+  </tbody>
+</table>
+
+<h2>Point 8 — Frontend Integration <span class="badge pts">10 pts</span></h2>
+<div class="card-row">
+  <div class="card">
+    <h3>Fork</h3>
+    <p>Forked <code>ishraq-hassan/chatbot-frontend</code> → <code>hamza-hesham-hendy/chatbot-frontend</code></p>
+  </div>
+  <div class="card">
+    <h3>Change made</h3>
+    <pre style="font-size:10px">const API_BASE =
+  "https://HamzaHendy-sakina-api.hf.space";</pre>
+  </div>
+</div>
+<p>Deployed on <strong>GitHub Pages</strong>: https://hamza-hesham-hendy.github.io/chatbot-frontend/</p>
+
+<h2>Bonus — Model Comparison <span class="badge bonus">+5 pts</span></h2>
+<h3>Language Detection (3 classifiers, 20 languages)</h3>
+<table>
+  <thead><tr><th>Model</th><th>Test accuracy</th><th>Macro-F1</th></tr></thead>
+  <tbody>
+    <tr><td>Logistic Regression</td><td>0.9953</td><td>0.9953</td></tr>
+    <tr><td>Naive Bayes</td><td>0.9950</td><td>0.9950</td></tr>
+    <tr class="winner"><td><span class="check">✅</span> <strong>Calibrated LinearSVC</strong></td><td><strong>0.9959</strong></td><td><strong>0.9959</strong></td></tr>
+  </tbody>
+</table>
+<h3>Emotion — Translation Method (pooled macro-F1, n=1200)</h3>
+<table>
+  <thead><tr><th>Method</th><th>Pooled macro-F1</th></tr></thead>
+  <tbody>
+    <tr class="winner"><td><span class="check">✅</span> <strong>NLLB-200-distilled-1.3B</strong></td><td><strong>0.8975</strong></td></tr>
+    <tr><td>NLLB-200-distilled-600M</td><td>0.8806</td></tr>
+    <tr><td>LLM gpt-oss-120b (translate)</td><td>0.8759</td></tr>
+    <tr><td>LLM gpt-oss-20b (translate)</td><td>0.7983</td></tr>
+    <tr><td>LLM gpt-oss-20b (direct)</td><td>0.4919</td></tr>
+  </tbody>
+</table>
+
+<h2>Commits Made (mlops-final)</h2>
+<table>
+  <thead><tr><th>Commit message</th><th>What changed</th></tr></thead>
+  <tbody>
+    <tr><td>ci: add GitHub Actions workflow</td><td>Created .github/workflows/ci.yml</td></tr>
+    <tr><td>ci: restrict workflow to mlops-final branch only</td><td>Changed triggers from [main, mlops-final]</td></tr>
+    <tr><td>fix: sort imports in test files to pass ruff lint</td><td>Fixed I001 in conftest.py + test_safety.py</td></tr>
+    <tr><td>ci: fix lint (uvx ruff) and test (frozen sync) jobs</td><td>uvx ruff@0.7.0, --all-extras, format main.py</td></tr>
+    <tr><td>ci: commit large artifacts via Git LFS</td><td>Added git lfs track "*.joblib" "*.pkl"</td></tr>
+    <tr><td>ci: push only minimal Docker build inputs to HF Space</td><td>Minimal Space repo in $RUNNER_TEMP/space</td></tr>
+    <tr><td>docs: add Deployment and CI/CD sections to README</td><td>Added Deployment + CI/CD to README.md</td></tr>
+    <tr><td>docs: add model comparison tables</td><td>Language detection + emotion tables in README</td></tr>
+    <tr><td>docs: add live frontend URL to Deployment section</td><td>Added GitHub Pages URL to README</td></tr>
+    <tr><td>feat(telemetry): export metrics directly to Axiom from HF Space</td><td>OTLP HTTP direct export; added HTTP exporter package</td></tr>
+    <tr><td>docs: update implementation summary with Axiom direct-export change</td><td>This file</td></tr>
+  </tbody>
+</table>
+
+<h2>Demo Video Checklist</h2>
+<div class="card">
+  <ul>
+    <li>Open https://hamza-hesham-hendy.github.io/chatbot-frontend/</li>
+    <li>Send a greeting ("Hello")</li>
+    <li>Send a mental-health message ("I've been feeling really anxious lately")</li>
+    <li>Send a crisis message → show the crisis card</li>
+    <li>Send a message in Arabic → response in Arabic</li>
+    <li>Click thumbs up / down feedback buttons</li>
+    <li>Show Axiom dashboard with metrics flowing in</li>
+    <li>Show GitHub Actions page with all 4 jobs green</li>
+  </ul>
+</div>
+
+<hr class="divider" />
+<p class="muted" style="text-align:center">
+  Sakina · MLOps Final Project · ITI AI Track Intake 46 · Branch: mlops-final · June 2026
+</p>
+
+</body>
+</html>
