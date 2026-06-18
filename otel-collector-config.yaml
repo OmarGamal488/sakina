@@ -18,14 +18,14 @@ processors:
 
 exporters:
   # Axiom ingests OTLP over HTTP with a bearer token + dataset header.
-  # All signals (metrics, logs, traces) use x-axiom-dataset when targeting
-  # an Events dataset.
+  # Metrics route via x-axiom-metrics-dataset (logs/traces use x-axiom-dataset)
+  # and require a dedicated Metrics-kind dataset.
   otlphttp/axiom:
     compression: gzip
     endpoint: https://api.axiom.co
     headers:
       authorization: "Bearer ${env:AXIOM_TOKEN}"
-      x-axiom-dataset: "${env:AXIOM_DATASET}"
+      x-axiom-metrics-dataset: "${env:AXIOM_DATASET}"
   # Echo to the Collector's own logs so you can confirm data is flowing locally.
   debug:
     verbosity: normal

@@ -67,14 +67,14 @@ def setup_telemetry() -> bool:
             OTLPMetricExporter as HTTPMetricExporter,
         )
 
-        # Axiom's OTLP HTTP endpoint expects X-Axiom-Dataset for all signals
-        # (logs, traces, and metrics) when using an Events dataset. The exporter
-        # appends /v1/metrics to the base endpoint automatically.
+        # Axiom routes OTLP *metrics* via the X-Axiom-Metrics-Dataset header
+        # (logs/traces use X-Axiom-Dataset) and requires a dedicated Metrics-kind
+        # dataset. The exporter appends /v1/metrics to the base endpoint.
         exporter = HTTPMetricExporter(
             endpoint="https://api.axiom.co",
             headers={
                 "Authorization": f"Bearer {axiom_token}",
-                "X-Axiom-Dataset": axiom_dataset,
+                "X-Axiom-Metrics-Dataset": axiom_dataset,
             },
         )
         _enabled = True
