@@ -53,14 +53,40 @@ def setup_telemetry() -> bool:
         logger.warning("telemetry_unavailable", reason="opentelemetry_not_installed")
         return False
 
+    from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
+
+    axiom_token = settings.axiom_token.strip()
+    axiom_dataset = settings.axiom_dataset.strip()
     endpoint = settings.otel_exporter_otlp_endpoint.strip()
-    if endpoint:
+
+    exporter = None
+    if axiom_token and axiom_dataset:
+        # HF Space path: no collector running there, so export directly to Axiom
+        # via OTLP HTTP with bearer-token auth.
+        from opentelemetry.exporter.otlp.proto.http.metric_exporter import (
+            OTLPMetricExporter as HTTPMetricExporter,
+        )
+
+        exporter = HTTPMetricExporter(
+            endpoint="https://api.axiom.co",
+            headers={
+                "Authorization": f"Bearer {axiom_token}",
+                "X-Axiom-Dataset": axiom_dataset,
+            },
+        )
+        _enabled = True
+        logger.info("telemetry_enabled", mode="axiom_direct", dataset=axiom_dataset)
+    elif endpoint:
+        # Local docker-compose path: API → gRPC → OTel Collector → Axiom.
         from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import (
             OTLPMetricExporter,
         )
-        from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 
         exporter = OTLPMetricExporter(endpoint=endpoint, insecure=True)
+        _enabled = True
+        logger.info("telemetry_enabled", mode="otlp_grpc", endpoint=endpoint)
+
+    if exporter is not None:
         reader = PeriodicExportingMetricReader(
             exporter, export_interval_millis=settings.otel_metric_export_interval_ms
         )
@@ -68,16 +94,14 @@ def setup_telemetry() -> bool:
             resource=Resource.create({SERVICE_NAME: settings.otel_service_name}),
             metric_readers=[reader],
         )
-        _enabled = True
-        logger.info("telemetry_enabled", endpoint=endpoint)
     else:
-        # No endpoint → a provider with no readers. Instruments still record into
-        # the void, so the record_* helpers stay valid no-ops.
+        # No config → a provider with no readers. Instruments still record into
+        # the void, so the record_* helpers are always safe to call.
         provider = MeterProvider(
             resource=Resource.create({SERVICE_NAME: settings.otel_service_name})
         )
         _enabled = False
-        logger.info("telemetry_disabled", reason="otel_endpoint_empty")
+        logger.info("telemetry_disabled", reason="no_axiom_token_or_otlp_endpoint")
 
     metrics.set_meter_provider(provider)
     meter = metrics.get_meter("sakina")

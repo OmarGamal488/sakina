@@ -52,6 +52,11 @@ class Settings(BaseSettings):
     otel_exporter_otlp_endpoint: str = ""
     otel_service_name: str = "sakina-api"
     otel_metric_export_interval_ms: int = 15000  # how often metrics flush to the Collector
+    # Direct Axiom export (HF Space path — no collector running there).
+    # Set AXIOM_TOKEN + AXIOM_DATASET on HF Space secrets/variables; the API exports
+    # directly via OTLP HTTP instead of routing through the local collector.
+    axiom_token: str = ""
+    axiom_dataset: str = ""
 
     # comma-separated str (pydantic-settings JSON-decodes list fields, tripping on plain values)
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
