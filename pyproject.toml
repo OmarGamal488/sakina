@@ -31,3 +31,8 @@ ignore = ["E501"]
 # FastAPI's File/Form/Query/Depends are call-in-default BY DESIGN (DI markers),
 # so B008 is a false positive on idiomatic FastAPI signatures.
 extend-immutable-calls = ["fastapi.File", "fastapi.Form", "fastapi.Query", "fastapi.Depends"]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.6.0",
+]

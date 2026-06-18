@@ -63,17 +63,13 @@ class EmotionClassifier:
                 cache_dir=settings.hf_hub_cache_dir,
                 low_cpu_mem_usage=True,
             ),
-            tokenizer=AutoTokenizer.from_pretrained(
-                emo_id, cache_dir=settings.hf_hub_cache_dir
-            ),
+            tokenizer=AutoTokenizer.from_pretrained(emo_id, cache_dir=settings.hf_hub_cache_dir),
             device=-1,  # CPU
             truncation=True,
             max_length=self._max_len,
             top_k=None,
         )
-        self._nllb_tok = AutoTokenizer.from_pretrained(
-            nllb_id, cache_dir=settings.hf_hub_cache_dir
-        )
+        self._nllb_tok = AutoTokenizer.from_pretrained(nllb_id, cache_dir=settings.hf_hub_cache_dir)
         self._nllb = AutoModelForSeq2SeqLM.from_pretrained(
             nllb_id,
             cache_dir=settings.hf_hub_cache_dir,
@@ -91,9 +87,7 @@ class EmotionClassifier:
         tgt_code = tgt_code or self._eng_code
         self._nllb_tok.src_lang = src_code
         bos = self._nllb_tok.convert_tokens_to_ids(tgt_code)
-        enc = self._nllb_tok(
-            text, return_tensors="pt", truncation=True, max_length=self._max_len
-        )
+        enc = self._nllb_tok(text, return_tensors="pt", truncation=True, max_length=self._max_len)
         with self._torch.no_grad():
             gen = self._nllb.generate(
                 **enc, forced_bos_token_id=bos, max_length=self._max_len, num_beams=1
@@ -135,8 +129,10 @@ def get_classifier() -> EmotionClassifier:
 
 if __name__ == "__main__":
     clf = get_classifier()
-    for txt, lang in [("I feel hopeless and tired", "en"),
-                      ("je suis tellement heureux aujourd'hui", "fr"),
-                      ("أنا خائف جداً", "ar")]:
+    for txt, lang in [
+        ("I feel hopeless and tired", "en"),
+        ("je suis tellement heureux aujourd'hui", "fr"),
+        ("أنا خائف جداً", "ar"),
+    ]:
         r = clf.classify(txt, lang)
         print(f"[{r.emotion:<8} {r.confidence:.3f}] ({lang}) {txt!r} -> {r.translated_text!r}")

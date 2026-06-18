@@ -1,18 +1,23 @@
-"""Sakina FastAPI app — ``/chat`` (SSE) + ``/healthz``.
+"""Sakina FastAPI app.
+
+Rubric (Serenity) contract: ``POST /chat`` (single JSON), ``POST /feedback``,
+``GET /health``. The richer SSE pipeline used by our own React UI lives at
+``POST /chat/stream`` and ``POST /chat/ui``.
 
 Pipeline: language → emotion → intent → RAG → LLM compose. A model-free crisis
-regex gate runs FIRST in ``/chat`` and ``/chat/ui``, short-circuiting to a crisis
-card with no RAG/LLM call.
+regex gate runs FIRST on every chat entrypoint, short-circuiting to a crisis
+response with no RAG/LLM call.
 """
 
 from __future__ import annotations
 
 import asyncio
 import json
-from urllib import request as urlrequest
+import logging
 import uuid
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
+from urllib import request as urlrequest
 
 import structlog
 from fastapi import FastAPI, File, HTTPException, Request, Response, UploadFile
@@ -21,20 +26,34 @@ from fastapi.responses import StreamingResponse
 from sse_starlette.sse import EventSourceResponse
 from starlette.concurrency import run_in_threadpool
 
-from app import memory, orchestrator, safety, widgets
+from app import memory, orchestrator, safety, telemetry, widgets
 from app import scribble as scribble_service
 from app import stt as stt_service
 from app import tts as tts_service
 from app.config import settings
-from app.schemas import ChatRequest, ScribbleRequest, ScribbleResponse, TTSRequest
+from app.schemas import (
+    ChatJSONResponse,
+    ChatRequest,
+    FeedbackRequest,
+    ScribbleRequest,
+    ScribbleResponse,
+    TTSRequest,
+)
 
+# Configure Python's stdlib logging (rubric: INFO/WARNING/ERROR throughout the app).
+# structlog is routed through the stdlib root logger so all records share one stream.
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
 logger = structlog.get_logger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """App lifespan — warm the model singletons once at startup."""
+    """App lifespan — set up telemetry + warm the model singletons once at startup."""
     logger.info("sakina_api_start", model=settings.lightning_model)
+    telemetry.setup_telemetry()
     await run_in_threadpool(orchestrator.warmup)
     logger.info("sakina_api_ready")
     yield
@@ -42,6 +61,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Sakina API", version="0.1.0", lifespan=lifespan)
+telemetry.instrument_app(app)  # request count / latency / errors (server metrics)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
@@ -94,10 +114,33 @@ async def _notify_trusted_person(name: str | None, email: str | None) -> None:
         logger.warning("crisis_help_webhook_error", error=str(exc)[:200], email=clean_email)
 
 
+def _health_payload() -> dict:
+    return {"status": "ok", "service": "sakina-api", "version": "0.1.0"}
+
+
 @app.get("/healthz")
 async def healthz() -> dict:
     """Liveness probe — no models touched, returns instantly."""
-    return {"status": "ok", "service": "sakina-api", "version": "0.1.0"}
+    return _health_payload()
+
+
+@app.get("/health")
+async def health() -> dict:
+    """Rubric health endpoint — alias of ``/healthz``."""
+    return _health_payload()
+
+
+@app.post("/feedback")
+async def feedback(req: FeedbackRequest) -> dict:
+    """Thumbs up/down on an assistant reply. Logged now; metered in Phase 4."""
+    logger.info(
+        "feedback",
+        vote=req.vote,
+        user_chars=len(req.user_message),
+        bot_chars=len(req.bot_response),
+    )
+    telemetry.record_feedback(req.vote)  # data metric: up/down ratio
+    return {"status": "ok"}
 
 
 @app.post("/stt")
@@ -107,9 +150,7 @@ async def stt(audio: UploadFile = File(...)) -> dict:
     if not data:
         raise HTTPException(status_code=400, detail="empty audio upload")
     try:
-        text = await run_in_threadpool(
-            stt_service.transcribe, data, audio.filename or "audio.webm"
-        )
+        text = await run_in_threadpool(stt_service.transcribe, data, audio.filename or "audio.webm")
     except Exception as e:  # noqa: BLE001
         logger.warning("stt_error", error=str(e)[:200])
         raise HTTPException(status_code=502, detail="transcription failed") from e
@@ -143,7 +184,56 @@ async def scribble_reflect(req: ScribbleRequest) -> ScribbleResponse:
     return ScribbleResponse(reflection=reflection, emotion=emotion)
 
 
-@app.post("/chat")
+@app.post("/chat", response_model=ChatJSONResponse)
+async def chat_json(req: ChatRequest) -> ChatJSONResponse:
+    """Rubric ``/chat`` — single JSON reply for the provided frontend.
+
+    Same pipeline as the SSE route, collected into one response: crisis gate →
+    analyze → drain ``stream_reply`` → ``{response, intent, emotion, language}``.
+    """
+    with telemetry.measure_latency() as elapsed_ms:
+        # Crisis-safety gate — model-free, before any RAG/LLM call.
+        crisis = safety.check_crisis(req.message)
+        if crisis.triggered:
+            lang = crisis.lang_hint
+            line = safety.SUPPORTIVE_LINE.get(lang, safety.SUPPORTIVE_LINE["en"])
+            logger.info("crisis_gate", source="chat_json", lang=lang, pattern=crisis.pattern[:40])
+            if req.trusted_person_email:
+                asyncio.create_task(_notify_trusted_person(req.user_name, req.trusted_person_email))
+            telemetry.record_chat("crisis", len(req.message), elapsed_ms())
+            return ChatJSONResponse(
+                response=line, intent=None, emotion="sadness", language=lang, kind="crisis"
+            )
+
+        mem = memory.get_memory()
+        sid = req.session_id or ""
+        session_lang = req.session_lang or mem.get_prior_lang(sid)
+        history = mem.get_history(sid)
+        result = await orchestrator.analyze(
+            req.message, lang_hint=req.lang, session_lang=session_lang
+        )
+        parts: list[str] = []
+        async for tok in orchestrator.stream_reply(req.message, result, history):
+            parts.append(tok)
+        reply = "".join(parts).strip()
+
+        if sid:
+            mem.append_turn(sid, "user", req.message)
+            mem.append_turn(sid, "assistant", reply)
+            mem.set_prior_lang(sid, result.language)
+
+        logger.info("chat_json", intent=result.intent, emotion=result.emotion, lang=result.language)
+        # model/NLP metrics: intent distribution + latency; data metric: message length.
+        telemetry.record_chat(result.intent, len(req.message), elapsed_ms())
+        return ChatJSONResponse(
+            response=reply,
+            intent=result.intent,
+            emotion=result.emotion,
+            language=result.language,
+        )
+
+
+@app.post("/chat/stream")
 async def chat(req: ChatRequest):
     """Stream the assistant turn as Server-Sent Events: meta → delta* → done."""
 
@@ -157,20 +247,31 @@ async def chat(req: ChatRequest):
             logger.info("crisis_gate", source="chat", lang=lang, pattern=crisis.pattern[:40])
             yield _sse(
                 "meta",
-                {"emotion": "sadness", "intent": None, "language": lang,
-                 "sources": [], "kind": "crisis"},
+                {
+                    "emotion": "sadness",
+                    "intent": None,
+                    "language": lang,
+                    "sources": [],
+                    "kind": "crisis",
+                },
             )
             words = line.split(" ")
             for i in range(0, len(words), 3):
-                chunk = " ".join(words[i:i + 3])
+                chunk = " ".join(words[i : i + 3])
                 yield _sse("delta", {"text": chunk + (" " if i + 3 < len(words) else "")})
             text = {lang: line}
             if lang != "en":
                 text["en"] = safety.SUPPORTIVE_LINE["en"]
             yield _sse(
                 "done",
-                {"id": "a-" + uuid.uuid4().hex[:8], "role": "assistant",
-                 "emotion": "sadness", "time": _now(), "text": text, "kind": "crisis"},
+                {
+                    "id": "a-" + uuid.uuid4().hex[:8],
+                    "role": "assistant",
+                    "emotion": "sadness",
+                    "time": _now(),
+                    "text": text,
+                    "kind": "crisis",
+                },
             )
             asyncio.create_task(_notify_trusted_person(req.user_name, req.trusted_person_email))
             return
@@ -235,10 +336,9 @@ async def chat_ui(request: Request) -> StreamingResponse:
     for m in reversed(msgs):
         if m.get("role") == "user":
             parts = m.get("parts") or []
-            user_text = (
-                " ".join(p.get("text", "") for p in parts if p.get("type") == "text").strip()
-                or m.get("content", "")
-            )
+            user_text = " ".join(
+                p.get("text", "") for p in parts if p.get("type") == "text"
+            ).strip() or m.get("content", "")
             break
     if not user_text:
         raise HTTPException(status_code=400, detail="no user message")
@@ -261,11 +361,19 @@ async def chat_ui(request: Request) -> StreamingResponse:
             lang = crisis.lang_hint
             line = safety.SUPPORTIVE_LINE.get(lang, safety.SUPPORTIVE_LINE["en"])
             logger.info("crisis_gate", source="chat_ui", lang=lang, pattern=crisis.pattern[:40])
-            yield _ai({
-                "type": "data-meta", "id": "meta",
-                "data": {"emotion": "sadness", "intent": None, "language": lang,
-                         "sources": [], "kind": "crisis"},
-            })
+            yield _ai(
+                {
+                    "type": "data-meta",
+                    "id": "meta",
+                    "data": {
+                        "emotion": "sadness",
+                        "intent": None,
+                        "language": lang,
+                        "sources": [],
+                        "kind": "crisis",
+                    },
+                }
+            )
             yield _ai({"type": "text-start", "id": tid})
             yield _ai({"type": "text-delta", "id": tid, "delta": line})
             yield _ai({"type": "text-end", "id": tid})
@@ -283,16 +391,18 @@ async def chat_ui(request: Request) -> StreamingResponse:
         prior_lang = mem.get_prior_lang(session_id)
         history = mem.get_history(session_id)
         result = await orchestrator.analyze(user_text, session_lang=prior_lang)
-        yield _ai({
-            "type": "data-meta",
-            "id": "meta",
-            "data": {
-                "emotion": result.emotion,
-                "intent": result.intent,
-                "language": result.language,
-                "sources": result.sources,
-            },
-        })
+        yield _ai(
+            {
+                "type": "data-meta",
+                "id": "meta",
+                "data": {
+                    "emotion": result.emotion,
+                    "intent": result.intent,
+                    "language": result.language,
+                    "sources": result.sources,
+                },
+            }
+        )
 
         # The LLM picks a generative-UI widget (mental-health turns only), concurrently.
         widget_task = None

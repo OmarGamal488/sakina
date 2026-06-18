@@ -77,6 +77,11 @@ def get_classifier() -> IntentClassifier:
 
 if __name__ == "__main__":
     clf = get_classifier()
-    for q in ["hello there", "thanks so much", "I can't stop feeling anxious",
-              "what's the weather tomorrow?", "bye"]:
+    for q in [
+        "hello there",
+        "thanks so much",
+        "I can't stop feeling anxious",
+        "what's the weather tomorrow?",
+        "bye",
+    ]:
         print(f"[{clf.classify(q).intent:<32}] {q!r}")

@@ -54,6 +54,32 @@ your message
 scikit-learn, Qdrant, Redis, Lightning AI (`gpt-oss-120b`). **Frontend:** React 18,
 TypeScript, Vite, Tailwind, Vercel AI SDK. **Tooling:** `uv` workspace, `ruff`, `pytest`, `vitest`.
 
+## Model Comparison
+
+Each pipeline stage was chosen by benchmarking candidates on held-out data. The selected model is in **bold**.
+
+**Language detection** — three classifiers on shared TF-IDF `char_wb` n-gram features (20 languages):
+
+| Model | Test accuracy | Macro-F1 | Weakest language (`sw`) |
+|---|---|---|---|
+| Logistic Regression | 0.9953 | 0.9953 | 0.9661 |
+| Naive Bayes | 0.9950 | 0.9950 | 0.9680 |
+| **Calibrated LinearSVC** ✅ | **0.9959** | **0.9959** | **0.9708** |
+
+> LinearSVC wins on every metric; `CalibratedClassifierCV` also exposes `predict_proba` for the lingua fallback.
+
+**Emotion** — same DistilBERT classifier, varying the translation method (pooled macro-F1 across 20 languages, n=1200):
+
+| Method | Pooled macro-F1 |
+|---|---|
+| **NLLB-200-distilled-1.3B** ✅ | **0.8975** |
+| NLLB-200-distilled-600M | 0.8806 |
+| LLM `gpt-oss-120b` (translate) | 0.8759 |
+| LLM `gpt-oss-20b` (translate) | 0.7983 |
+| LLM `gpt-oss-20b` (direct, no translation) | 0.4919 |
+
+> NLLB-1.3B wins pooled (+1.7pp over 600M, better in 13/20 languages), is free/local, and costs 0 API calls. English-only test: accuracy 0.927, macro-F1 0.882.
+
 ## Installation
 
 **Prerequisites:** Python 3.11, [`uv`](https://docs.astral.sh/uv/), Node 18+, and accounts for
@@ -103,6 +129,71 @@ uv run jupyter lab     # open notebooks/01..04 and Run All
 ```bash
 cd demo && python3 -m http.server 8000   # http://localhost:8000
 ```
+
+## Deployment
+
+The backend API is deployed on **Hugging Face Spaces** (Docker runtime, HTTPS enabled):
+
+**Live API → https://HamzaHendy-sakina-api.hf.space**
+
+- Health check: [`/health`](https://HamzaHendy-sakina-api.hf.space/health)
+- Interactive docs: [`/docs`](https://HamzaHendy-sakina-api.hf.space/docs)
+
+The frontend ([forked from `ishraq-hassan/chatbot-frontend`](https://github.com/ishraq-hassan/chatbot-frontend)) is deployed on GitHub Pages and points at the API above:
+
+**Live frontend → https://hamza-hesham-hendy.github.io/chatbot-frontend/**
+
+The Docker image is also published to the GitHub Container Registry at `ghcr.io/omargamal488/sakina`.
+
+## CI/CD
+
+A GitHub Actions workflow ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs on every push to the **`mlops-final`** branch. (This repository hosts the original NLP project on `main` and the MLOps deliverable on `mlops-final`, so CI is scoped to the latter to avoid running against the NLP codebase.) The pipeline runs four sequential jobs:
+
+1. **Lint** — `ruff check` + `ruff format --check`
+2. **Test** — the full `pytest` suite (must pass)
+3. **Build & Push** — builds the Docker image and pushes it to GHCR
+4. **Deploy** — pushes the app to the Hugging Face Space (only runs if lint + tests pass)
+
+All actions are official/verified and pinned to stable versions.
+
+## Monitoring Metrics
+
+The API is instrumented with [OpenTelemetry](https://opentelemetry.io/) and exports metrics via OTLP to an OTel Collector, which forwards them to [Axiom](https://axiom.co/). Five instruments cover the three required categories:
+
+**Model / NLP**
+
+| Metric | Type | Why |
+|---|---|---|
+| `sakina.chat.requests` | Counter (by intent) | Tracks intent distribution — shows which intents are most common and flags model drift if the distribution shifts unexpectedly |
+| `sakina.chat.latency` | Histogram (ms) | End-to-end response latency — catches slowdowns in RAG retrieval or LLM generation before users notice |
+
+**Data**
+
+| Metric | Type | Why |
+|---|---|---|
+| `sakina.message.length` | Histogram (chars) | Input size distribution — very short messages may signal bot traffic; very long ones may expose edge cases in the pipeline |
+| `sakina.feedback.votes` | Counter (up / down) | Helpfulness ratio — direct user signal on response quality over time |
+
+**Server**
+
+| Metric | Type | Why |
+|---|---|---|
+| `sakina.http.errors` | Counter (by status code) | Error rate and reliability — 4xx/5xx spikes indicate broken clients or backend failures |
+
+## System Monitoring
+
+Metrics flow: **Sakina API → OTLP/gRPC (port 4317) → OTel Collector → Axiom**.
+
+Run the full observability stack locally:
+
+```bash
+# copy api/.env.example → api/.env and fill in AXIOM_TOKEN + AXIOM_DATASET
+docker compose up --build
+```
+
+Send traffic to `http://localhost:8000/chat` and watch metrics appear in your Axiom dataset.
+
+![Axiom Dashboard](docs/screenshots/axiom-dashboard.png)
 
 ## Team
 

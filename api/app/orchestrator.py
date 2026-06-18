@@ -28,10 +28,26 @@ from app.models import rag as rag_mod
 logger = structlog.get_logger(__name__)
 
 LANG_NAMES = {
-    "ar": "Arabic", "bg": "Bulgarian", "de": "German", "el": "Greek", "en": "English",
-    "es": "Spanish", "fr": "French", "hi": "Hindi", "it": "Italian", "ja": "Japanese",
-    "nl": "Dutch", "pl": "Polish", "pt": "Portuguese", "ru": "Russian", "sw": "Swahili",
-    "th": "Thai", "tr": "Turkish", "ur": "Urdu", "vi": "Vietnamese", "zh": "Chinese",
+    "ar": "Arabic",
+    "bg": "Bulgarian",
+    "de": "German",
+    "el": "Greek",
+    "en": "English",
+    "es": "Spanish",
+    "fr": "French",
+    "hi": "Hindi",
+    "it": "Italian",
+    "ja": "Japanese",
+    "nl": "Dutch",
+    "pl": "Polish",
+    "pt": "Portuguese",
+    "ru": "Russian",
+    "sw": "Swahili",
+    "th": "Thai",
+    "tr": "Turkish",
+    "ur": "Urdu",
+    "vi": "Vietnamese",
+    "zh": "Chinese",
 }
 
 _INTENT_GUIDANCE = {
@@ -98,16 +114,21 @@ def _localize_canned(intent: str, language: str) -> str:
             temperature=0.0,
             max_tokens=512,
             messages=[
-                {"role": "system", "content": (
-                    f"Translate the user's message into {lang_name}, preserving its warm, "
-                    "gentle tone. Output ONLY the translated message — no quotes, no notes."
-                )},
+                {
+                    "role": "system",
+                    "content": (
+                        f"Translate the user's message into {lang_name}, preserving its warm, "
+                        "gentle tone. Output ONLY the translated message — no quotes, no notes."
+                    ),
+                },
                 {"role": "user", "content": base},
             ],
         )
         reply = (r.choices[0].message.content or "").strip()
     except Exception as e:  # noqa: BLE001
-        logger.warning("canned_localize_llm_error", error=str(e)[:100], intent=intent, lang=language)
+        logger.warning(
+            "canned_localize_llm_error", error=str(e)[:100], intent=intent, lang=language
+        )
 
     if not reply:
         # LLM unavailable/empty → local NLLB (still localized, never English to a non-EN user).
@@ -131,7 +152,7 @@ class PipelineResult:
     language: str
     emotion: str
     intent: str | None
-    english_query: str = ""          # English version of the message (for grounding)
+    english_query: str = ""  # English version of the message (for grounding)
     sources: list[dict] = field(default_factory=list)
 
 
@@ -141,19 +162,41 @@ _llm: OpenAI | None = None
 def _get_llm() -> OpenAI:
     global _llm
     if _llm is None:
-        _llm = OpenAI(base_url=settings.lightning_base_url, api_key=settings.lightning_api_key)
+        # The OpenAI client refuses to construct with an empty api_key, which would
+        # crash startup / health on a keyless container (CI, fresh deploy). Pass a
+        # placeholder so it constructs; a real call still 401s clearly if the key is
+        # genuinely missing — but /health and boot stay green without secrets.
+        _llm = OpenAI(
+            base_url=settings.lightning_base_url,
+            api_key=settings.lightning_api_key or "missing-key",
+        )
     return _llm
 
 
 def warmup() -> None:
-    """Load all model singletons once (blocking).  Called from the app lifespan."""
+    """Warm the model singletons at startup.
+
+    Default (``WARMUP_HEAVY`` unset/false): load only the CHEAP, local-artifact
+    singletons (language detector + memory) so the container becomes healthy in
+    seconds without any API keys. The LLM client and the heavy HF models —
+    emotion+NLLB (~5 GB) and RAG
+    bge-m3+reranker (~4.6 GB) — stay lazy and load on the first request that needs
+    them. This keeps cold starts fast and the image small for free-tier hosting.
+
+    Set ``WARMUP_HEAVY=1`` to pre-load everything (useful locally / on a warm box).
+    """
+    import os
+
     language_id.get_detector()
-    emotion_mod.get_classifier()
-    intent_mod.get_classifier()
-    rag_mod.get_retriever()
     memory.get_memory()
-    _get_llm()
-    logger.info("orchestrator_warm")
+    if os.getenv("WARMUP_HEAVY", "").lower() in ("1", "true", "yes"):
+        _get_llm()
+        emotion_mod.get_classifier()
+        intent_mod.get_classifier()
+        rag_mod.get_retriever()
+        logger.info("orchestrator_warm", heavy=True)
+    else:
+        logger.info("orchestrator_warm", heavy=False)
 
 
 async def analyze(
@@ -194,12 +237,18 @@ async def analyze(
     emotion_label = emo.emotion if is_mh else "joy"
 
     logger.info(
-        "analyze", language=lang, emotion=emotion_label,
-        intent=intent_res.intent, n_sources=len(sources),
+        "analyze",
+        language=lang,
+        emotion=emotion_label,
+        intent=intent_res.intent,
+        n_sources=len(sources),
     )
     return PipelineResult(
-        language=lang, emotion=emotion_label, intent=intent_res.intent,
-        english_query=emo.translated_text, sources=sources,
+        language=lang,
+        emotion=emotion_label,
+        intent=intent_res.intent,
+        english_query=emo.translated_text,
+        sources=sources,
     )
 
 
@@ -207,7 +256,9 @@ def _compose_messages(
     message: str, result: PipelineResult, history: list[dict] | None = None
 ) -> list[dict]:
     lang_name = LANG_NAMES.get(result.language, "the user's language")
-    guidance = _INTENT_GUIDANCE.get(result.intent or "", _INTENT_GUIDANCE["asking_mental_health_question"])
+    guidance = _INTENT_GUIDANCE.get(
+        result.intent or "", _INTENT_GUIDANCE["asking_mental_health_question"]
+    )
     notes_block = ""
     if result.sources:
         notes = "\n".join(f"[{i + 1}] {s['text']}" for i, s in enumerate(result.sources))
@@ -249,7 +300,9 @@ async def stream_reply(
         def _call() -> str:
             try:
                 r = _get_llm().chat.completions.create(
-                    model=settings.lightning_model, temperature=0.6, max_tokens=400,
+                    model=settings.lightning_model,
+                    temperature=0.6,
+                    max_tokens=400,
                     messages=messages,
                 )
                 return (r.choices[0].message.content or "").strip() or _FALLBACK
@@ -260,7 +313,7 @@ async def stream_reply(
         reply = await run_in_threadpool(_call)
     words = reply.split(" ")
     for i in range(0, len(words), 3):
-        chunk = " ".join(words[i:i + 3])
+        chunk = " ".join(words[i : i + 3])
         yield chunk + (" " if i + 3 < len(words) else "")
 
 

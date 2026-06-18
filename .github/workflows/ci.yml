@@ -1,0 +1,147 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [mlops-final]
+  pull_request:
+    branches: [mlops-final]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Lint with ruff
+        run: uvx ruff@0.7.0 check --exclude notebooks/ .
+
+      - name: Check formatting with ruff
+        run: uvx ruff@0.7.0 format --check --exclude notebooks/ .
+
+  test:
+    name: Test
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen --all-packages --all-extras
+
+      - name: Run unit tests
+        run: uv run pytest api/tests/ -v
+
+  docker:
+    name: Build & Push Docker Image
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/mlops-final' }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to Hugging Face Spaces
+    needs: docker
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/mlops-final'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Push to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE: ${{ secrets.HF_SPACE }}
+        run: |
+          if [ -z "$HF_TOKEN" ] || [ -z "$HF_SPACE" ]; then
+            echo "HF_TOKEN or HF_SPACE secret not set — skipping deploy."
+            exit 0
+          fi
+
+          # HF Docker Spaces are configured via YAML frontmatter in the Space's
+          # README. Build it here so HF knows to build the Dockerfile and route
+          # to port 8000.
+          cat > hf_readme.md <<'EOF'
+          ---
+          title: Sakina API
+          emoji: 🧠
+          colorFrom: indigo
+          colorTo: purple
+          sdk: docker
+          app_port: 8000
+          pinned: false
+          ---
+
+          EOF
+          cat README.md >> hf_readme.md
+
+          # Assemble a MINIMAL Space repo — only the files the Dockerfile builds
+          # from. This keeps the Space lean and, crucially, avoids pushing the
+          # presentation/frontend binaries that HF's hub rejects. The only
+          # binary artifacts left (bm25_index.pkl, lang_id.joblib) go into LFS.
+          SPACE_DIR="$RUNNER_TEMP/space"
+          rm -rf "$SPACE_DIR"
+          mkdir -p "$SPACE_DIR/api"
+          cp Dockerfile .dockerignore pyproject.toml uv.lock "$SPACE_DIR/"
+          cp hf_readme.md "$SPACE_DIR/README.md"
+          cp api/pyproject.toml "$SPACE_DIR/api/"
+          cp -r api/app "$SPACE_DIR/api/app"
+
+          cd "$SPACE_DIR"
+          git init -q
+          git lfs install --local
+          git lfs track "*.joblib" "*.pkl"
+          git config user.email "ci@github.com"
+          git config user.name "GitHub Actions"
+          git add .gitattributes
+          git add -A
+          git commit -q -m "deploy from GitHub Actions"
+          git branch -M main
+
+          # Username for HF git auth is the Space namespace (token owner).
+          HF_USER="${HF_SPACE%%/*}"
+          git push --force https://${HF_USER}:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE} main

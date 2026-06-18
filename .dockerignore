@@ -1,0 +1,45 @@
+# Keep the build context (and final image) lean — exclude everything the API
+# does not need at runtime. A small context also makes builds faster.
+
+# VCS + tooling
+.git
+.github
+.gitignore
+.pre-commit-config.yaml
+
+# Local Python / virtualenv / caches
+.venv
+**/.venv
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.ruff_cache
+.mypy_cache
+
+# Large local model downloads (re-fetched at runtime if needed)
+downloaded_models/
+**/downloaded_models/
+
+# Not part of the backend image
+frontend/
+demo/
+preview/
+preview-vercel/
+presentation/
+notebooks/
+
+# Tests are committed to the repo but not needed in the runtime image
+api/tests/
+api/conftest.py
+
+# Docs / misc
+*.md
+!api/README.md
+*.pdf
+LICENSE
+start.sh
+
+# Env files — never bake secrets into an image
+**/.env
+**/.env.*
+!**/.env.example

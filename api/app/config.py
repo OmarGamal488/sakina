@@ -47,6 +47,12 @@ class Settings(BaseSettings):
     # --- Hugging Face ─────────────────────────────────────────────────────────
     hf_token: str = ""
 
+    # --- OpenTelemetry → Collector → Axiom ---
+    # OTLP/gRPC endpoint of the Collector. Empty → telemetry no-ops (local/CI/tests).
+    otel_exporter_otlp_endpoint: str = ""
+    otel_service_name: str = "sakina-api"
+    otel_metric_export_interval_ms: int = 15000  # how often metrics flush to the Collector
+
     # comma-separated str (pydantic-settings JSON-decodes list fields, tripping on plain values)
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
     model_cache_dir: Path = _REPO_ROOT / "downloaded_models"
@@ -63,9 +69,7 @@ class Settings(BaseSettings):
     crisis_en_number: str = "988"
     crisis_en_text: str = "Text HOME to 741741"
     crisis_ar_number: str = "8001717"  # TODO: verify regional AR crisis line
-    crisis_help_webhook_url: str = (
-        "https://ahmedgamal7207.app.n8n.cloud/webhook/letter-forward"
-    )
+    crisis_help_webhook_url: str = "https://ahmedgamal7207.app.n8n.cloud/webhook/letter-forward"
 
     @property
     def artifacts_dir(self) -> Path:
