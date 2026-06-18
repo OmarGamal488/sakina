@@ -67,11 +67,15 @@ def setup_telemetry() -> bool:
             OTLPMetricExporter as HTTPMetricExporter,
         )
 
+        # NB: Axiom's OTLP *metrics* endpoint routes by the X-Axiom-Metrics-Dataset
+        # header (logs/traces use X-Axiom-Dataset). Using the wrong header makes
+        # Axiom reject the batch with a 404. The exporter appends /v1/metrics to
+        # the base endpoint, giving https://api.axiom.co/v1/metrics.
         exporter = HTTPMetricExporter(
             endpoint="https://api.axiom.co",
             headers={
                 "Authorization": f"Bearer {axiom_token}",
-                "X-Axiom-Dataset": axiom_dataset,
+                "X-Axiom-Metrics-Dataset": axiom_dataset,
             },
         )
         _enabled = True
