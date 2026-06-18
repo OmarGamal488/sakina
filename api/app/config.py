@@ -57,6 +57,8 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
     model_cache_dir: Path = _REPO_ROOT / "downloaded_models"
 
+    use_reranker: bool = False
+
     # --- Redis (conversation memory + cache) ---
     redis_url: str = ""  # empty OR unreachable → in-process fallback
     memory_max_turns: int = 8
